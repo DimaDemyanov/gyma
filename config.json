@@ -1,0 +1,42 @@
+{
+  "profiles": [
+    {
+      "name": "local",
+      "server_host" : "127.0.0.1:4201",
+      "swagger_port" : "8081",
+      "api_port" : "4201",
+      "vdv_db": {
+        "host": "localhost",
+        "port": 1521,
+        "sid": "vdv",
+        "user": "VDV",
+        "password": "vdv",
+        "direct": null
+      },
+      "oidc": {
+        "client_id": "vdv",
+        "client_secret": "",
+        "realm": "http://GOOOGLE"
+      }
+    },
+    {
+      "name": "dev",
+      "server_host" : "127.0.0.1:4201",
+      "swagger_port" : "8081",
+      "api_port" : "4201",
+      "vdv_db": {
+        "host": "localhost",
+        "port": 1521,
+        "sid": "vdv",
+        "user": "VDV",
+        "password": "vdv",
+        "direct": null
+      },
+      "oidc": {
+        "client_id": "vdv",
+        "client_secret": "",
+        "realm": "http://GOOOGLE"
+      }
+    }
+  ]
+}
