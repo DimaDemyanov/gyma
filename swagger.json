@@ -24,6 +24,22 @@
       }
     },
     {
+      "name": "user_user",
+      "description": "Everything about user followers and following",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "user_court",
+      "description": "Everything about user and courts relations",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
       "name": "media",
       "description": "Everything about medias",
       "externalDocs": {
@@ -36,6 +52,7 @@
     "http"
   ],
   "paths": {
+
     "/initDatabase": {
       "post": {
         "summary": "Initialize VDV database",
@@ -220,7 +237,7 @@
         ]
       }
     },
-    "/catalog/{courtId}": {
+    "/court/{courtId}": {
       "get": {
         "tags": [
           "court"
@@ -302,6 +319,800 @@
           }
         ]
       }
+    },
+    "/user": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Create a new user",
+        "description": "",
+        "operationId": "createUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_user",
+            "in": "body",
+            "description": "User encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Name already taken"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Update existing catalog info",
+        "description": "",
+        "operationId": "updateUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_user",
+            "in": "body",
+            "description": "User encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Court"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/user/all": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get all users",
+        "description": "Returns a list of courts descriptions",
+        "operationId": "getAllUsers",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/user/{userId}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Find user by ID",
+        "description": "Returns a user description",
+        "operationId": "getUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Remove court",
+        "description": "",
+        "operationId": "deleteUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User id to unlink",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "hard",
+            "in": "query",
+            "description": "Hard-delete (no undo)",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/user/{userId}/following/all": {
+      "get": {
+        "tags": [
+          "user_user"
+        ],
+        "summary": "Find followings of user by ID",
+        "description": "Returns a list of user followings",
+        "operationId": "getUserFollowingsList",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/user/{userId}/following/{followingId}": {
+      "post": {
+        "tags": [
+          "user_user"
+        ],
+        "summary": "Follow",
+        "description": "",
+        "operationId": "userAddFollowing",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to attach",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "followingId",
+            "in": "path",
+            "description": "ID of following to link",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "user_user"
+        ],
+        "summary": "Unfollow",
+        "description": "",
+        "operationId": "userDelFollowing",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to detach",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "followingId",
+            "in": "path",
+            "description": "ID of following to unlink",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "405": {
+            "description": "Following not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/user/{userId}/follower/all": {
+      "get": {
+        "tags": [
+          "user_user"
+        ],
+        "summary": "Find followers of user by ID",
+        "description": "Returns a list of user followers",
+        "operationId": "getUserFollowersList",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/user/{userId}/follower/request": {
+      "get": {
+        "tags": [
+          "user_user"
+        ],
+        "summary": "Get followers that requesting following",
+        "description": "Returns a list of user possible followers",
+        "operationId": "getUserFollowersRequestList",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/user/{userId}/follower/request/{followerId}": {
+      "delete": {
+        "tags": [
+          "user_user"
+        ],
+        "summary": "Accept or deny request",
+        "description": "",
+        "operationId": "userResolveFollowerRequest",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to solve",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "followerId",
+            "in": "path",
+            "description": "ID of following to possible follow",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "accept",
+            "in": "query",
+            "description": "will the follower be accepted?",
+            "required": true,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "405": {
+            "description": "Follower not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/user/{userId}/court/all": {
+      "get": {
+        "tags": [
+          "user_court"
+        ],
+        "summary": "Find court by ID",
+        "description": "Returns a user court list",
+        "operationId": "getUserCourts",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to proceed",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Court"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/user/{userId}/court/{courtId}": {
+      "post": {
+        "tags": [
+          "user_court"
+        ],
+        "summary": "Add a court",
+        "description": "",
+        "operationId": "userAddCourt",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to attach",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "courtId",
+            "in": "path",
+            "description": "ID of following to link",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "user_court"
+        ],
+        "summary": "Delete court from user list",
+        "description": "",
+        "operationId": "userDelCourt",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user to attach",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "courtId",
+            "in": "path",
+            "description": "ID of following to link",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "405": {
+            "description": "Court not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/media": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Create a new media item",
+        "description": "",
+        "operationId": "createMedia",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_media",
+            "in": "body",
+            "description": "Media encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Media"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "court"
+        ],
+        "summary": "Update existing catalog info",
+        "description": "",
+        "operationId": "updateCourt",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_court",
+            "in": "body",
+            "description": "Court encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Court"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Court not found"
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/media/{ownerID}/all": {
+      "get": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Get all courts",
+        "description": "Returns a list of owners media descriptors",
+        "operationId": "getAllOwnerMedias",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/media/{mediaId}": {
+      "get": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Get media by ID",
+        "description": "Returns a media item",
+        "operationId": "getMedia",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "courtId",
+            "in": "path",
+            "description": "ID of court to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Court"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Court not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Remove media item",
+        "description": "",
+        "operationId": "deleteMedia",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "mediaId",
+            "in": "path",
+            "description": "Court id to unlink",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Media not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
     }
   },
   "securityDefinitions": {
@@ -346,6 +1157,38 @@
         }
       }
     },
+    "Media": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "type": {
+          "type": "string",
+          "example": "enum: [image, video, text]"
+        },
+        "storage": {
+          "type": "string",
+          "example": "enum: [internal, external]"
+        },
+        "url": {
+          "type": "string",
+          "example": "https://youtube.com/supervideo/542341"
+        },
+        "date_added": {
+          "type": "string",
+          "example": "Thu Apr 27 19:28:32 2017"
+        },
+        "date_modified": {
+          "type": "string",
+          "example": "Thu Apr 27 19:28:32 2017"
+        }
+      }
+    },
     "Court": {
       "type": "object",
       "required": [
@@ -371,6 +1214,10 @@
         "location": {
           "type": "string",
           "example": "39'12312''1231;61'12312''13123"
+        },
+        "media": {
+          "type": "string",
+          "example": "[media_id1, media_id2, ...]"
         },
         "date_added": {
           "type": "string",

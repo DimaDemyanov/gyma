@@ -119,7 +119,7 @@ def httpDefault(**request_handler_args):
 
 def getVersion(**request_handler_args):
     resp = request_handler_args['resp']
-    resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_501
     with open("VERSION") as f:
         resp.body = json.dumps({"version": f.read()})
 
@@ -129,18 +129,18 @@ def initDatabase(**request_handler_args):
     #with DBConnection() as db:
     #    db.init()
 
-    resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_501
 
 def cleanupDatabase(**request_handler_args):
     resp = request_handler_args['resp']
     #with DBConnection() as db:
     #    db.Cleanup()
 
-    resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_501
 
 def getAllCourts(**request_handler_args):
     resp = request_handler_args['resp']
-    resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_501
     resp.body = json.dumps("Not implemented")
 
 def getCourtById(**request_handler_args):
@@ -156,7 +156,7 @@ def getCourtById(**request_handler_args):
     #    resp.status = falcon.HTTP_404
     #    return
 
-    resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_501
     resp.body = json.dumps("Not implemented")
 
 def createCourt(**request_handler_args):
@@ -180,7 +180,7 @@ def createCourt(**request_handler_args):
     #if id:
     #    c = Court.GetCourtJSON(id)
     #    if c:
-    #        resp.status = falcon.HTTP_200
+    #        resp.status = falcon.HTTP_501
     #        resp.body = c
     #        return
 
@@ -206,7 +206,7 @@ def updateCourt(**request_handler_args):
     #    return
 
     #Court.UpdateCourt(params)
-    resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_501
 
 def deleteCourt(**request_handler_args):
     req = request_handler_args['req']
@@ -225,7 +225,115 @@ def deleteCourt(**request_handler_args):
     #    return
 
     #Court.RemoveCourt(id, hard)
-    resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_501
+
+def createUser(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def updateUser(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def getAllUsers(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def getUserById(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def deleteUser(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def getUserFollowingsList(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def userAddFollowing(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def userDelFollowing(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def getUserFollowersList(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def getUserFollowersRequestList(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def userResolveFollowerRequest(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def getUserCourts(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def userAddCourt(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def userDelCourt(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def createMedia(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def getAllOwnerMedias(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def getMedia(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def deleteMedia(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
 
 operation_handlers = {
     'initDatabase':    [initDatabase],
@@ -239,6 +347,29 @@ operation_handlers = {
     'createCourt':            [createCourt],
     'updateCourt':            [updateCourt],
     'deleteCourt':            [deleteCourt],
+
+    #User methods
+    'createUser':             [createUser],
+    'updateUser':             [updateUser],
+    'getAllUsers':            [getAllUsers],
+    'getUser':                [getUserById],
+    'deleteUser':             [deleteUser],
+    'getUserFollowingsList':        [getUserFollowingsList],
+    'userAddFollowing':             [userAddFollowing],
+    'userDelFollowing':             [userDelFollowing],
+    'getUserFollowersList':         [getUserFollowersList],
+    'getUserFollowersRequestList':  [getUserFollowersRequestList],
+    'userResolveFollowerRequest':   [userResolveFollowerRequest],
+    'getUserCourts':                [getUserCourts],
+    'userAddCourt':                 [userAddCourt],
+    'userDelCourt':                 [userDelCourt],
+
+    #Media methods
+    'createMedia':            [createMedia],
+    'getAllOwnerMedias':      [getAllOwnerMedias],
+    'getMedia':               [getMedia],
+    'deleteMedia':            [deleteMedia],
+
 }
 
 class CORS(object):
