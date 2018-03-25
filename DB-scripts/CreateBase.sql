@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS "vdv_court";
 CREATE TABLE "vdv_court" (
 	"courtid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"name" VARCHAR(256) NOT NULL UNIQUE,
@@ -13,6 +14,7 @@ CREATE TABLE "vdv_court" (
 
 
 
+DROP TABLE IF EXISTS "vdv_user";
 CREATE TABLE "vdv_user" (
 	"userid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"username" VARCHAR(256) NOT NULL UNIQUE,
@@ -27,6 +29,7 @@ CREATE TABLE "vdv_user" (
 
 
 
+DROP TABLE IF EXISTS "vdv_media";
 CREATE TABLE "vdv_media" (
 	"mediaid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"ownerid" BIGINT NOT NULL,
@@ -40,6 +43,7 @@ CREATE TABLE "vdv_media" (
 
 
 
+DROP TABLE IF EXISTS "vdv_court_follower";
 CREATE TABLE "vdv_court_follower" (
 	"courtid" BIGINT NOT NULL,
 	"userid" BIGINT NOT NULL,
@@ -51,6 +55,7 @@ CREATE TABLE "vdv_court_follower" (
 
 
 
+DROP TABLE IF EXISTS "vdv_user_follower";
 CREATE TABLE "vdv_user_follower" (
 	"userid" BIGINT NOT NULL,
 	"followerid" BIGINT NOT NULL,
@@ -62,6 +67,7 @@ CREATE TABLE "vdv_user_follower" (
 
 
 
+DROP TABLE IF EXISTS "vdv_location";
 CREATE TABLE "vdv_location" (
 	"locid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"GPS" POINT NOT NULL
@@ -71,6 +77,7 @@ CREATE TABLE "vdv_location" (
 
 
 
+DROP TABLE IF EXISTS "vdv_court_prop";
 CREATE TABLE "vdv_court_prop" (
 	"propid" BIGSERIAL NOT NULL,
 	"name" VARCHAR(40) NOT NULL UNIQUE,
@@ -81,6 +88,7 @@ CREATE TABLE "vdv_court_prop" (
 
 
 
+DROP TABLE IF EXISTS "vdv_court_prop_bool";
 CREATE TABLE "vdv_court_prop_bool" (
 	"courtid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
@@ -91,6 +99,7 @@ CREATE TABLE "vdv_court_prop_bool" (
 
 
 
+DROP TABLE IF EXISTS "vdv_court_prop_numeric";
 CREATE TABLE "vdv_court_prop_numeric" (
 	"propid" BIGSERIAL NOT NULL,
 	"value" NUMERIC(20) NOT NULL,
@@ -101,6 +110,7 @@ CREATE TABLE "vdv_court_prop_numeric" (
 
 
 
+DROP TABLE IF EXISTS "vdv_court_prop_media";
 CREATE TABLE "vdv_court_prop_media" (
 	"courtid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
@@ -111,6 +121,7 @@ CREATE TABLE "vdv_court_prop_media" (
 
 
 
+DROP TABLE IF EXISTS "vdv_court_prop_comment";
 CREATE TABLE "vdv_court_prop_comment" (
 	"courtid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
@@ -121,6 +132,7 @@ CREATE TABLE "vdv_court_prop_comment" (
 
 
 
+DROP TABLE IF EXISTS "vdv_post";
 CREATE TABLE "vdv_post" (
 	"postid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"userid" BIGINT NOT NULL,
@@ -132,6 +144,7 @@ CREATE TABLE "vdv_post" (
 
 
 
+DROP TABLE IF EXISTS "vdv_comment";
 CREATE TABLE "vdv_comment" (
 	"commentid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"userid" BIGINT NOT NULL,
@@ -143,6 +156,7 @@ CREATE TABLE "vdv_comment" (
 
 
 
+DROP TABLE IF EXISTS "vdv_post_prop";
 CREATE TABLE "vdv_post_prop" (
 	"propid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"name" VARCHAR(40) NOT NULL UNIQUE,
@@ -153,6 +167,7 @@ CREATE TABLE "vdv_post_prop" (
 
 
 
+DROP TABLE IF EXISTS "vdv_like";
 CREATE TABLE "vdv_like" (
 	"likeid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"userid" BIGINT NOT NULL,
@@ -163,6 +178,7 @@ CREATE TABLE "vdv_like" (
 
 
 
+DROP TABLE IF EXISTS "vdv_court_prop_like";
 CREATE TABLE "vdv_court_prop_like" (
 	"courtid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
@@ -173,6 +189,7 @@ CREATE TABLE "vdv_court_prop_like" (
 
 
 
+DROP TABLE IF EXISTS "vdv_post_like";
 CREATE TABLE "vdv_post_like" (
 	"postid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
@@ -183,6 +200,7 @@ CREATE TABLE "vdv_post_like" (
 
 
 
+DROP TABLE IF EXISTS "vdv_post_media";
 CREATE TABLE "vdv_post_media" (
 	"postid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
@@ -193,6 +211,7 @@ CREATE TABLE "vdv_post_media" (
 
 
 
+DROP TABLE IF EXISTS "vdv_post_comment";
 CREATE TABLE "vdv_post_comment" (
 	"postid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
