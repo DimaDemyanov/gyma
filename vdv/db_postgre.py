@@ -174,18 +174,16 @@ class PostgreSQLPoolConnections:
         if conn is PostgreSQLConnection:
             self.__release_postgresql_connection(conn)
 
-
-s_dbParams = {
-    'host': 'localhost',
-    'port': 5432,
-    'sid': 'vdv',
-    'user': 'vdv_admin',
-    'password': "asdfghjkl;'",
-    'database': 'VDV',
-    'direct': None
-}
-
 # Exmple
+# s_dbParams = {
+#     'host': 'localhost',
+#     'port': 5432,
+#     'sid': 'vdv',
+#     'user': 'vdv_admin',
+#     'password': "asdfghjkl;'",
+#     'database': 'VDV',
+#     'direct': None
+# }
 # async def run():
 #     m = await PostgreSQLPoolConnections.create(**s_dbParams)
 #     conn = await m.open_connection()
