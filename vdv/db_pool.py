@@ -1,15 +1,17 @@
 import time
 import concurrent.futures as ftr
-import cx_Oracle
+from psycopg2 import pool
 
-class DBSessionPool(cx_Oracle.SessionPool):
+
+class DBSessionPool(pool.ThreadedConnectionPool):
     s_executor = ftr.ThreadPoolExecutor(max_workers=1)
 
     def __acquire(self):
-        while self.busy == self.max:
-            time.sleep(1)
-        return super().acquire()
+        return super().getconn()
 
     def acquire(self):
         f = self.s_executor.submit(self.__acquire)
         return f.result()
+
+    def release(self, conn):
+        conn.close()

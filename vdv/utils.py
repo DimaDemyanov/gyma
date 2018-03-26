@@ -1,7 +1,6 @@
 import os
 import logging
 import datetime
-import cx_Oracle
 import argparse
 import base64
 import requests
@@ -21,15 +20,13 @@ def batch(iterable, batch_size):
         yield b
 
 
-def ReadEntireLobs(entire_tuple):
-    result = []
-    for item in entire_tuple:
-        if isinstance(item, cx_Oracle.LOB):
-            item = item.read()
-
-        result.append(item)
-
-    return tuple(result)
+# def ReadEntireLobs(entire_tuple):
+#     result = []
+#     for item in entire_tuple:
+#         if isinstance(item, cx_Oracle.LOB):
+#             item = item.read()
+#         result.append(item)
+#     return tuple(result)
 
 def GetAuthProfile(jso, profile_name="local", args=None):
     ret = None
