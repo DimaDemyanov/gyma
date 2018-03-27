@@ -1,6 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, Date
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, String, Integer, Boolean, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
 import datetime
@@ -11,7 +9,7 @@ Base = declarative_base()
 class Court(Base):
     __tablename__ = 'vdv_court'
 
-    courtid = Column(Integer, primary_key=True)
+    courtid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     name = Column(String)
     desc = Column(String)
     location = Column(Integer)
@@ -20,12 +18,11 @@ class Court(Base):
     created = Column(Date)
     updated = Column(Date)
 
-    def __init__(self, id, name, desc, location, address, private):
-        self.courtid = id
+    def __init__(self, name, desc, location, address, private):
         self.name = name
         self.desc = desc
         self.location = location
         self.address = address
         self.private = private
         ts = time.time()
-        self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
