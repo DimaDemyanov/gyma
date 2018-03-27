@@ -4,6 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 import datetime
 import time
 
+from vdv.db import DBConnection
+
 Base = declarative_base()
 
 class Court(Base):
@@ -26,3 +28,13 @@ class Court(Base):
         self.private = private
         ts = time.time()
         self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
+
+    def add(self):
+        with DBConnection() as session:
+            session.db.add(self)
+            session.db.commit()
+
+    @staticmethod
+    def get():
+        with DBConnection() as session:
+            return session.db.query(Court)

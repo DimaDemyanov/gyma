@@ -460,12 +460,9 @@ with open('swagger_temp.json') as f:
 from vdv.Court import Court
 
 
-with DBConnection() as session:
-    #new_court = Court("IamExclusive", "desc",  10, "", True)
-    #session.db.add(new_court)
-    session.db.commit()
-    res = session.db.query(Court)
-    print(res.all()[0].created)
+#Court("IamExclusive", "desc",  10, "", True)
+
+print(Court.get().all()[0].created)
 
 
 api.add_sink(server, r'/')
