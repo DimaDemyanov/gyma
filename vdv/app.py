@@ -14,6 +14,7 @@ from collections import OrderedDict
 from vdv.serve_swagger import SpecServer
 from vdv import auth
 from vdv import utils
+
 from vdv.db import DBConnection
 
 def stringToBool(str):
@@ -430,8 +431,7 @@ profile = args.profile
 # configure
 with open(cfgPath) as f:
     cfg = utils.GetAuthProfile(json.load(f), profile, args)
-    #if 'vdv_db' in cfg:
-        #db.DBConnection.configure(**cfg['vdv_db'])
+    DBConnection.configure(**cfg['vdv_db'])
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
@@ -456,5 +456,16 @@ if 'server_host' in cfg:
 with open('swagger_temp.json') as f:
     server.load_spec_swagger(f.read())
 
+
+from vdv.Court import Court
+
+
+session0 = DBConnection()
+res = session0.db.query(Court)
+print(res.all()[2].created)
+
+session1 = DBConnection()
+res = session1.db.query(Court)
+print(res.all()[1].created)
 
 api.add_sink(server, r'/')

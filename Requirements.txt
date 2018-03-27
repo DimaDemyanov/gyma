@@ -2,5 +2,6 @@ waitress
 requests
 falcon
 jose
-asyncio
-asyncpg
+psycopg2
+sqlalchemy
+base

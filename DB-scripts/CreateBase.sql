@@ -1,3 +1,6 @@
+DROP SEQUENCE vdv_seq;
+create SEQUENCE vdv_seq start with 1 increment by 1 cache 128;
+
 DROP TABLE IF EXISTS "vdv_court";
 CREATE TABLE "vdv_court" (
 	"courtid" BIGSERIAL NOT NULL PRIMARY KEY ,
