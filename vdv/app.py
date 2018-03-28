@@ -14,7 +14,7 @@ from falcon_multipart.middleware import MultipartMiddleware
 from collections import OrderedDict
 
 from vdv.serve_swagger import SpecServer
-from vdv import auth
+from vdv.auth import auth
 from vdv import utils
 
 from vdv.db import DBConnection
@@ -555,7 +555,7 @@ class Auth(object):
 
         error = 'Authorization required.'
         if token:
-            error, res = auth.Validate(token)
+            error, res = auth.Validate(token, auth.PROVIDER.GOOGLE)
             if not error:
                 return # passed access token is valid
 
@@ -575,7 +575,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS()])#, Auth()])
+wsgi_app = api = falcon.API(middleware=[CORS(), Auth()])
 
 server = SpecServer(operation_handlers=operation_handlers)
 

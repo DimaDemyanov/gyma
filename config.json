@@ -37,6 +37,25 @@
         "client_secret": "",
         "realm": "http://GOOOGLE"
       }
+    },
+    {
+      "name": "elephant",
+      "server_host" : "127.0.0.1:4201",
+      "swagger_port" : "8081",
+      "api_port" : "4201",
+      "vdv_db": {
+        "host": "postgres://wjcjjdvt:XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF@horton.elephantsql.com",
+        "port": 5432,
+        "sid": "wjcjjdvt",
+        "user": "wjcjjdvt",
+        "password": "XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF",
+        "direct": null
+      },
+      "oidc": {
+        "client_id": "166547794862-9vo9er4t53ji8p2mifh725del75899pa.apps.googleusercontent.com",
+        "client_secret": "52VuMRfSb3LyhpmIYPkbQLL2",
+        "realm": "http://GOOOGLE"
+      }
     }
   ]
 }
