@@ -4,6 +4,9 @@ create SEQUENCE vdv_seq start with 1 increment by 1;
 DROP TYPE IF EXISTS vdv_prop_type CASCADE;
 CREATE TYPE vdv_prop_type AS ENUM ('bool', 'numeric', 'media', 'comment', 'like');
 
+DROP TYPE IF EXISTS vdv_media_type CASCADE;
+CREATE TYPE vdv_media_type AS ENUM ('image');
+
 DROP TABLE IF EXISTS "vdv_court";
 CREATE TABLE "vdv_court" (
 	"courtid" BIGSERIAL NOT NULL PRIMARY KEY ,
@@ -38,10 +41,9 @@ DROP TABLE IF EXISTS "vdv_media";
 CREATE TABLE "vdv_media" (
 	"mediaid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"ownerid" BIGINT NOT NULL,
-	"type" int NOT NULL,
-	"url" VARCHAR(256) NOT NULL UNIQUE,
-	"created" TIMESTAMP WITH TIME ZONE NOT NULL,
-	"updated" TIMESTAMP WITH TIME ZONE NOT NULL
+	"type" vdv_media_type NOT NULL,
+	"url" VARCHAR(4000) NOT NULL UNIQUE,
+	"created" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (
   OIDS=FALSE
 );

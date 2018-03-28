@@ -5,3 +5,7 @@ jose
 psycopg2
 sqlalchemy
 base
+scipy
+scikit-image
+matplotlib
+falcon-multipart

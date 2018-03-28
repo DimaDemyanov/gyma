@@ -945,20 +945,18 @@
         "description": "",
         "operationId": "createMedia",
         "consumes": [
-          "application/json"
+          "multipart/form-data"
         ],
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "new_media",
-            "in": "body",
-            "description": "Media encoded in JSON string",
+            "name": "file",
+            "in": "formData",
+            "description": "File contents (Possible to use multiple files, up to 10)",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/Media"
-            }
+            "type": "file"
           }
         ],
         "responses": {
@@ -1020,7 +1018,7 @@
         ]
       }
     },
-    "/media/{ownerID}/all": {
+    "/media/{ownerId}/all": {
       "get": {
         "tags": [
           "media"
@@ -1030,6 +1028,16 @@
         "operationId": "getAllOwnerMedias",
         "produces": [
           "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "description": "ID of court to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
         ],
         "responses": {
           "200": {
@@ -1059,7 +1067,7 @@
         ],
         "parameters": [
           {
-            "name": "courtId",
+            "name": "mediaId",
             "in": "path",
             "description": "ID of court to return",
             "required": true,

@@ -9,6 +9,8 @@ import threading
 import json
 import base64
 import falcon
+from falcon_multipart.middleware import MultipartMiddleware
+
 from collections import OrderedDict
 
 from vdv.serve_swagger import SpecServer
@@ -19,6 +21,9 @@ from vdv.db import DBConnection
 
 from vdv.Court import Court
 from vdv.Location import Location
+from vdv.Media import Media
+
+from vdv.MediaResolverFactory import MediaResolverFactory
 
 def stringToBool(str):
     # empty string is included because we allow empty-valued flags in query
@@ -319,25 +324,77 @@ def createMedia(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    query_body = req.stream.read()
+    boundary = '--' + req.env['CONTENT_TYPE'].partition('=')[2]
+
+    data_parts = query_body.split(boundary.encode())
+
+    results = []
+    for key in req._params.keys():
+        data = req.get_param(key)
+        try:
+            resolver = MediaResolverFactory.produce(data.type.split('/')[0], data.file.read())
+            resolver.Resolve()
+
+            #TODO:NO NULL HERE AS OWNER
+            id = Media(0, resolver.type, resolver.url).add()
+            if id:
+                results.append(id)
+        except Exception as e:
+            resp.status = falcon.HTTP_400
+            resp.body = json.dumps("Media uploading error\nException::\n" + str(e), 2, 2)
+
+    resp.body = json.dumps(results, 2, 2)
+    resp.status = falcon.HTTP_200
 
 def getAllOwnerMedias(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    id = getIntPathParam('ownerId', **request_handler_args)
+    res = []
+
+    objects = Media.get().filter_by(ownerid=id).all()
+    if len(objects):
+        res = [o.to_dict() for o in objects]
+
+    resp.status = falcon.HTTP_200
+    resp.body = json.dumps(res, 2, 2)
+
 
 def getMedia(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    id = getIntPathParam('mediaId', **request_handler_args)
+    res = []
+
+    objects = Media.get().filter_by(mediaid=id).all()
+    if len(objects):
+        res = [o.to_dict() for o in objects]
+
+    resp.status = falcon.HTTP_200
+    resp.body = json.dumps(res, 2, 2)
 
 def deleteMedia(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    id = getIntPathParam('mediaId', **request_handler_args)
+
+    if id:
+        try:
+            Media.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
+
+        object = Media.get().filter_by(mediaid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
 
 def createLocation(**request_handler_args):
     req = request_handler_args['req']
@@ -518,7 +575,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS()])#, Auth()])
+wsgi_app = api = falcon.API(middleware=[CORS(), MultipartMiddleware()])#, Auth()])
 
 server = SpecServer(operation_handlers=operation_handlers)
 
@@ -538,13 +595,5 @@ if 'server_host' in cfg:
 
 with open('swagger_temp.json') as f:
     server.load_spec_swagger(f.read())
-
-
-
-#Location.delete(7)
-
-
-#print(Court.get().all()[0].created)
-
 
 api.add_sink(server, r'/')
