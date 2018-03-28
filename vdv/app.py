@@ -336,6 +336,24 @@ def deleteMedia(**request_handler_args):
 
     resp.status = falcon.HTTP_501
 
+def createLocation(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def getLocationById(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+def deleteLocation(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
 operation_handlers = {
     'initDatabase':    [initDatabase],
     'cleanupDatabase': [cleanupDatabase],
@@ -371,6 +389,10 @@ operation_handlers = {
     'getMedia':               [getMedia],
     'deleteMedia':            [deleteMedia],
 
+    #Location methods
+    'createLocation':         [createLocation],
+    'getLocationById':        [getLocationById],
+    'deleteLocation':         [deleteLocation],
 }
 
 class CORS(object):
@@ -462,7 +484,7 @@ from vdv.Court import Court
 
 #Court("IamExclusive", "desc",  10, "", True)
 
-print(Court.get().all()[0].created)
+#print(Court.get().all()[0].created)
 
 
 api.add_sink(server, r'/')
