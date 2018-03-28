@@ -575,7 +575,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), MultipartMiddleware()])#, Auth()])
+wsgi_app = api = falcon.API(middleware=[CORS()])#, Auth()])
 
 server = SpecServer(operation_handlers=operation_handlers)
 
