@@ -1285,7 +1285,10 @@
       "flow": "accessCode",
       "authorizationUrl": "https://accounts.google.com/o/oauth2/auth",
       "tokenUrl": "https://accounts.google.com/o/oauth2/token",
-      "scopes": {}
+      "scopes": {
+        "email": "View your email address",
+        "profile": "View your basic profile info"
+      }
     }
   },
   "definitions": {

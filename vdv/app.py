@@ -571,6 +571,9 @@ profile = args.profile
 with open(cfgPath) as f:
     cfg = utils.GetAuthProfile(json.load(f), profile, args)
     DBConnection.configure(**cfg['vdv_db'])
+    if 'oidc' in cfg:
+        cfg_oidc = cfg['oidc']
+        auth.Configure(**cfg_oidc)
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 

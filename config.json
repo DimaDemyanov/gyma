@@ -2,9 +2,9 @@
   "profiles": [
     {
       "name": "local",
-      "server_host" : "127.0.0.1:4201",
-      "swagger_port" : "8081",
-      "api_port" : "4201",
+      "server_host": "127.0.0.1:4201",
+      "swagger_port": "8081",
+      "api_port": "4201",
       "vdv_db": {
         "host": "localhost",
         "port": 1521,
@@ -14,16 +14,18 @@
         "direct": null
       },
       "oidc": {
-        "client_id": "vdv",
-        "client_secret": "",
-        "realm": "http://GOOOGLE"
+        "google": {
+          "client_id": "166547794862-lacphj0d9mbmvh5ib474h1iirj9uf71n.apps.googleusercontent.com",
+          "client_secret": "a345X-2KsS2p9EHCx6fjwnDS",
+          "realm": "http://GOOOGLE"
+        }
       }
     },
     {
       "name": "dev",
-      "server_host" : "127.0.0.1:4201",
-      "swagger_port" : "8081",
-      "api_port" : "4201",
+      "server_host": "127.0.0.1:4201",
+      "swagger_port": "8081",
+      "api_port": "4201",
       "vdv_db": {
         "host": "localhost",
         "port": 1521,
@@ -33,16 +35,18 @@
         "direct": null
       },
       "oidc": {
-        "client_id": "vdv",
-        "client_secret": "",
-        "realm": "http://GOOOGLE"
+        "google": {
+          "client_id": "166547794862-lacphj0d9mbmvh5ib474h1iirj9uf71n.apps.googleusercontent.com",
+          "client_secret": "a345X-2KsS2p9EHCx6fjwnDS",
+          "realm": "http://GOOOGLE"
+        }
       }
     },
     {
       "name": "elephant",
-      "server_host" : "127.0.0.1:4201",
-      "swagger_port" : "8081",
-      "api_port" : "4201",
+      "server_host": "127.0.0.1:4201",
+      "swagger_port": "8081",
+      "api_port": "4201",
       "vdv_db": {
         "host": "postgres://wjcjjdvt:XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF@horton.elephantsql.com",
         "port": 5432,
@@ -52,9 +56,11 @@
         "direct": null
       },
       "oidc": {
-        "client_id": "166547794862-9vo9er4t53ji8p2mifh725del75899pa.apps.googleusercontent.com",
-        "client_secret": "52VuMRfSb3LyhpmIYPkbQLL2",
-        "realm": "http://GOOOGLE"
+        "google": {
+          "client_id": "166547794862-lacphj0d9mbmvh5ib474h1iirj9uf71n.apps.googleusercontent.com",
+          "client_secret": "a345X-2KsS2p9EHCx6fjwnDS",
+          "realm": "http://GOOOGLE"
+        }
       }
     }
   ]

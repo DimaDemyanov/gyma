@@ -7,16 +7,18 @@ class PROVIDER:
 
 CONFIG = {
     PROVIDER.GOOGLE: {
-        'consumer_key': '166547794862-9vo9er4t53ji8p2mifh725del75899pa.apps.googleusercontent.com',
-        'consumer_secret': '52VuMRfSb3LyhpmIYPkbQLL2',
+        'client_id': '',
+        'client_secret': '',
+        'realm': '',
         'scope': [],
         'authorization_url': 'https://accounts.google.com/o/oauth2/auth',
         'access_token_url': 'https://accounts.google.com/o/oauth2/token',
         'user_info_url': 'https://www.googleapis.com/plus/v1/people/me'
     },
     PROVIDER.VK: {
-        'consumer_key': '',
-        'consumer_secret': '',
+        'client_id': '',
+        'client_secret': '',
+        'realm': '',
         'scope': [],
         'authorization_url': 'http://api.vkontakte.ru/oauth/authorize',
         'access_token_url': 'https://api.vkontakte.ru/oauth/access_token',
@@ -24,16 +26,18 @@ CONFIG = {
                          'fields=uid,first_name,last_name,nickname,sex,bdate,city,country,timezone,photo_big'
     },
     PROVIDER.FACEBOOK: {
-        'consumer_key': '',
-        'consumer_secret': '',
+        'client_id': '',
+        'client_secret': '',
+        'realm': '',
         'scope': [],
         'authorization_url': 'https://www.facebook.com/dialog/oauth',
         'access_token_url': 'https://graph.facebook.com/oauth/access_token',
         'user_info_url': 'https://graph.facebook.com/v2.3/me'
     },
     PROVIDER.YANDEX: {
-        'consumer_key': '',
-        'consumer_secret': '',
+        'client_id': '',
+        'client_secret': '',
+        'realm': '',
         'scope': [],
         'authorization_url': 'https://oauth.yandex.com/authorize',
         'access_token_url': 'https://oauth.yandex.com/token',
