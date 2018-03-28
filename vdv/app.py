@@ -5,9 +5,8 @@ import mimetypes
 import time
 import logging
 import concurrent.futures as ftr
-import threading
 import json
-import base64
+
 import falcon
 from falcon_multipart.middleware import MultipartMiddleware
 
@@ -575,7 +574,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), Auth()])
+wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
 
 server = SpecServer(operation_handlers=operation_handlers)
 
