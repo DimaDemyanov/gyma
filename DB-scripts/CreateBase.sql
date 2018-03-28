@@ -1,12 +1,15 @@
 DROP SEQUENCE vdv_seq;
 create SEQUENCE vdv_seq start with 1 increment by 1;
 
+DROP TYPE IF EXISTS vdv_prop_type;
+CREATE TYPE vdv_prop_type AS ENUM ('bool', 'numeric', 'media', 'comment', 'like');
+
 DROP TABLE IF EXISTS "vdv_court";
 CREATE TABLE "vdv_court" (
 	"courtid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"name" VARCHAR(256) NOT NULL UNIQUE,
 	"desc" VARCHAR(4000) NOT NULL DEFAULT '',
-  "location" BIGINT NOT NULL,
+	"location" BIGINT NOT NULL,
 	"address" VARCHAR(4000) NOT NULL,
 	"private" BOOLEAN NOT NULL DEFAULT 'false',
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -79,16 +82,21 @@ CREATE TABLE "vdv_location" (
 );
 
 
-
 DROP TABLE IF EXISTS "vdv_court_prop";
 CREATE TABLE "vdv_court_prop" (
 	"propid" BIGSERIAL NOT NULL,
 	"name" VARCHAR(40) NOT NULL UNIQUE,
-	"type" INT NOT NULL
+	"type" vdv_prop_type NOT NULL
 ) WITH (
   OIDS=FALSE
 );
 
+INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isopen', 'bool');
+INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isfree', 'bool');
+INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isonair', 'bool');
+INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'price', 'numeric');
+INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'photo', 'media');
+INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'review', 'comment');
 
 
 DROP TABLE IF EXISTS "vdv_court_prop_bool";
@@ -163,7 +171,7 @@ DROP TABLE IF EXISTS "vdv_post_prop";
 CREATE TABLE "vdv_post_prop" (
 	"propid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"name" VARCHAR(40) NOT NULL UNIQUE,
-	"type" INT NOT NULL
+	"type" vdv_prop_type NOT NULL
 ) WITH (
   OIDS=FALSE
 );
@@ -222,3 +230,5 @@ CREATE TABLE "vdv_post_comment" (
 ) WITH (
   OIDS=FALSE
 );
+
+commit;
