@@ -18,7 +18,7 @@ class DBConnection:
     def configure(cls, **kwargs):
         cls.s_dbParams.update(kwargs)
         #TODO: IMPROVE AUTH TO DB
-        cls.engine = create_engine('postgresql://wjcjjdvt:XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF@horton.elephantsql.com:5432/wjcjjdvt', pool_size=20)
+        cls.engine = create_engine('postgresql://wjcjjdvt:XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF@horton.elephantsql.com:5432/wjcjjdvt', pool_size=2)
         # create a configured "Session" class
         cls.Session = sessionmaker(bind=cls.engine)
 
@@ -38,13 +38,14 @@ class DBConnection:
         self.close()
 
     def __acquire_connection(self):
-        conn = self.engine.connect()
-        session = self.Session(bind=conn)
+        #conn = self.engine.connect()
+        session = self.Session()
 
         return session
 
-    def __release_connection(self, conn):
-        conn.close()
+    def __release_connection(self, session):
+        session.close()
+        #conn.close()
 
     def open(self):
         self.db = self.__acquire_connection()

@@ -1,7 +1,7 @@
 DROP SEQUENCE vdv_seq;
 create SEQUENCE vdv_seq start with 1 increment by 1;
 
-DROP TYPE IF EXISTS vdv_prop_type;
+DROP TYPE IF EXISTS vdv_prop_type CASCADE;
 CREATE TYPE vdv_prop_type AS ENUM ('bool', 'numeric', 'media', 'comment', 'like');
 
 DROP TABLE IF EXISTS "vdv_court";
@@ -76,7 +76,8 @@ DROP TABLE IF EXISTS "vdv_location";
 CREATE TABLE "vdv_location" (
 	"locid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"name" VARCHAR(256) NOT NULL UNIQUE,
-	"GPS" POINT NOT NULL
+	"latitude" REAL NOT NULL,
+	"longitude" REAL NOT NULL
 ) WITH (
   OIDS=FALSE
 );

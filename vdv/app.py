@@ -17,6 +17,9 @@ from vdv import utils
 
 from vdv.db import DBConnection
 
+from vdv.Court import Court
+from vdv.Location import Location
+
 def stringToBool(str):
     # empty string is included because we allow empty-valued flags in query
     return str.lower() in ['true', '1', 'yes', 'y', '']
@@ -340,19 +343,76 @@ def createLocation(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        name = params.get('name')
+        latitude = params.get('latitude')
+        longitude = params.get('longitude')
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
+    if not name:
+        resp.status = falcon.HTTP_405
+        return
+
+    id = Location(name, latitude, longitude).add()
+
+    if id:
+        object = Location.get().filter_by(locid=id).one()
+        if object:
+            resp.status = falcon.HTTP_200
+            resp.body = json.dumps(object.to_dict(), 2, 2)
+            return
+
     resp.status = falcon.HTTP_501
 
 def getLocationById(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    id = getIntPathParam('locId', **request_handler_args)
+
+    if id:
+        object = Location.get().filter_by(locid=id).all()
+        if len(object):
+            resp.status = falcon.HTTP_200
+            resp.body = json.dumps(object[0].to_dict(), 2, 2)
+            return
+    resp.status = falcon.HTTP_404
 
 def deleteLocation(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    id = getIntPathParam('locId', **request_handler_args)
+
+    if id:
+        try:
+            Location.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
+
+        object = Location.get().filter_by(locid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
+
+def getAllLocations(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    res = []
+
+    objects = Location.get().all()
+    if len(objects):
+        res = [o.to_dict() for o in objects]
+
+    resp.status = falcon.HTTP_200
+    resp.body = json.dumps(res, 2, 2)
 
 operation_handlers = {
     'initDatabase':    [initDatabase],
@@ -393,6 +453,7 @@ operation_handlers = {
     'createLocation':         [createLocation],
     'getLocationById':        [getLocationById],
     'deleteLocation':         [deleteLocation],
+    'getAllLocations':        [getAllLocations],
 }
 
 class CORS(object):
@@ -479,10 +540,9 @@ with open('swagger_temp.json') as f:
     server.load_spec_swagger(f.read())
 
 
-from vdv.Court import Court
 
+#Location.delete(7)
 
-#Court("IamExclusive", "desc",  10, "", True)
 
 #print(Court.get().all()[0].created)
 

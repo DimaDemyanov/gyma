@@ -1168,6 +1168,32 @@
         ]
       }
     },
+    "/location/all": {
+      "get": {
+        "tags": [
+          "location"
+        ],
+        "summary": "Get all locations",
+        "description": "Returns a list of locations descriptions",
+        "operationId": "getAllLocations",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/location/{locId}": {
       "get": {
         "tags": [
@@ -1269,9 +1295,13 @@
           "type": "string",
           "example": "Super club Huba Buba"
         },
-        "GPS": {
-          "type": "string",
-          "example": "40.7127753,-74.0059728"
+        "latitude": {
+          "type": "float",
+          "example": 40.7127753
+        },
+        "longitude": {
+          "type": "float",
+          "example": -74.0059728
         }
       }
     },

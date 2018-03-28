@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from sqlalchemy import Column, String, Integer, Boolean, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -15,10 +17,13 @@ class Court(Base):
     name = Column(String)
     desc = Column(String)
     location = Column(Integer)
-    address = Column(String)
     private = Column(Boolean)
     created = Column(Date)
     updated = Column(Date)
+
+    def to_dict(self):
+        return OrderedDict([(key, self.__dict__[key]) for key in ['courtid', 'name', 'desc', 'location',
+                                                                  'private', 'created', 'updated']])
 
     def __init__(self, name, desc, location, address, private):
         self.name = name
@@ -33,6 +38,7 @@ class Court(Base):
         with DBConnection() as session:
             session.db.add(self)
             session.db.commit()
+            return self.courtid
 
     @staticmethod
     def get():
