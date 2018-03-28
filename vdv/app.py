@@ -537,6 +537,7 @@ class Auth(object):
         # skip authentication for version, UI and Swagger
         if re.match('(/vdv/version|'
                      '/vdv/settings/urls|'
+                     '/vdv/images|'
                      '/vdv/ui|'
                      '/vdv/swagger\.json|'
                      '/vdv/swagger-temp\.json|'
