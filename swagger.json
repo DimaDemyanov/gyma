@@ -1283,8 +1283,8 @@
     "auth_env": {
       "type": "oauth2",
       "flow": "accessCode",
-      "authorizationUrl": "GOOOGLE",
-      "tokenUrl": "GOOOGLE",
+      "authorizationUrl": "https://accounts.google.com/o/oauth2/auth",
+      "tokenUrl": "https://accounts.google.com/o/oauth2/token",
       "scopes": {}
     }
   },
