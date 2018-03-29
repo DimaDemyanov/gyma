@@ -29,10 +29,10 @@ class Location(Base):
     def to_dict(self):
         return OrderedDict([(key, self.__dict__[key]) for key in ['locid', 'name', 'latitude', 'longitude']])
 
-    @staticmethod
-    def delete(id):
+    @classmethod
+    def delete(cls, id):
         with DBConnection() as session:
-            res = session.db.query(Location).filter_by(locid=id).all()
+            res = session.db.query(cls).filter_by(locid=id).all()
 
             if len(res) == 1:
                 session.db.delete(res[0])
@@ -40,7 +40,7 @@ class Location(Base):
             else:
                 raise FileNotFoundError('location was not found')
 
-    @staticmethod
-    def get():
+    @classmethod
+    def get(cls):
         with DBConnection() as session:
-            return session.db.query(Location)
+            return session.db.query(cls)

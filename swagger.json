@@ -1338,13 +1338,13 @@
           "type": "string",
           "example": "I am from Saint-Petersburg"
         },
-        "date_added": {
+        "created": {
           "type": "string",
-          "example": "Thu Apr 27 19:28:32 2017"
+          "example": "2018-03-28 20:24:00+00:00"
         },
-        "date_modified": {
+        "updated": {
           "type": "string",
-          "example": "Thu Apr 27 19:28:32 2017"
+          "example": "2018-03-28 20:24:00+00:00"
         }
       }
     },
@@ -1370,13 +1370,13 @@
           "type": "string",
           "example": "https://youtube.com/supervideo/542341"
         },
-        "date_added": {
+        "created": {
           "type": "string",
-          "example": "Thu Apr 27 19:28:32 2017"
+          "example": "2018-03-28 20:24:00+00:00"
         },
-        "date_modified": {
+        "updated": {
           "type": "string",
-          "example": "Thu Apr 27 19:28:32 2017"
+          "example": "2018-03-28 20:24:00+00:00"
         }
       }
     },
@@ -1403,16 +1403,35 @@
           "example": "128"
         },
         "media": {
-          "type": "string",
-          "example": "[media_id1, media_id2, ...]"
+          "type": "array",
+          "items": {
+            "type": "int",
+            "example": "1"
+          }
         },
-        "date_added": {
-          "type": "string",
-          "example": "Thu Apr 27 19:28:32 2017"
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "propid": {
+                "type": "int",
+                "example": "1"
+              },
+              "value": {
+                "type": "string",
+                "example": "prop_value"
+              }
+            }
+          }
         },
-        "date_modified": {
+        "created": {
           "type": "string",
-          "example": "Thu Apr 27 19:28:32 2017"
+          "example": "2018-03-28 20:24:00+00:00"
+        },
+        "updated": {
+          "type": "string",
+          "example": "2018-03-28 20:24:00+00:00"
         }
       }
     },

@@ -171,29 +171,30 @@ def createCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    try:
-        params = json.loads(req.stream.read().decode('utf-8'))
-    except ValueError:
-        resp.status = falcon.HTTP_405
-        return
+    query_body = req.stream.read()
+    boundary = '--' + req.env['CONTENT_TYPE'].partition('=')[2]
 
-    name = params.get('name')
-    desc = params.get('description')
+    data_parts = query_body.split(boundary.encode())
 
-    if not name:
-        resp.status = falcon.HTTP_405
-        return
+    results = []
+    for key in req._params.keys():
+        data = req.get_param(key)
+        try:
+            resolver = MediaResolverFactory.produce(data.type.split('/')[0], data.file.read())
+            resolver.Resolve()
 
-    #id = Court.CreateCourt(name, desc)
-    #if id:
-    #    c = Court.GetCourtJSON(id)
-    #    if c:
-    #        resp.status = falcon.HTTP_501
-    #        resp.body = c
-    #        return
+            # TODO:NO NULL HERE AS OWNER
+            id = Media(0, resolver.type, resolver.url).add()
+            if id:
+                results.append(id)
+        except Exception as e:
+            resp.status = falcon.HTTP_400
+            resp.body = json.dumps("Media uploading error\nException::\n" + str(e), 2, 2)
 
-    resp.status = falcon.HTTP_500
+    resp.body = json.dumps(results, 2, 2)
+    resp.status = falcon.HTTP_200
 
+    
 def updateCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
@@ -215,6 +216,7 @@ def updateCourt(**request_handler_args):
 
     #Court.UpdateCourt(params)
     resp.status = falcon.HTTP_501
+    
 
 def deleteCourt(**request_handler_args):
     req = request_handler_args['req']
@@ -234,72 +236,84 @@ def deleteCourt(**request_handler_args):
 
     #Court.RemoveCourt(id, hard)
     resp.status = falcon.HTTP_501
+    
 
 def createUser(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def updateUser(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def getAllUsers(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def getUserById(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def deleteUser(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def getUserFollowingsList(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def userAddFollowing(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def userDelFollowing(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def getUserFollowersList(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def getUserFollowersRequestList(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def userResolveFollowerRequest(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+    
 
 def getUserCourts(**request_handler_args):
     req = request_handler_args['req']
@@ -307,17 +321,20 @@ def getUserCourts(**request_handler_args):
 
     resp.status = falcon.HTTP_501
 
+
 def userAddCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
 
+
 def userDelCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     resp.status = falcon.HTTP_501
+
 
 def createMedia(**request_handler_args):
     req = request_handler_args['req']
@@ -345,6 +362,7 @@ def createMedia(**request_handler_args):
 
     resp.body = json.dumps(results, 2, 2)
     resp.status = falcon.HTTP_200
+
 
 def getAllOwnerMedias(**request_handler_args):
     req = request_handler_args['req']
@@ -375,6 +393,7 @@ def getMedia(**request_handler_args):
     resp.status = falcon.HTTP_200
     resp.body = json.dumps(res, 2, 2)
 
+
 def deleteMedia(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
@@ -394,6 +413,7 @@ def deleteMedia(**request_handler_args):
             return
 
     resp.status = falcon.HTTP_400
+
 
 def createLocation(**request_handler_args):
     req = request_handler_args['req']
@@ -421,7 +441,8 @@ def createLocation(**request_handler_args):
             resp.body = json.dumps(object.to_dict(), 2, 2)
             return
 
-    resp.status = falcon.HTTP_501
+    resp.status = falcon.HTTP_400
+
 
 def getLocationById(**request_handler_args):
     req = request_handler_args['req']
@@ -436,6 +457,7 @@ def getLocationById(**request_handler_args):
             resp.body = json.dumps(object[0].to_dict(), 2, 2)
             return
     resp.status = falcon.HTTP_404
+
 
 def deleteLocation(**request_handler_args):
     req = request_handler_args['req']
@@ -457,18 +479,22 @@ def deleteLocation(**request_handler_args):
 
     resp.status = falcon.HTTP_400
 
+
+from vdv.prop.PropLike import PropLike
+
 def getAllLocations(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     res = []
 
-    objects = Location.get().all()
+    objects = PropLike.get_object_property(0, 0)#Location.get().all()
     if len(objects):
         res = [o.to_dict() for o in objects]
 
     resp.status = falcon.HTTP_200
     resp.body = json.dumps(res, 2, 2)
+
 
 operation_handlers = {
     'initDatabase':    [initDatabase],
@@ -532,6 +558,7 @@ class CORS(object):
             #    if acrh:
             #        resp.set_header('Access-Control-Allow-Headers', acrh)
 
+
 class Auth(object):
     def process_request(self, req, resp):
         # skip authentication for version, UI and Swagger
@@ -578,7 +605,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
+wsgi_app = api = falcon.API(middleware=[CORS(), MultipartMiddleware()])
 
 server = SpecServer(operation_handlers=operation_handlers)
 

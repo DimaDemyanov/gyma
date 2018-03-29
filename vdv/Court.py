@@ -22,8 +22,12 @@ class Court(Base):
     updated = Column(Date)
 
     def to_dict(self):
-        return OrderedDict([(key, self.__dict__[key]) for key in ['courtid', 'name', 'desc', 'location',
+        tmp_crt, tmp_upd = self.created, self.updated
+        self.created, self.updated = str(self.created), str(self.update)
+        res = OrderedDict([(key, self.__dict__[key]) for key in ['courtid', 'name', 'desc', 'location',
                                                                   'private', 'created', 'updated']])
+        self.created, self.updated = tmp_crt, tmp_upd
+        return res
 
     def __init__(self, name, desc, location, address, private):
         self.name = name
@@ -39,6 +43,17 @@ class Court(Base):
             session.db.add(self)
             session.db.commit()
             return self.courtid
+
+    @staticmethod
+    def delete(id):
+        with DBConnection() as session:
+            res = session.db.query(Court).filter_by(courtid=id).all()
+
+            if len(res) == 1:
+                session.db.delete(res[0])
+                session.db.commit()
+            else:
+                raise FileNotFoundError('courtid was not found')
 
     @staticmethod
     def get():

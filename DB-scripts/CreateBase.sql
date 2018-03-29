@@ -2,7 +2,7 @@ DROP SEQUENCE vdv_seq;
 create SEQUENCE vdv_seq start with 1 increment by 1;
 
 DROP TYPE IF EXISTS vdv_prop_type CASCADE;
-CREATE TYPE vdv_prop_type AS ENUM ('bool', 'numeric', 'media', 'comment', 'like');
+CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like');
 
 DROP TYPE IF EXISTS vdv_media_type CASCADE;
 CREATE TYPE vdv_media_type AS ENUM ('image');
@@ -55,7 +55,7 @@ CREATE TABLE "vdv_court_follower" (
 	"courtid" BIGINT NOT NULL,
 	"userid" BIGINT NOT NULL,
 	"permit" int NOT NULL DEFAULT '0',
-	"timestamp" TIMESTAMP WITH TIME ZONE NOT NULL
+	"created" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (
   OIDS=FALSE
 );
@@ -67,7 +67,7 @@ CREATE TABLE "vdv_user_follower" (
 	"userid" BIGINT NOT NULL,
 	"followerid" BIGINT NOT NULL,
 	"permit" BOOLEAN NOT NULL DEFAULT 'true',
-	"timestamp" TIMESTAMP WITH TIME ZONE NOT NULL
+	"created" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (
   OIDS=FALSE
 );
@@ -85,8 +85,8 @@ CREATE TABLE "vdv_location" (
 );
 
 
-DROP TABLE IF EXISTS "vdv_court_prop";
-CREATE TABLE "vdv_court_prop" (
+DROP TABLE IF EXISTS "vdv_prop";
+CREATE TABLE "vdv_prop" (
 	"propid" BIGSERIAL NOT NULL,
 	"name" VARCHAR(40) NOT NULL UNIQUE,
 	"type" vdv_prop_type NOT NULL
@@ -94,17 +94,18 @@ CREATE TABLE "vdv_court_prop" (
   OIDS=FALSE
 );
 
-INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isopen', 'bool');
-INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isfree', 'bool');
-INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isonair', 'bool');
-INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'price', 'numeric');
-INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'photo', 'media');
-INSERT INTO vdv_court_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'review', 'comment');
+INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isopen', 'bool');
+INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isfree', 'bool');
+INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isonair', 'bool');
+INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'price', 'real');
+INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'photo', 'media');
+INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'comment', 'comment');
+INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'like', 'like');
 
 
-DROP TABLE IF EXISTS "vdv_court_prop_bool";
-CREATE TABLE "vdv_court_prop_bool" (
-	"courtid" BIGINT NOT NULL,
+DROP TABLE IF EXISTS "vdv_prop_bool";
+CREATE TABLE "vdv_prop_bool" (
+	"vdvid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
 	"value" BOOLEAN NOT NULL
 ) WITH (
@@ -113,20 +114,28 @@ CREATE TABLE "vdv_court_prop_bool" (
 
 
 
-DROP TABLE IF EXISTS "vdv_court_prop_numeric";
-CREATE TABLE "vdv_court_prop_numeric" (
+DROP TABLE IF EXISTS "vdv_prop_int";
+CREATE TABLE "vdv_prop_int" (
+    "vdvid" BIGSERIAL NOT NULL,
 	"propid" BIGSERIAL NOT NULL,
-	"value" NUMERIC(20) NOT NULL,
-	"courtid" BIGSERIAL NOT NULL
+	"value" INT NOT NULL
+) WITH (
+  OIDS=FALSE
+);
+
+DROP TABLE IF EXISTS "vdv_prop_real";
+CREATE TABLE "vdv_prop_real" (
+    "vdvid" BIGSERIAL NOT NULL,
+	"propid" BIGSERIAL NOT NULL,
+	"value" REAL NOT NULL
 ) WITH (
   OIDS=FALSE
 );
 
 
-
-DROP TABLE IF EXISTS "vdv_court_prop_media";
-CREATE TABLE "vdv_court_prop_media" (
-	"courtid" BIGINT NOT NULL,
+DROP TABLE IF EXISTS "vdv_prop_media";
+CREATE TABLE "vdv_prop_media" (
+	"vdvid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
 	"value" INT NOT NULL
 ) WITH (
@@ -135,15 +144,23 @@ CREATE TABLE "vdv_court_prop_media" (
 
 
 
-DROP TABLE IF EXISTS "vdv_court_prop_comment";
-CREATE TABLE "vdv_court_prop_comment" (
-	"courtid" BIGINT NOT NULL,
+DROP TABLE IF EXISTS "vdv_prop_comment";
+CREATE TABLE "vdv_prop_comment" (
+	"vdvid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
 	"value" INT NOT NULL
 ) WITH (
   OIDS=FALSE
 );
 
+DROP TABLE IF EXISTS "vdv_prop_like";
+CREATE TABLE "vdv_prop_like" (
+	"vdvid" BIGINT NOT NULL,
+	"propid" BIGINT NOT NULL,
+	"value" INT NOT NULL
+) WITH (
+  OIDS=FALSE
+);
 
 
 DROP TABLE IF EXISTS "vdv_post";
@@ -151,7 +168,8 @@ CREATE TABLE "vdv_post" (
 	"postid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"userid" BIGINT NOT NULL,
 	"description" VARCHAR(256) NOT NULL,
-	"timestamp" TIMESTAMP WITH TIME ZONE NOT NULL
+	"created" TIMESTAMP WITH TIME ZONE NOT NULL,
+	"updated" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (
   OIDS=FALSE
 );
@@ -163,18 +181,7 @@ CREATE TABLE "vdv_comment" (
 	"commentid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"userid" BIGINT NOT NULL,
 	"text" TEXT NOT NULL,
-	"timestamp" TIMESTAMP WITH TIME ZONE NOT NULL
-) WITH (
-  OIDS=FALSE
-);
-
-
-
-DROP TABLE IF EXISTS "vdv_post_prop";
-CREATE TABLE "vdv_post_prop" (
-	"propid" BIGSERIAL NOT NULL PRIMARY KEY ,
-	"name" VARCHAR(40) NOT NULL UNIQUE,
-	"type" vdv_prop_type NOT NULL
+	"created" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (
   OIDS=FALSE
 );
@@ -185,53 +192,11 @@ DROP TABLE IF EXISTS "vdv_like";
 CREATE TABLE "vdv_like" (
 	"likeid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"userid" BIGINT NOT NULL,
-	"timestamp" TIMESTAMP WITH TIME ZONE NOT NULL
+	"created" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (
   OIDS=FALSE
 );
 
 
-
-DROP TABLE IF EXISTS "vdv_court_prop_like";
-CREATE TABLE "vdv_court_prop_like" (
-	"courtid" BIGINT NOT NULL,
-	"propid" BIGINT NOT NULL,
-	"value" INT NOT NULL
-) WITH (
-  OIDS=FALSE
-);
-
-
-
-DROP TABLE IF EXISTS "vdv_post_like";
-CREATE TABLE "vdv_post_like" (
-	"postid" BIGINT NOT NULL,
-	"propid" BIGINT NOT NULL,
-	"value" INT NOT NULL
-) WITH (
-  OIDS=FALSE
-);
-
-
-
-DROP TABLE IF EXISTS "vdv_post_media";
-CREATE TABLE "vdv_post_media" (
-	"postid" BIGINT NOT NULL,
-	"propid" BIGINT NOT NULL,
-	"value" INT NOT NULL
-) WITH (
-  OIDS=FALSE
-);
-
-
-
-DROP TABLE IF EXISTS "vdv_post_comment";
-CREATE TABLE "vdv_post_comment" (
-	"postid" BIGINT NOT NULL,
-	"propid" BIGINT NOT NULL,
-	"value" INT NOT NULL
-) WITH (
-  OIDS=FALSE
-);
 
 commit;
