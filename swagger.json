@@ -1398,25 +1398,14 @@
           "type": "string",
           "example": "Very cool workout place"
         },
-        "location": {
-          "type": "int",
-          "example": "128"
-        },
-        "media": {
-          "type": "array",
-          "items": {
-            "type": "int",
-            "example": "1"
-          }
-        },
-        "properties": {
+        "prop": {
           "type": "array",
           "items": {
             "type": "object",
             "properties": {
-              "propid": {
-                "type": "int",
-                "example": "1"
+              "name": {
+                "type": "string",
+                "example": "media"
               },
               "value": {
                 "type": "string",

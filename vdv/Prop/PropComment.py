@@ -10,8 +10,8 @@ from vdv.db import DBConnection
 class PropLike(PropBase, Base):
     __tablename__ = 'vdv_prop_comment'
 
-    def __init__(self, name, type):
-        super().__init__(name, type)
+    def __init__(self, vdvid, propid, value):
+        super().__init__(vdvid, propid, value)
 
     @classmethod
     def get_object_property(cls, vdvid, propid):

@@ -12,8 +12,6 @@ CREATE TABLE "vdv_court" (
 	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"name" VARCHAR(256) NOT NULL UNIQUE,
 	"desc" VARCHAR(4000) NOT NULL DEFAULT '',
-	"location" BIGINT NOT NULL,
-	"private" BOOLEAN NOT NULL DEFAULT 'false',
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL,
 	"updated" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (
@@ -94,6 +92,7 @@ CREATE TABLE "vdv_prop" (
   OIDS=FALSE
 );
 
+INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'private', 'bool');
 INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isopen', 'bool');
 INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isfree', 'bool');
 INSERT INTO vdv_prop (propid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isonair', 'bool');

@@ -6,5 +6,5 @@ Base = declarative_base()
 class PropBool(PropBase, Base):
     __tablename__ = 'vdv_prop_bool'
 
-    def __init__(self, name, type):
-        super().__init__(name, type)
+    def __init__(self, vdvid, propid, value):
+        super().__init__(vdvid, propid, value)
