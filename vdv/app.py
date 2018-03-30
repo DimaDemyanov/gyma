@@ -481,15 +481,10 @@ def getAllLocations(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    res = []
-
     objects = Location.get().all()#PropLike.get_object_property(0, 0)#
-    if len(objects):
-        res = [o.to_dict() for o in objects]
 
+    resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
     resp.status = falcon.HTTP_200
-    resp.body = json.dumps(res, 2, 2)
-
 
 operation_handlers = {
     'initDatabase':    [initDatabase],
