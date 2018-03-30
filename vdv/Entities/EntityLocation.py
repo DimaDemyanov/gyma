@@ -5,7 +5,7 @@ from vdv.Entities.EntityBase import EntityBase
 
 Base = declarative_base()
 
-class Location(EntityBase, Base):
+class EntityLocation(EntityBase, Base):
     __tablename__ = 'vdv_location'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)

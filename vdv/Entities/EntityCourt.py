@@ -8,7 +8,7 @@ from vdv.Entities.EntityBase import EntityBase
 
 Base = declarative_base()
 
-class Court(EntityBase, Base):
+class EntityCourt(EntityBase, Base):
     __tablename__ = 'vdv_court'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)

@@ -10,7 +10,7 @@ from vdv.db import DBConnection
 
 Base = declarative_base()
 
-class Media(EntityBase, Base):
+class EntityMedia(EntityBase, Base):
     __tablename__ = 'vdv_media'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)

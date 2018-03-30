@@ -8,7 +8,7 @@ from vdv.Entities.EntityBase import EntityBase
 
 Base = declarative_base()
 
-class Like(EntityBase, Base):
+class EntityLike(EntityBase, Base):
     __tablename__ = 'vdv_like'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)

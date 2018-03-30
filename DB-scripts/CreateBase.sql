@@ -52,7 +52,7 @@ CREATE TABLE "vdv_media" (
 
 DROP TABLE IF EXISTS "vdv_court_follower";
 CREATE TABLE "vdv_court_follower" (
-	"vdvid" BIGINT NOT NULL,
+	"vdvid" BIGINT NOT NULL PRIMARY KEY,
 	"userid" BIGINT NOT NULL,
 	"permit" int NOT NULL DEFAULT '0',
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL
@@ -64,7 +64,7 @@ CREATE TABLE "vdv_court_follower" (
 
 DROP TABLE IF EXISTS "vdv_user_follower";
 CREATE TABLE "vdv_user_follower" (
-	"vdvid" BIGINT NOT NULL,
+	"vdvid" BIGINT NOT NULL PRIMARY KEY,
 	"followerid" BIGINT NOT NULL,
 	"permit" BOOLEAN NOT NULL DEFAULT 'true',
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL
@@ -87,7 +87,7 @@ CREATE TABLE "vdv_location" (
 
 DROP TABLE IF EXISTS "vdv_prop";
 CREATE TABLE "vdv_prop" (
-	"propid" BIGSERIAL NOT NULL,
+	"propid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"name" VARCHAR(40) NOT NULL UNIQUE,
 	"type" vdv_prop_type NOT NULL
 ) WITH (
@@ -107,7 +107,8 @@ DROP TABLE IF EXISTS "vdv_prop_bool";
 CREATE TABLE "vdv_prop_bool" (
 	"vdvid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
-	"value" BOOLEAN NOT NULL
+	"value" BOOLEAN NOT NULL,
+	PRIMARY KEY (vdvid, propid, value)
 ) WITH (
   OIDS=FALSE
 );
@@ -118,7 +119,8 @@ DROP TABLE IF EXISTS "vdv_prop_int";
 CREATE TABLE "vdv_prop_int" (
     "vdvid" BIGSERIAL NOT NULL,
 	"propid" BIGSERIAL NOT NULL,
-	"value" INT NOT NULL
+	"value" INT NOT NULL,
+	PRIMARY KEY (vdvid, propid, value)
 ) WITH (
   OIDS=FALSE
 );
@@ -127,7 +129,8 @@ DROP TABLE IF EXISTS "vdv_prop_real";
 CREATE TABLE "vdv_prop_real" (
     "vdvid" BIGSERIAL NOT NULL,
 	"propid" BIGSERIAL NOT NULL,
-	"value" REAL NOT NULL
+	"value" REAL NOT NULL,
+	PRIMARY KEY (vdvid, propid, value)
 ) WITH (
   OIDS=FALSE
 );
@@ -137,7 +140,8 @@ DROP TABLE IF EXISTS "vdv_prop_media";
 CREATE TABLE "vdv_prop_media" (
 	"vdvid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
-	"value" INT NOT NULL
+	"value" INT NOT NULL,
+	PRIMARY KEY (vdvid, propid, value)
 ) WITH (
   OIDS=FALSE
 );
@@ -148,7 +152,8 @@ DROP TABLE IF EXISTS "vdv_prop_comment";
 CREATE TABLE "vdv_prop_comment" (
 	"vdvid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
-	"value" INT NOT NULL
+	"value" INT NOT NULL,
+	PRIMARY KEY (vdvid, propid, value)
 ) WITH (
   OIDS=FALSE
 );
@@ -157,7 +162,8 @@ DROP TABLE IF EXISTS "vdv_prop_like";
 CREATE TABLE "vdv_prop_like" (
 	"vdvid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
-	"value" INT NOT NULL
+	"value" INT NOT NULL,
+	PRIMARY KEY (vdvid, propid, value)
 ) WITH (
   OIDS=FALSE
 );
@@ -181,7 +187,8 @@ CREATE TABLE "vdv_comment" (
 	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"userid" BIGINT NOT NULL,
 	"text" TEXT NOT NULL,
-	"created" TIMESTAMP WITH TIME ZONE NOT NULL
+	"created" TIMESTAMP WITH TIME ZONE NOT NULL,
+	"updated" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (
   OIDS=FALSE
 );

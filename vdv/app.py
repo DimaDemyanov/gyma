@@ -16,8 +16,8 @@ from vdv.auth import auth
 from vdv.db import DBConnection
 from vdv.serve_swagger import SpecServer
 
-from vdv.Entities.EntityLocation import Location
-from vdv.Entities.EntityMedia import Media
+from vdv.Entities.EntityLocation import EntityLocation
+from vdv.Entities.EntityMedia import EntityMedia
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
 def stringToBool(str):
@@ -180,7 +180,7 @@ def createCourt(**request_handler_args):
             resolver.Resolve()
 
             # TODO:NO NULL HERE AS OWNER
-            id = Media(0, resolver.type, resolver.url).add()
+            id = EntityMedia(0, resolver.type, resolver.url).add()
             if id:
                 results.append(id)
         except Exception as e:
@@ -349,7 +349,7 @@ def createMedia(**request_handler_args):
             resolver.Resolve()
 
             #TODO:NO NULL HERE AS OWNER
-            id = Media(0, resolver.type, resolver.url).add()
+            id = EntityMedia(0, resolver.type, resolver.url).add()
             if id:
                 results.append(id)
         except Exception as e:
@@ -367,7 +367,7 @@ def getAllOwnerMedias(**request_handler_args):
     id = getIntPathParam('ownerId', **request_handler_args)
 
     if id is not None:
-        objects = Media.get().filter_by(ownerid=id).all()
+        objects = EntityMedia.get().filter_by(ownerid=id).all()
         resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
         resp.status = falcon.HTTP_200
         return
@@ -382,7 +382,7 @@ def getMedia(**request_handler_args):
     id = getIntPathParam('mediaId', **request_handler_args)
 
     if id is not None:
-        objects = Media.get().filter_by(vdvid=id).all()
+        objects = EntityMedia.get().filter_by(vdvid=id).all()
 
         resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
         resp.status = falcon.HTTP_200
@@ -398,12 +398,12 @@ def deleteMedia(**request_handler_args):
 
     if id:
         try:
-            Media.delete(id)
+            EntityMedia.delete(id)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
             return
 
-        object = Media.get().filter_by(vdvid=id).all()
+        object = EntityMedia.get().filter_by(vdvid=id).all()
         if not len(object):
             resp.status = falcon.HTTP_200
             return
@@ -428,10 +428,10 @@ def createLocation(**request_handler_args):
         resp.status = falcon.HTTP_405
         return
 
-    id = Location(name, latitude, longitude).add()
+    id = EntityLocation(name, latitude, longitude).add()
 
     if id:
-        objects = Location.get().filter_by(vdvid=id).all()
+        objects = EntityLocation.get().filter_by(vdvid=id).all()
 
         resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
         resp.status = falcon.HTTP_200
@@ -447,7 +447,7 @@ def getLocationById(**request_handler_args):
     id = getIntPathParam('locId', **request_handler_args)
 
     if id is not None:
-        objects = Location.get().filter_by(vdvid=id).all()
+        objects = EntityLocation.get().filter_by(vdvid=id).all()
 
         resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
         resp.status = falcon.HTTP_200
@@ -464,12 +464,12 @@ def deleteLocation(**request_handler_args):
 
     if id is not None:
         try:
-            Location.delete(id)
+            EntityLocation.delete(id)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
             return
 
-        object = Location.get().filter_by(vdvid=id).all()
+        object = EntityLocation.get().filter_by(vdvid=id).all()
         if not len(object):
             resp.status = falcon.HTTP_200
             return
@@ -481,7 +481,7 @@ def getAllLocations(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    objects = Location.get().all()#PropLike.get_object_property(0, 0)#
+    objects = EntityLocation.get().all()#PropLike.get_object_property(0, 0)#
 
     resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
     resp.status = falcon.HTTP_200
