@@ -1,7 +1,8 @@
-from vdv.prop.PropBase import PropBase
-from vdv.Like import Like
-
 from sqlalchemy.ext.declarative import declarative_base
+
+from vdv.Entities.Like import Like
+from vdv.prop.PropBase import PropBase
+
 Base = declarative_base()
 
 from vdv.db import DBConnection
@@ -18,4 +19,4 @@ class PropLike(PropBase, Base):
             return [(_[0].propid, _[1]) for _ in session.db.query(cls, Like).
                 filter(cls.vdvid == vdvid).
                 filter(cls.propid == propid).
-                filter(cls.value == Like.likeid).all()]
+                filter(cls.value == Like.vdvid).all()]

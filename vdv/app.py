@@ -1,28 +1,24 @@
-import os
-import re
-import posixpath
-import mimetypes
-import time
-import logging
 import concurrent.futures as ftr
 import json
+import logging
+import mimetypes
+import os
+import posixpath
+import re
+import time
+from collections import OrderedDict
 
 import falcon
 from falcon_multipart.middleware import MultipartMiddleware
 
-from collections import OrderedDict
-
-from vdv.serve_swagger import SpecServer
-from vdv.auth import auth
 from vdv import utils
-
+from vdv.auth import auth
 from vdv.db import DBConnection
+from vdv.serve_swagger import SpecServer
 
-from vdv.Court import Court
-from vdv.Location import Location
-from vdv.Media import Media
-
-from vdv.MediaResolverFactory import MediaResolverFactory
+from vdv.Entities.Location import Location
+from vdv.Entities.Media import Media
+from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
 def stringToBool(str):
     # empty string is included because we allow empty-valued flags in query
@@ -369,14 +365,14 @@ def getAllOwnerMedias(**request_handler_args):
     resp = request_handler_args['resp']
 
     id = getIntPathParam('ownerId', **request_handler_args)
-    res = []
 
-    objects = Media.get().filter_by(ownerid=id).all()
-    if len(objects):
-        res = [o.to_dict() for o in objects]
+    if id is not None:
+        objects = Media.get().filter_by(ownerid=id).all()
+        resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
+        resp.status = falcon.HTTP_200
+        return
 
-    resp.status = falcon.HTTP_200
-    resp.body = json.dumps(res, 2, 2)
+    resp.status = falcon.HTTP_500
 
 
 def getMedia(**request_handler_args):
@@ -384,15 +380,15 @@ def getMedia(**request_handler_args):
     resp = request_handler_args['resp']
 
     id = getIntPathParam('mediaId', **request_handler_args)
-    res = []
 
-    objects = Media.get().filter_by(mediaid=id).all()
-    if len(objects):
-        res = [o.to_dict() for o in objects]
+    if id is not None:
+        objects = Media.get().filter_by(vdvid=id).all()
 
-    resp.status = falcon.HTTP_200
-    resp.body = json.dumps(res, 2, 2)
+        resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
+        resp.status = falcon.HTTP_200
+        return
 
+    resp.status = falcon.HTTP_500
 
 def deleteMedia(**request_handler_args):
     req = request_handler_args['req']
@@ -407,12 +403,12 @@ def deleteMedia(**request_handler_args):
             resp.status = falcon.HTTP_404
             return
 
-        object = Media.get().filter_by(mediaid=id).all()
+        object = Media.get().filter_by(vdvid=id).all()
         if not len(object):
             resp.status = falcon.HTTP_200
             return
 
-    resp.status = falcon.HTTP_400
+    resp.status = falcon.HTTP_500
 
 
 def createLocation(**request_handler_args):
@@ -435,13 +431,13 @@ def createLocation(**request_handler_args):
     id = Location(name, latitude, longitude).add()
 
     if id:
-        object = Location.get().filter_by(locid=id).one()
-        if object:
-            resp.status = falcon.HTTP_200
-            resp.body = json.dumps(object.to_dict(), 2, 2)
-            return
+        objects = Location.get().filter_by(vdvid=id).all()
 
-    resp.status = falcon.HTTP_400
+        resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
+        resp.status = falcon.HTTP_200
+        return
+
+    resp.status = falcon.HTTP_500
 
 
 def getLocationById(**request_handler_args):
@@ -450,13 +446,14 @@ def getLocationById(**request_handler_args):
 
     id = getIntPathParam('locId', **request_handler_args)
 
-    if id:
-        object = Location.get().filter_by(locid=id).all()
-        if len(object):
-            resp.status = falcon.HTTP_200
-            resp.body = json.dumps(object[0].to_dict(), 2, 2)
-            return
-    resp.status = falcon.HTTP_404
+    if id is not None:
+        objects = Location.get().filter_by(vdvid=id).all()
+
+        resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
+        resp.status = falcon.HTTP_200
+        return
+
+    resp.status = falcon.HTTP_500
 
 
 def deleteLocation(**request_handler_args):
@@ -465,14 +462,14 @@ def deleteLocation(**request_handler_args):
 
     id = getIntPathParam('locId', **request_handler_args)
 
-    if id:
+    if id is not None:
         try:
             Location.delete(id)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
             return
 
-        object = Location.get().filter_by(locid=id).all()
+        object = Location.get().filter_by(vdvid=id).all()
         if not len(object):
             resp.status = falcon.HTTP_200
             return
@@ -480,15 +477,13 @@ def deleteLocation(**request_handler_args):
     resp.status = falcon.HTTP_400
 
 
-from vdv.prop.PropLike import PropLike
-
 def getAllLocations(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     res = []
 
-    objects = PropLike.get_object_property(0, 0)#Location.get().all()
+    objects = Location.get().all()#PropLike.get_object_property(0, 0)#
     if len(objects):
         res = [o.to_dict() for o in objects]
 

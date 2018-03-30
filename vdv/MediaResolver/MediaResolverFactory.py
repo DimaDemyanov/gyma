@@ -1,4 +1,4 @@
-from vdv.ImageResolver import ImageResolver
+from vdv.MediaResolver.ImageResolver import ImageResolver
 
 class MediaResolverFactory:
     resolvers = {'image': ImageResolver}

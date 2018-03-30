@@ -9,7 +9,7 @@ CREATE TYPE vdv_media_type AS ENUM ('image');
 
 DROP TABLE IF EXISTS "vdv_court";
 CREATE TABLE "vdv_court" (
-	"courtid" BIGSERIAL NOT NULL PRIMARY KEY ,
+	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"name" VARCHAR(256) NOT NULL UNIQUE,
 	"desc" VARCHAR(4000) NOT NULL DEFAULT '',
 	"location" BIGINT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE "vdv_court" (
 
 DROP TABLE IF EXISTS "vdv_user";
 CREATE TABLE "vdv_user" (
-	"userid" BIGSERIAL NOT NULL PRIMARY KEY,
+	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"username" VARCHAR(256) NOT NULL UNIQUE,
 	"e-mail" VARCHAR(256) NOT NULL UNIQUE,
 	"status" VARCHAR(256) NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE "vdv_user" (
 
 DROP TABLE IF EXISTS "vdv_media";
 CREATE TABLE "vdv_media" (
-	"mediaid" BIGSERIAL NOT NULL PRIMARY KEY,
+	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"ownerid" BIGINT NOT NULL,
 	"type" vdv_media_type NOT NULL,
 	"url" VARCHAR(4000) NOT NULL UNIQUE,
@@ -52,7 +52,7 @@ CREATE TABLE "vdv_media" (
 
 DROP TABLE IF EXISTS "vdv_court_follower";
 CREATE TABLE "vdv_court_follower" (
-	"courtid" BIGINT NOT NULL,
+	"vdvid" BIGINT NOT NULL,
 	"userid" BIGINT NOT NULL,
 	"permit" int NOT NULL DEFAULT '0',
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL
@@ -64,7 +64,7 @@ CREATE TABLE "vdv_court_follower" (
 
 DROP TABLE IF EXISTS "vdv_user_follower";
 CREATE TABLE "vdv_user_follower" (
-	"userid" BIGINT NOT NULL,
+	"vdvid" BIGINT NOT NULL,
 	"followerid" BIGINT NOT NULL,
 	"permit" BOOLEAN NOT NULL DEFAULT 'true',
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL
@@ -76,7 +76,7 @@ CREATE TABLE "vdv_user_follower" (
 
 DROP TABLE IF EXISTS "vdv_location";
 CREATE TABLE "vdv_location" (
-	"locid" BIGSERIAL NOT NULL PRIMARY KEY,
+	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"name" VARCHAR(256) NOT NULL UNIQUE,
 	"latitude" REAL NOT NULL,
 	"longitude" REAL NOT NULL
@@ -165,7 +165,7 @@ CREATE TABLE "vdv_prop_like" (
 
 DROP TABLE IF EXISTS "vdv_post";
 CREATE TABLE "vdv_post" (
-	"postid" BIGSERIAL NOT NULL PRIMARY KEY,
+	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"userid" BIGINT NOT NULL,
 	"description" VARCHAR(256) NOT NULL,
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE "vdv_post" (
 
 DROP TABLE IF EXISTS "vdv_comment";
 CREATE TABLE "vdv_comment" (
-	"commentid" BIGSERIAL NOT NULL PRIMARY KEY ,
+	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"userid" BIGINT NOT NULL,
 	"text" TEXT NOT NULL,
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL
@@ -190,7 +190,7 @@ CREATE TABLE "vdv_comment" (
 
 DROP TABLE IF EXISTS "vdv_like";
 CREATE TABLE "vdv_like" (
-	"likeid" BIGSERIAL NOT NULL PRIMARY KEY ,
+	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY ,
 	"userid" BIGINT NOT NULL,
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (

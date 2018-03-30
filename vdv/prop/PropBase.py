@@ -13,9 +13,10 @@ class PropBase:
         res = OrderedDict([(key, self.__dict__[key]) for key in ['vdvid', 'propid', 'value']])
         return res
 
-    def __init__(self, name, type):
-        self.name = name
-        self.type = type
+    def __init__(self, vdvid, propid, value):
+        self.vdvid = vdvid
+        self.propid = propid
+        self.value = value
 
     def add(self):
         with DBConnection() as session:

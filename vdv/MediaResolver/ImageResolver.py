@@ -3,7 +3,7 @@ from io import BytesIO
 from skimage import io
 from skimage.transform import rescale
 
-from vdv.MediaResolver import MediaResolver
+from vdv.MediaResolver.MediaResolver import MediaResolver
 
 import uuid
 
