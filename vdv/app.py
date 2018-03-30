@@ -16,8 +16,8 @@ from vdv.auth import auth
 from vdv.db import DBConnection
 from vdv.serve_swagger import SpecServer
 
-from vdv.Entities.Location import Location
-from vdv.Entities.Media import Media
+from vdv.Entities.EntityLocation import Location
+from vdv.Entities.EntityMedia import Media
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
 def stringToBool(str):
