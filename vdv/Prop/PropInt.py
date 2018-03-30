@@ -1,4 +1,4 @@
-from vdv.prop.PropBase import PropBase
+from vdv.Prop.PropBase import PropBase
 
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()

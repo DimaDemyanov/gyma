@@ -1,7 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.Like import Like
-from vdv.prop.PropBase import PropBase
+from vdv.Prop.PropBase import PropBase
 
 Base = declarative_base()
 
