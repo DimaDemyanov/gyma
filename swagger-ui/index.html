@@ -77,7 +77,8 @@ window.onload = function() {
     url: "http://127.0.0.1:4201/vdv/swagger.json",
     dom_id: '#swagger-ui',
     deepLinking: true,
-    oauth2RedirectUrl: "http://127.0.0.1:4201/vdv/oauth2-redirect.html",
+      enableCORS: true,
+    oauth2RedirectUrl: "http://127.0.0.1:4201/vdv/swagger-ui/oauth2-redirect.html",
     presets: [
       SwaggerUIBundle.presets.apis,
       SwaggerUIStandalonePreset
