@@ -17,7 +17,12 @@
         "google": {
           "client_id": "166547794862-lacphj0d9mbmvh5ib474h1iirj9uf71n.apps.googleusercontent.com",
           "client_secret": "a345X-2KsS2p9EHCx6fjwnDS",
-          "realm": "http://GOOOGLE"
+          "realm": "http://GOOOGLE",
+          "scope": [],
+          "authorization_url": "https://accounts.google.com/o/oauth2/auth",
+          "access_token_url": "https://www.googleapis.com/oauth2/v4/token",
+          "user_info_url": "https://www.googleapis.com/plus/v1/people/me",
+          "check_token_url": "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token="
         }
       }
     },
@@ -38,7 +43,12 @@
         "google": {
           "client_id": "166547794862-lacphj0d9mbmvh5ib474h1iirj9uf71n.apps.googleusercontent.com",
           "client_secret": "a345X-2KsS2p9EHCx6fjwnDS",
-          "realm": "http://GOOOGLE"
+          "realm": "http://GOOOGLE",
+          "scope": [],
+          "authorization_url": "https://accounts.google.com/o/oauth2/auth",
+          "access_token_url": "https://www.googleapis.com/oauth2/v4/token",
+          "user_info_url": "https://www.googleapis.com/plus/v1/people/me",
+          "check_token_url": "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token="
         }
       }
     },
@@ -59,7 +69,12 @@
         "google": {
           "client_id": "166547794862-lacphj0d9mbmvh5ib474h1iirj9uf71n.apps.googleusercontent.com",
           "client_secret": "a345X-2KsS2p9EHCx6fjwnDS",
-          "realm": "http://GOOOGLE"
+          "realm": "http://GOOOGLE",
+          "scope": [],
+          "authorization_url": "https://accounts.google.com/o/oauth2/auth",
+          "access_token_url": "https://www.googleapis.com/oauth2/v4/token",
+          "user_info_url": "https://www.googleapis.com/plus/v1/people/me",
+          "check_token_url": "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token="
         }
       }
     }

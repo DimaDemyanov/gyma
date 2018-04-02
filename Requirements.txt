@@ -1,7 +1,6 @@
 waitress
 requests
 falcon
-python-jose
 psycopg2-binary
 sqlalchemy
 base

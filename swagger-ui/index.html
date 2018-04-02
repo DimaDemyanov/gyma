@@ -89,36 +89,6 @@ window.onload = function() {
     layout: "StandaloneLayout"
   });
 
-  var clientId = null;
-  var clientSecure = null;
-
-  function loadJSON(path, success, error) {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function()
-    {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                if (success)
-                    success(JSON.parse(xhr.responseText));
-            } else {
-                if (error)
-                    error(xhr);
-            }
-        }
-    };
-    xhr.open("GET", path, true);
-    xhr.send();
-  }
-
-  var x = loadJSON('http://127.0.0.1:4201/vdv/config.json',
-      function(data){
-      ui.initOAuth({
-          clientId: data.profiles[2].oidc.google.client_id.toString(),
-          clientSecret: data.profiles[2].oidc.google.client_secret.toString(),
-          oauth2RedirectUrl: "your-realms"
-      });
-  });
-
   window.ui = ui
 }
 </script>

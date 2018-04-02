@@ -12,8 +12,9 @@ CONFIG = {
         'realm': '',
         'scope': [],
         'authorization_url': 'https://accounts.google.com/o/oauth2/auth',
-        'access_token_url': 'https://accounts.google.com/o/oauth2/token',
-        'user_info_url': 'https://www.googleapis.com/plus/v1/people/me'
+        'access_token_url': 'https://www.googleapis.com/oauth2/v4/token',
+        'user_info_url': 'https://www.googleapis.com/plus/v1/people/me',
+        'check_token_url': 'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token='
     },
     PROVIDER.VK: {
         'client_id': '',
