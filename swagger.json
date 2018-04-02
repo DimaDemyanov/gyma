@@ -1284,7 +1284,7 @@
       "type": "oauth2",
       "flow": "accessCode",
       "authorizationUrl": "https://accounts.google.com/o/oauth2/auth",
-      "tokenUrl": "https://accounts.google.com/o/oauth2/token",
+      "tokenUrl": "https://www.googleapis.com/oauth2/v4/token",
       "scopes": {
         "email": "View your email address",
         "profile": "View your basic profile info"
