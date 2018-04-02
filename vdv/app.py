@@ -16,6 +16,7 @@ from vdv.auth import auth
 from vdv.db import DBConnection
 from vdv.serve_swagger import SpecServer
 
+from vdv.Entities.EntityCourt import EntityCourt
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityMedia import EntityMedia
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
@@ -31,6 +32,9 @@ def safeToInt(s):
         return int(s)
     except ValueError:
         return None
+
+def obj_to_json(obj):
+    return json.dumps(obj, indent=2)
 
 def getPathParam(name, **request_handler_args):
     # Falcon fails to strip the rest of the query from path param
@@ -125,7 +129,7 @@ def getVersion(**request_handler_args):
     resp = request_handler_args['resp']
     resp.status = falcon.HTTP_501
     with open("VERSION") as f:
-        resp.body = json.dumps({"version": f.read()})
+        resp.body = obj_to_json({"version": f.read()})
 
 def initDatabase(**request_handler_args):
     resp = request_handler_args['resp']
@@ -144,94 +148,79 @@ def cleanupDatabase(**request_handler_args):
 
 def getAllCourts(**request_handler_args):
     resp = request_handler_args['resp']
-    resp.status = falcon.HTTP_501
-    resp.body = json.dumps("Not implemented")
+
+    objects = EntityCourt.get().all()
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.status = falcon.HTTP_200
 
 def getCourtById(**request_handler_args):
     resp = request_handler_args['resp']
 
-    id = getIntPathParam('CourtId', **request_handler_args)
-    if id is None:
-        resp.status = falcon.HTTP_400
-        return
+    id = getIntPathParam('courtId', **request_handler_args)
+    objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-    #c = Court.GetCourtJSON(id)
-    #if not c:
-    #    resp.status = falcon.HTTP_404
-    #    return
+    wide_info = EntityCourt.get_wide_object(id)
+    result_arr = [o.to_dict() for o in objects]
+    for item in result_arr:
+        item['prop'] = wide_info
 
-    resp.status = falcon.HTTP_501
-    resp.body = json.dumps("Not implemented")
+    resp.body = obj_to_json(result_arr)
+    resp.status = falcon.HTTP_200
+
 
 def createCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    query_body = req.stream.read()
-    boundary = '--' + req.env['CONTENT_TYPE'].partition('=')[2]
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        id = EntityCourt.add_from_json(params)
 
-    data_parts = query_body.split(boundary.encode())
+        if id:
+            objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-    results = []
-    for key in req._params.keys():
-        data = req.get_param(key)
-        try:
-            resolver = MediaResolverFactory.produce(data.type.split('/')[0], data.file.read())
-            resolver.Resolve()
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
 
-            # TODO:NO NULL HERE AS OWNER
-            id = EntityMedia(0, resolver.type, resolver.url).add()
-            if id:
-                results.append(id)
-        except Exception as e:
-            resp.status = falcon.HTTP_400
-            resp.body = json.dumps("Media uploading error\nException::\n" + str(e), 2, 2)
-
-    resp.body = json.dumps(results, 2, 2)
-    resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_405
 
     
 def updateCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    try:
-        params = json.loads(req.stream.read().decode('utf-8'))
-    except ValueError:
-        resp.status = falcon.HTTP_405
-        return
-
-    id = params.get('id')
-    if id is None:
-        resp.status = falcon.HTTP_400
-        return
-
-    #if not Court.GetCourt(id):
-    #    resp.status = falcon.HTTP_404
-    #    return
-
-    #Court.UpdateCourt(params)
     resp.status = falcon.HTTP_501
     
 
 def deleteCourt(**request_handler_args):
-    req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    id = getIntPathParam('CourtId', **request_handler_args)
-    if id is None:
-        resp.status = falcon.HTTP_400
-        return
+    id = getIntPathParam('courtId', **request_handler_args)
 
-    hard = stringToBool(req.params.get('hard', 'false'))
+    if id is not None:
+        try:
+            EntityCourt.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
 
-    #c = Court.GetCourt(id)
-    #if not c:
-    #    resp.status = falcon.HTTP_404
-    #    return
+        try:
+            EntityCourt.delete_wide_object(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_405
+            return
 
-    #Court.RemoveCourt(id, hard)
-    resp.status = falcon.HTTP_501
+        object = EntityCourt.get().filter_by(vdvid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
     
 
 def createUser(**request_handler_args):
@@ -349,9 +338,10 @@ def createMedia(**request_handler_args):
                 results.append(id)
         except Exception as e:
             resp.status = falcon.HTTP_400
-            resp.body = json.dumps("Media uploading error\nException::\n" + str(e), 2, 2)
+            resp.body = obj_to_json("Media uploading error\nException::\n" + str(e))
+            return
 
-    resp.body = json.dumps(results, 2, 2)
+    resp.body = obj_to_json(results)
     resp.status = falcon.HTTP_200
 
 
@@ -363,7 +353,7 @@ def getAllOwnerMedias(**request_handler_args):
 
     if id is not None:
         objects = EntityMedia.get().filter_by(ownerid=id).all()
-        resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
+        resp.body = obj_to_json([o.to_dict() for o in objects])
         resp.status = falcon.HTTP_200
         return
 
@@ -379,7 +369,7 @@ def getMedia(**request_handler_args):
     if id is not None:
         objects = EntityMedia.get().filter_by(vdvid=id).all()
 
-        resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
+        resp.body = obj_to_json([o.to_dict() for o in objects])
         resp.status = falcon.HTTP_200
         return
 
@@ -428,7 +418,7 @@ def createLocation(**request_handler_args):
     if id:
         objects = EntityLocation.get().filter_by(vdvid=id).all()
 
-        resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
+        resp.body = obj_to_json([o.to_dict() for o in objects])
         resp.status = falcon.HTTP_200
         return
 
@@ -444,7 +434,7 @@ def getLocationById(**request_handler_args):
     if id is not None:
         objects = EntityLocation.get().filter_by(vdvid=id).all()
 
-        resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
+        resp.body = obj_to_json([o.to_dict() for o in objects])
         resp.status = falcon.HTTP_200
         return
 
@@ -478,7 +468,7 @@ def getAllLocations(**request_handler_args):
 
     objects = EntityLocation.get().all()#PropLike.get_object_property(0, 0)#
 
-    resp.body = json.dumps([o.to_dict() for o in objects], 2, 2)
+    resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
 
 operation_handlers = {
@@ -590,7 +580,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
+wsgi_app = api = falcon.API(middleware=[CORS(), MultipartMiddleware()])
 
 server = SpecServer(operation_handlers=operation_handlers)
 
@@ -603,7 +593,7 @@ if 'server_host' in cfg:
     if 'basePath' in swagger_json:
         baseURL = swagger_json['basePath']
 
-    json_string = json.dumps(swagger_json, indent=2)
+    json_string = json.dumps(swagger_json)
 
     with open('swagger_temp.json', 'wt') as f:
         f.write(json_string)

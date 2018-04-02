@@ -7,7 +7,7 @@ from vdv.db import DBConnection
 class PropBase:
     vdvid = Column(Integer, primary_key=True)
     propid = Column(Integer, primary_key=True)
-    value = Column(Boolean)
+    value = Column(Integer)
 
     def to_dict(self):
         res = OrderedDict([(key, self.__dict__[key]) for key in ['vdvid', 'propid', 'value']])
@@ -18,14 +18,24 @@ class PropBase:
         self.propid = propid
         self.value = value
 
-    def add(self):
-        with DBConnection() as session:
+    def add(self, session, no_commit=False):
+        def proseed(session):
             session.db.add(self)
-            session.db.commit()
-            return self.vdvid, self.propid
+            if not no_commit:
+                session.db.commit()
+                return self.vdvid
+            return None
+
+        if session:
+            return proseed(session)
+
+        with DBConnection() as session:
+            return proseed(session)
+
+        return None
 
     @classmethod
-    def delete(cls, vdvid, propid):
+    def delete(cls, vdvid, propid, raise_exception=True):
         with DBConnection() as session:
             res = session.db.query(cls).filter_by(vdvid=vdvid, propid=propid).all()
 
@@ -33,7 +43,8 @@ class PropBase:
                 [session.db.delete(_) for _ in res]
                 session.db.commit()
             else:
-                raise FileNotFoundError('(vdvid, propid) was not found')
+                if raise_exception:
+                    raise FileNotFoundError('(vdvid, propid) was not found')
 
     @classmethod
     def get(cls):

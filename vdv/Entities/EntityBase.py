@@ -30,6 +30,8 @@ class EntityBase:
             session.db.commit()
             return self.vdvid
 
+        return None
+
     @classmethod
     def delete(cls, vdvid):
         with DBConnection() as session:
