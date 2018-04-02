@@ -336,11 +336,6 @@ def createMedia(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    query_body = req.stream.read()
-    boundary = '--' + req.env['CONTENT_TYPE'].partition('=')[2]
-
-    data_parts = query_body.split(boundary.encode())
-
     results = []
     for key in req._params.keys():
         data = req.get_param(key)

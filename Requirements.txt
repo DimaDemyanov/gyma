@@ -2,7 +2,7 @@ waitress
 requests
 falcon
 python-jose
-psycopg2
+psycopg2-binary
 sqlalchemy
 base
 scipy
