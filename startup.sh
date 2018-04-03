@@ -1,6 +1,3 @@
 #!/usr/bin/env bash
 
-set -e
-
-python3 ./server.py --profile $PROFILE 
-# >/tmp/logs/mrs_$BUILD_NUMBER.log 2>/tmp/logs/mrs_$BUILD_NUMBER.log
+python3.6 ./server.py --profile $1 >output.log 2>error.log
