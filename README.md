@@ -1,13 +1,20 @@
 # VDV-Backend
 
-## DOCKER
-docker build -t vdvsrv -f Dockerfile .
-docker run -d -e "PROFILE=dev" -e "BUILD_NUMBER=33" -p 80:4201 --name vdvsrv vdvsrv
+## Grabbing the code
+git clone https://github.com/toshiks/VDV-Backend.git
 
+## Environment
+^ python3.6
 
-nohup python3.6 ./server.py --profile dev >/dev/null 2>/dev/null &
+## Setup requirements
+pip install ./Requirements.txt
 
-pgrep -af python | grep dev | awk '{print $1;}'
+## Running server
+python ./server.py --profile [ONE OF: dev, prod, elephant, local]
 
-kill $(pgrep -af python | grep dev | awk '{print $1;}')
-curl http://185.185.40.39:4201/vdv/swagger-ui/
+## Example
+pyhton ./server.py dev
+will run at http://0.0.0.0:4201/vdv/
+
+if running on localhost then visit the page after the start: http://127.0.0.1:4201/vdv/swagger-ui/
+
