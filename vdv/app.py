@@ -114,6 +114,12 @@ def httpDefault(**request_handler_args):
             length = fs[6]
 
             buffer = f.read()
+            if path.endswith('index.html'):
+                str = buffer.decode()
+                str = str.replace('127.0.0.1:4201', server_host)
+                buffer = str.encode()
+                length = len(buffer)
+
     except IOError:
         resp.status = falcon.HTTP_404
         return
@@ -588,7 +594,8 @@ if 'server_host' in cfg:
     with open('swagger.json') as f:
         swagger_json = json.loads(f.read(), object_pairs_hook=OrderedDict)
 
-    swagger_json['host'] = cfg['server_host']
+    server_host = cfg['server_host']
+    swagger_json['host'] = server_host
     baseURL = '/marsrv'
     if 'basePath' in swagger_json:
         baseURL = swagger_json['basePath']
