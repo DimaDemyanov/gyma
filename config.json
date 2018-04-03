@@ -28,15 +28,15 @@
     },
     {
       "name": "dev",
-      "server_host": "127.0.0.1:4201",
+      "server_host": "185.185.40.39:4201",
       "swagger_port": "8081",
       "api_port": "4201",
       "vdv_db": {
-        "host": "localhost",
-        "port": 1521,
-        "sid": "vdv",
-        "user": "VDV",
-        "password": "vdv",
+        "host": "postgres://wjcjjdvt:XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF@horton.elephantsql.com",
+        "port": 5432,
+        "sid": "wjcjjdvt",
+        "user": "wjcjjdvt",
+        "password": "XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF",
         "direct": null
       },
       "oidc": {

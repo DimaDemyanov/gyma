@@ -2,6 +2,5 @@
 
 set -e
 
-python3 ./server.py 
-# --profile $PROFILE 
+python3 ./server.py --profile $PROFILE 
 # >/tmp/logs/mrs_$BUILD_NUMBER.log 2>/tmp/logs/mrs_$BUILD_NUMBER.log
