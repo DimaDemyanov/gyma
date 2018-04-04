@@ -1,5 +1,5 @@
-DROP SEQUENCE vdv_seq;
-create SEQUENCE vdv_seq start with 1 increment by 1;
+DROP SEQUENCE IF EXISTS vdv_seq;
+CREATE SEQUENCE vdv_seq start with 1 increment by 1;
 
 DROP TYPE IF EXISTS vdv_prop_type CASCADE;
 CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location');

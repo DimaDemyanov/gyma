@@ -1,5 +1,7 @@
 from sqlalchemy import create_engine
+from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker
+
 
 class DBConnection:
     s_owner_token = None
@@ -7,19 +9,18 @@ class DBConnection:
     s_dbParams = {
         'host': 'localhost',
         'port': 5432,
-        'sid': 'vdv',
+        'sid': 'VDV',
         'user': 'vdv_admin',
         'password': "asdfghjkl;'",
-        'dbname': 'VDV',
-        'direct': None
     }
 
     @classmethod
     def configure(cls, **kwargs):
         cls.s_dbParams.update(kwargs)
-        #TODO: IMPROVE AUTH TO DB
-        cls.engine = create_engine('postgresql://wjcjjdvt:XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF@horton.elephantsql.com:5432/wjcjjdvt', pool_size=2)
-        # create a configured "Session" class
+        dsn = URL("postgresql", username=cls.s_dbParams['user'], password=cls.s_dbParams['password'],
+                  host=cls.s_dbParams['host'], port=cls.s_dbParams['port'], database=cls.s_dbParams['sid'])
+
+        cls.engine = create_engine(dsn, pool_size=2)       # create a configured "Session" class
         cls.Session = sessionmaker(bind=cls.engine)
 
     def __init__(self, logger=None):
@@ -38,14 +39,14 @@ class DBConnection:
         self.close()
 
     def __acquire_connection(self):
-        #conn = self.engine.connect()
+        # conn = self.engine.connect()
         session = self.Session()
 
         return session
 
     def __release_connection(self, session):
         session.close()
-        #conn.close()
+        # conn.close()
 
     def open(self):
         self.db = self.__acquire_connection()

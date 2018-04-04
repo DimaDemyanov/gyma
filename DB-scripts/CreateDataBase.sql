@@ -1,6 +1,6 @@
-CREATE DATABASE "VDV"
-WITH OWNER "vdv_dev"
+CREATE DATABASE "vdv_dev"
+WITH OWNER "postgres"
   ENCODING 'UTF-8'
-  LC_COLLATE = 'English_United States.1252'
-  LC_CTYPE = 'English_United States.1252'
+  LC_COLLATE = 'en_US.utf8'
+  LC_CTYPE = 'en_US.utf8'
   TEMPLATE template0;
