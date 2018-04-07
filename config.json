@@ -11,7 +11,8 @@
         "sid": "vdv",
         "user": "VDV",
         "password": "vdv",
-        "direct": null
+        "direct": null,
+        "pool_size": 2
       },
       "oidc": {
         "google": {
@@ -37,7 +38,8 @@
         "sid": "vdv_dev",
         "user": "postgres",
         "password": "9j46cqOn9q463uPW",
-        "direct": null
+        "direct": null,
+        "pool_size": 2
       },
       "oidc": {
         "google": {
@@ -63,7 +65,8 @@
         "sid": "wjcjjdvt",
         "user": "wjcjjdvt",
         "password": "XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF",
-        "direct": null
+        "direct": null,
+        "pool_size": 2
       },
       "oidc": {
         "google": {

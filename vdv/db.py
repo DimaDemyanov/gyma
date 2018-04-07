@@ -12,6 +12,7 @@ class DBConnection:
         'sid': 'VDV',
         'user': 'vdv_admin',
         'password': "asdfghjkl;'",
+        'pool_size': 2
     }
 
     @classmethod
@@ -20,7 +21,7 @@ class DBConnection:
         dsn = URL("postgresql", username=cls.s_dbParams['user'], password=cls.s_dbParams['password'],
                   host=cls.s_dbParams['host'], port=cls.s_dbParams['port'], database=cls.s_dbParams['sid'])
 
-        cls.engine = create_engine(dsn, pool_size=2)       # create a configured "Session" class
+        cls.engine = create_engine(dsn, pool_size=cls.s_dbParams['pool_size'])       # create a configured "Session" class
         cls.Session = sessionmaker(bind=cls.engine)
 
     def __init__(self, logger=None):
