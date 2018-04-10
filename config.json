@@ -29,7 +29,7 @@
     },
     {
       "name": "dev",
-      "server_host": "185.185.40.39:4201",
+      "server_host": "vdv.itsociety.su:4201",
       "swagger_port": "8081",
       "api_port": "4201",
       "vdv_db": {
