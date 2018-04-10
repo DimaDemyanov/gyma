@@ -1326,17 +1326,29 @@
           "type": "integer",
           "format": "int64"
         },
-        "name": {
+        "username": {
           "type": "string",
           "example": "Daniil"
         },
-        "surname": {
+        "e_mail": {
           "type": "string",
-          "example": "Savchuk"
+          "example": "Savchuk@itsociety.su"
         },
-        "description": {
-          "type": "string",
-          "example": "I am from Saint-Petersburg"
+        "prop": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "private"
+              },
+              "value": {
+                "type": "boolean",
+                "example": false
+              }
+            }
+          }
         },
         "created": {
           "type": "string",

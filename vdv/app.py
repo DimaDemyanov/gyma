@@ -17,6 +17,7 @@ from vdv.db import DBConnection
 from vdv.serve_swagger import SpecServer
 
 from vdv.Entities.EntityCourt import EntityCourt
+from vdv.Entities.EntityUser import EntityUser
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityMedia import EntityMedia
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
@@ -44,6 +45,13 @@ def getIntPathParam(name, **request_handler_args):
     s = getPathParam(name, **request_handler_args)
     try:
         return int(s)
+    except ValueError:
+        return None
+
+def getStrPathParam(name, **request_handler_args):
+    s = getPathParam(name, **request_handler_args)
+    try:
+        return str(s)
     except ValueError:
         return None
 
@@ -233,6 +241,20 @@ def createUser(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        id = EntityUser.add_from_json(params)
+
+        if id:
+            objects = EntityUser.get().filter_by(vdvid=id).all()
+
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
     resp.status = falcon.HTTP_501
     
 
@@ -247,21 +269,60 @@ def getAllUsers(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    objects = EntityUser.get().all()
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.status = falcon.HTTP_200
     
 
 def getUserById(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    id = getIntPathParam("userId", **request_handler_args)
+    objects = EntityUser.get().filter_by(vdvid=id).all()
+
+    wide_info = EntityUser.get_wide_object(id)
+    result_arr = [o.to_dict() for o in objects]
+    for item in result_arr:
+        item['prop'] = wide_info
+
+    resp.body = obj_to_json(result_arr)
+    resp.status = falcon.HTTP_200
     
 
 def deleteUser(**request_handler_args):
-    req = request_handler_args['req']
     resp = request_handler_args['resp']
+    req = request_handler_args['req']
 
-    resp.status = falcon.HTTP_501
+    e_mail = req.context['email']
+    id_from_req = getIntPathParam("userId", **request_handler_args)
+    id = EntityUser.get_id_from_email(e_mail)
+
+    if id is not None:
+        if id != id_from_req:
+            resp.status = falcon.HTTP_400
+            return
+
+        try:
+            EntityUser.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
+
+        try:
+            EntityUser.delete_wide_object(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_405
+            return
+
+        object = EntityUser.get().filter_by(vdvid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
+
     
 
 def getUserFollowingsList(**request_handler_args):
@@ -563,8 +624,9 @@ class Auth(object):
 
         error = 'Authorization required.'
         if token:
-            error, res = auth.Validate(token, auth.PROVIDER.GOOGLE)
+            error, res, email = auth.Validate(token, auth.PROVIDER.GOOGLE)
             if not error:
+                req.context['email'] = email
                 return # passed access token is valid
 
         raise falcon.HTTPUnauthorized(description=error,
