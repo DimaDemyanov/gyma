@@ -33,11 +33,11 @@
       "swagger_port": "8081",
       "api_port": "4201",
       "vdv_db": {
-        "host": "localhost",
+        "host": "horton.elephantsql.com",
         "port": 5432,
-        "sid": "vdv_dev",
-        "user": "postgres",
-        "password": "9j46cqOn9q463uPW",
+        "sid": "wjcjjdvt",
+        "user": "wjcjjdvt",
+        "password": "XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF",
         "direct": null,
         "pool_size": 2
       },
@@ -60,7 +60,7 @@
       "swagger_port": "8081",
       "api_port": "4201",
       "vdv_db": {
-        "host": "postgres://wjcjjdvt:XiZFxCaDuNg2b9z3MzBjDjMEnvF6clEF@horton.elephantsql.com",
+        "host": "horton.elephantsql.com",
         "port": 5432,
         "sid": "wjcjjdvt",
         "user": "wjcjjdvt",
