@@ -99,7 +99,7 @@ INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'media', 'm
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'comment', 'comment');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'like', 'like');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'location', 'location');
-
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'post', 'post');
 
 DROP TABLE IF EXISTS "vdv_prop_bool";
 CREATE TABLE "vdv_prop_bool" (
@@ -168,6 +168,16 @@ CREATE TABLE "vdv_prop_like" (
 
 DROP TABLE IF EXISTS "vdv_prop_location";
 CREATE TABLE "vdv_prop_location" (
+	"vdvid" BIGINT NOT NULL,
+	"propid" BIGINT NOT NULL,
+	"value" BIGINT NOT NULL,
+	PRIMARY KEY (vdvid, propid, value)
+) WITH (
+  OIDS=FALSE
+);
+
+DROP TABLE IF EXISTS "vdv_prop_post";
+CREATE TABLE "vdv_prop_post" (
 	"vdvid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
 	"value" BIGINT NOT NULL,

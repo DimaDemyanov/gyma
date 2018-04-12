@@ -10,6 +10,7 @@ from vdv.Entities.EntityProp import EntityProp
 
 from vdv.Prop.PropBool import PropBool
 from vdv.Prop.PropMedia import PropMedia
+from vdv.Prop.PropPost import PropPost
 from vdv.Prop.PropLocation import PropLocation
 
 from vdv.db import DBConnection
@@ -45,10 +46,10 @@ class EntityUser(EntityBase, Base):
         PROP_MAPPING = {
             'private':
                 lambda session, _vdvid, _id, _value: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
-            'location':
-                lambda s, _vdvid, _id, _val: PropLocation(_vdvid, _id, _val).add(session=s, no_commit=True),
-            'media':
-                lambda s, _vdvid, _id, _val: [PropMedia(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val]
+            'post':
+                lambda s, _vdvid, _id, _val: [PropPost(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val],
+            'avatar':
+                lambda s, _vdvid, _id, _val: PropMedia(_vdvid, _id, _val).add(session=s, no_commit=True)
         }
 
         if 'username' in data and 'e_mail' in data and 'prop' in data:
@@ -80,8 +81,8 @@ class EntityUser(EntityBase, Base):
 
         PROP_MAPPING = {
             'private': lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'location': lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
-            'media': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id)
+            'post': lambda _vdvid, _id: PropPost.get_object_property(_vdvid, _id),
+            'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id)
         }
 
         result = []
@@ -97,8 +98,8 @@ class EntityUser(EntityBase, Base):
 
         PROP_MAPPING = {
             'private': lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'location': lambda _vdvid, _id: PropLocation.delete(_vdvid, _id, False),
-            'media': lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False)
+            'post': lambda _vdvid, _id: PropPost.delete(_vdvid, _id, False),
+            'avatar': lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False)
         }
 
         for key, propid in PROPNAME_MAPPING.items():
