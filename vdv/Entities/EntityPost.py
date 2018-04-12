@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import datetime
 import time
 
@@ -5,14 +6,20 @@ from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
+from vdv.Entities.EntityProp import EntityProp
+
+from vdv.Prop.PropLocation import PropLocation
+from vdv.Prop.PropComment import PropComment
+from vdv.Prop.PropLike import PropLike
+from vdv.Prop.PropMedia import PropMedia
 
 from vdv.db import DBConnection
 
 Base = declarative_base()
 
+
 class EntityPost(EntityBase, Base):
     __tablename__ = 'vdv_post'
-
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     userid = Column(Integer)
@@ -35,10 +42,73 @@ class EntityPost(EntityBase, Base):
     def add_from_json(cls, data, userId):
         vdvid = None
 
-        if 'description' in data:
+        if userId is None:
+            return None
+
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
+        PROP_MAPPING = {
+            'location':
+                lambda s, _vdvid, _id, _val: PropLocation(_vdvid, _id, _val).add(session=s, no_commit=True),
+            'comment':
+                lambda s, _vdvid, _id, _val: [PropComment(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val],
+            'media':
+                lambda s, _vdvid, _id, _val: [PropMedia(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val],
+            'like':
+                lambda s, _vdvid, _id, _val: [PropLike(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val]
+        }
+
+        if 'description' in data and "prop" in data:
             description = data['description']
 
             new_entity = EntityPost(userId, description)
             vdvid = new_entity.add()
 
+            with DBConnection() as session:
+                for prop in data['prop']:
+                    prop_name = prop['name']
+                    prop_val = prop['value']
+
+                    if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
+                        PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
+                    else:
+                        new_entity.delete(vdvid)
+                        raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
+                                        (prop_name, str(PROPNAME_MAPPING)))
+
+                session.db.commit()
+
         return vdvid
+
+    @classmethod
+    def get_wide_object(cls, vdvid):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
+        PROP_MAPPING = {
+            'location': lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
+            'comment':  lambda _vdvid, _id: PropComment.get_object_property(_vdvid, _id),
+            'media':    lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
+            'like':     lambda _vdvid, _id: PropLike.get_object_property(_vdvid, _id)
+        }
+
+        result = []
+        for key, propid in PROPNAME_MAPPING.items():
+            if key in PROP_MAPPING:
+                result.append(OrderedDict([('name', key), ('value', PROP_MAPPING[key](vdvid, propid))]))
+
+        return result
+
+    @classmethod
+    def delete_wide_object(cls, vdvid):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
+        PROP_MAPPING = {
+            'location': lambda _vdvid, _id: PropLocation.delete(_vdvid, _id, False),
+            'comment':  lambda _vdvid, _id: PropComment.delete(_vdvid, _id, False),
+            'media':    lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False),
+            'like':     lambda _vdvid, _id: PropLike.delete(_vdvid, _id, False)
+        }
+
+        for key, propid in PROPNAME_MAPPING.items():
+            if key in PROP_MAPPING:
+                PROP_MAPPING[key](vdvid, propid)

@@ -1650,6 +1650,22 @@
           "type": "string",
           "example": "Post about something"
         },
+        "prop": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "media"
+              },
+              "value": {
+                "type": "string",
+                "example": "prop_value"
+              }
+            }
+          }
+        },
         "created": {
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"

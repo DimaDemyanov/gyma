@@ -9,7 +9,7 @@ from vdv.Entities.EntityBase import EntityBase
 Base = declarative_base()
 
 class EntityComment(EntityBase, Base):
-    __tablename__ = 'vdv_court'
+    __tablename__ = 'vdv_comment'
 
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)

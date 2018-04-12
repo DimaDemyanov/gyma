@@ -545,11 +545,12 @@ def getPostById(**request_handler_args):
     resp = request_handler_args['resp']
 
     id = getIntPathParam("postId", **request_handler_args)
-    print("ok")
-    print(id)
     objects = EntityPost.get().filter_by(vdvid=id).all()
 
+    wide_info = EntityPost.get_wide_object(id)
     result_arr = [o.to_dict() for o in objects]
+    for item in result_arr:
+        item['prop'] = wide_info
 
     resp.body = obj_to_json(result_arr)
     resp.status = falcon.HTTP_200
@@ -608,6 +609,12 @@ def deletePost(**request_handler_args):
             EntityPost.delete(id)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
+            return
+
+        try:
+            EntityPost.delete_wide_object(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_405
             return
 
         object = EntityPost.get().filter_by(vdvid=id).all()

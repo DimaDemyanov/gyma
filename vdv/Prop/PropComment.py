@@ -7,7 +7,7 @@ Base = declarative_base()
 
 from vdv.db import DBConnection
 
-class PropLike(PropBase, Base):
+class PropComment(PropBase, Base):
     __tablename__ = 'vdv_prop_comment'
 
     def __init__(self, vdvid, propid, value):
