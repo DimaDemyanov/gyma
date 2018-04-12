@@ -2,10 +2,13 @@ DROP SEQUENCE IF EXISTS vdv_seq;
 CREATE SEQUENCE vdv_seq start with 1 increment by 1;
 
 DROP TYPE IF EXISTS vdv_prop_type CASCADE;
-CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location');
+CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post');
 
 DROP TYPE IF EXISTS vdv_media_type CASCADE;
 CREATE TYPE vdv_media_type AS ENUM ('image');
+
+DROP TYPE IF EXISTS vdv_user_admin_type CASCADE;
+CREATE TYPE vdv_user_admin_type AS ENUM ('admin', 'super');
 
 DROP TABLE IF EXISTS "vdv_court";
 CREATE TABLE "vdv_court" (
@@ -223,5 +226,13 @@ CREATE TABLE "vdv_like" (
 );
 
 
+DROP TABLE IF EXISTS "vdv_user_admin";
+CREATE TABLE "vdv_user_admin" (
+	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY,
+	"userid" BIGINT NOT NULL,
+	"level" vdv_user_admin_type NOT NULL
+) WITH (
+	OIDS=FALSE
+);
 
 commit;
