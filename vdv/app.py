@@ -20,6 +20,7 @@ from vdv.Entities.EntityCourt import EntityCourt
 from vdv.Entities.EntityUser import EntityUser
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityMedia import EntityMedia
+from vdv.Entities.EntityPost import EntityPost
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
 def stringToBool(str):
@@ -538,6 +539,84 @@ def getAllLocations(**request_handler_args):
     resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
 
+
+def getPostById(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam("postId", **request_handler_args)
+    print("ok")
+    print(id)
+    objects = EntityPost.get().filter_by(vdvid=id).all()
+
+    result_arr = [o.to_dict() for o in objects]
+
+    resp.body = obj_to_json(result_arr)
+    resp.status = falcon.HTTP_200
+
+
+def getAllPosts(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    objects = EntityPost.get().all()
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.status = falcon.HTTP_200
+
+def createPost(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    userId = EntityUser.get_id_from_email(req.context['email'])
+
+    if userId is None:
+        resp.status = falcon.HTTP_405
+        return
+
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        id = EntityPost.add_from_json(params, userId)
+
+        if id:
+            objects = EntityPost.get().filter_by(vdvid=id).all()
+
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
+    resp.status = falcon.HTTP_501
+
+
+def updatePost(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    resp.status = falcon.HTTP_501
+
+
+def deletePost(**request_handler_args):
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('postId', **request_handler_args)
+
+    if id is not None:
+        try:
+            EntityPost.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
+
+        object = EntityPost.get().filter_by(vdvid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
+
 operation_handlers = {
     'initDatabase':    [initDatabase],
     'cleanupDatabase': [cleanupDatabase],
@@ -578,6 +657,13 @@ operation_handlers = {
     'getLocationById':        [getLocationById],
     'deleteLocation':         [deleteLocation],
     'getAllLocations':        [getAllLocations],
+
+    #Post methods
+    'getPostById':          [getPostById],
+    'getAllPosts':          [getAllPosts],
+    'createPost':           [createPost],
+    'updatePost':           [updatePost],
+    'deletePost':           [deletePost]
 }
 
 class CORS(object):

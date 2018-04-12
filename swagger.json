@@ -393,7 +393,7 @@
             "description": "User encoded in JSON string",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Court"
+              "$ref": "#/definitions/User"
             }
           }
         ],
@@ -1277,6 +1277,202 @@
           }
         ]
       }
+    },
+    "/post": {
+      "post": {
+        "tags": [
+          "post"
+        ],
+        "summary": "Create a new post",
+        "description": "",
+        "operationId": "createPost",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_post",
+            "in": "body",
+            "description": "Post encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Name already taken"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "post"
+        ],
+        "summary": "Update existing catalog info",
+        "description": "",
+        "operationId": "updatePost",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_post",
+            "in": "body",
+            "description": "Post encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/post/all": {
+      "get": {
+        "tags": [
+          "post"
+        ],
+        "summary": "Get all posts",
+        "description": "Returns a list of posts descriptions",
+        "operationId": "getAllPosts",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/post/{postId}": {
+      "get": {
+        "tags": [
+          "post"
+        ],
+        "summary": "Find post by ID",
+        "description": "Returns a post description",
+        "operationId": "getPostById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "ID of post to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "post"
+        ],
+        "summary": "Remove post",
+        "description": "",
+        "operationId": "deletePost",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Post id to unlink",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "hard",
+            "in": "query",
+            "description": "Hard-delete (no undo)",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Post not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
     }
   },
   "securityDefinitions": {
@@ -1425,6 +1621,34 @@
               }
             }
           }
+        },
+        "created": {
+          "type": "string",
+          "example": "2018-03-28 20:24:00+00:00"
+        },
+        "updated": {
+          "type": "string",
+          "example": "2018-03-28 20:24:00+00:00"
+        }
+      }
+    },
+    "Post": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "description": {
+          "type": "string",
+          "example": "Post about something"
         },
         "created": {
           "type": "string",

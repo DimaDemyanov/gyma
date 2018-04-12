@@ -7,7 +7,7 @@
       "api_port": "4201",
       "vdv_db": {
         "host": "localhost",
-        "port": 1521,
+        "port": 5432,
         "sid": "vdv",
         "user": "VDV",
         "password": "vdv",
