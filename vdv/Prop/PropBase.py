@@ -34,6 +34,21 @@ class PropBase:
 
         return None
 
+    def update(self, session, no_commit=False):
+        def proseed(session):
+            entities = self.__class__.get().filter_by(vdvid=self.vdvid, propid=self.propid).all()
+            for _ in entities:
+                _.value = self.value
+
+            if not no_commit:
+                session.db.commit()
+
+        if session:
+            proseed(session)
+
+        with DBConnection() as session:
+            proseed(session)
+
     @classmethod
     def delete(cls, vdvid, propid, raise_exception=True):
         with DBConnection() as session:

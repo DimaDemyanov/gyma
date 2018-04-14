@@ -46,8 +46,6 @@ class EntityUser(EntityBase, Base):
         PROP_MAPPING = {
             'private':
                 lambda session, _vdvid, _id, _value: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
-            'post':
-                lambda s, _vdvid, _id, _val: [PropPost(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val],
             'avatar':
                 lambda s, _vdvid, _id, _val: PropMedia(_vdvid, _id, _val).add(session=s, no_commit=True)
         }
@@ -72,6 +70,51 @@ class EntityUser(EntityBase, Base):
                                         (prop_name, str(PROPNAME_MAPPING)))
 
                 session.db.commit()
+
+        return vdvid
+
+    @classmethod
+    def update_from_json(cls, data):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
+        vdvid = None
+
+        PROP_MAPPING = {
+            'private':
+                lambda session, _vdvid, _id, _value:
+                PropBool(_vdvid, _id, _value).update(session=session)
+                if len(PropBool.get().filter_by(vdvid=_vdvid, propid=_id).all())
+                else PropBool(_vdvid, _id, _value).add(session=session),
+            'avatar':
+                lambda s, _vdvid, _id, _val:
+                PropMedia(_vdvid, _id, _val).update(session=s)
+                if len(PropMedia.get().filter_by(vdvid=_vdvid, propid=_id).all())
+                else PropMedia(_vdvid, _id, _val).add(session=session),
+        }
+
+        if 'id' in data:
+            with DBConnection() as session:
+                vdvid = data['id']
+                entity = session.db.query(EntityUser).filter_by(vdvid=vdvid).all()
+
+                if len(entity):
+                    for _ in entity:
+                        if 'username' in data:
+                            _.username = data['username']
+
+                        if 'e_mail' in data:
+                            _.e_mail = data['e_mail']
+
+                        session.db.commit()
+
+                        for prop in data['prop']:
+                            prop_name = prop['name']
+                            prop_val = prop['value']
+
+                            if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
+                                PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
+
+                        session.db.commit()
 
         return vdvid
 

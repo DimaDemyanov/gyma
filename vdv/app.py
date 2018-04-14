@@ -268,6 +268,20 @@ def updateUser(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        id = EntityUser.update_from_json(params)
+
+        if id:
+            objects = EntityUser.get().filter_by(vdvid=id).all()
+
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
     resp.status = falcon.HTTP_501
     
 
