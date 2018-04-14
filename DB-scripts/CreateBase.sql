@@ -13,6 +13,7 @@ CREATE TYPE vdv_user_admin_type AS ENUM ('admin', 'super');
 DROP TABLE IF EXISTS "vdv_court";
 CREATE TABLE "vdv_court" (
 	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY ,
+	"ownerid" BIGSERIAL NOT NULL,
 	"name" VARCHAR(256) NOT NULL UNIQUE,
 	"desc" VARCHAR(4000) NOT NULL DEFAULT '',
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -20,7 +21,6 @@ CREATE TABLE "vdv_court" (
 ) WITH (
   OIDS=FALSE
 );
-
 
 
 DROP TABLE IF EXISTS "vdv_user";

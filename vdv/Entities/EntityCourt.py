@@ -20,16 +20,18 @@ class EntityCourt(EntityBase, Base):
     __tablename__ = 'vdv_court'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
+    ownerid = Column(Integer)
     name = Column(String)
     desc = Column(String)
     created = Column(Date)
     updated = Column(Date)
 
-    json_serialize_items_list = ['vdvid', 'name', 'desc', 'created', 'updated']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'created', 'updated']
 
-    def __init__(self, name, desc):
+    def __init__(self, ownerid, name, desc):
         super().__init__()
 
+        self.ownerid = ownerid
         self.name = name
         self.desc = desc
 
@@ -59,12 +61,12 @@ class EntityCourt(EntityBase, Base):
                 lambda s, _vdvid, _id, _val : [PropMedia(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val]
         }
 
-        if 'name' in data and 'desc' in data and 'prop' in data :
+        if 'ownerid' in data and 'name' in data and 'desc' in data and 'prop' in data :
+            ownerid = data['ownerid']
             name = data['name']
             desc = data['desc']
 
-
-            new_entity = EntityCourt(name, desc)
+            new_entity = EntityCourt(ownerid, name, desc)
             vdvid = new_entity.add()
 
             with DBConnection() as session:

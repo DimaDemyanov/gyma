@@ -189,7 +189,12 @@ def createCourt(**request_handler_args):
     resp = request_handler_args['resp']
 
     try:
+        e_mail = req.context['email']
+        ownerid = EntityUser.get_id_from_email(e_mail)
+
         params = json.loads(req.stream.read().decode('utf-8'))
+        params['ownerid'] = ownerid
+
         id = EntityCourt.add_from_json(params)
 
         if id:
@@ -720,6 +725,11 @@ class Auth(object):
             error, res, email = auth.Validate(token, auth.PROVIDER.GOOGLE)
             if not error:
                 req.context['email'] = email
+
+                if not EntityUser.get_id_from_email(email) and not re.match('(/vdv/user).*', req.relative_uri):
+                    raise falcon.HTTPUnavailableForLegalReasons(description=
+                                                                "Requestor [%s] not existed as user yet" % email)
+
                 return # passed access token is valid
 
         raise falcon.HTTPUnauthorized(description=error,
