@@ -309,7 +309,20 @@ def getUserById(**request_handler_args):
 
     resp.body = obj_to_json(result_arr)
     resp.status = falcon.HTTP_200
-    
+
+
+def getMyUser(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    e_mail = req.context['email']
+    ownerid = EntityUser.get_id_from_email(e_mail)
+
+    objects = EntityUser.get().filter_by(vdvid=ownerid).all()
+
+    resp.body = obj_to_json([_.to_dict() for _ in objects])
+    resp.status = falcon.HTTP_200
+
 
 def deleteUser(**request_handler_args):
     resp = request_handler_args['resp']
@@ -667,6 +680,7 @@ operation_handlers = {
     'updateUser':             [updateUser],
     'getAllUsers':            [getAllUsers],
     'getUser':                [getUserById],
+    'getMyUser':              [getMyUser],
     'deleteUser':             [deleteUser],
     'getUserFollowingsList':        [getUserFollowingsList],
     'userAddFollowing':             [userAddFollowing],

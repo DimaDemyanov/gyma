@@ -441,6 +441,32 @@
         ]
       }
     },
+    "/user/me": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get my user info",
+        "description": "Returns an info of currently authorized user",
+        "operationId": "getMyUser",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/user/{userId}": {
       "get": {
         "tags": [
