@@ -58,7 +58,9 @@ class EntityCourt(EntityBase, Base):
             'location':
                 lambda s, _vdvid, _id, _val: PropLocation(_vdvid, _id, _val).add(session=s, no_commit=True),
             'media':
-                lambda s, _vdvid, _id, _val : [PropMedia(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val]
+                lambda s, _vdvid, _id, _val : [PropMedia(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val],
+            'equipment':
+                lambda s, _vdvid, _id, _val: [PropMedia(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val]
         }
 
         if 'ownerid' in data and 'name' in data and 'desc' in data and 'prop' in data :
@@ -89,13 +91,14 @@ class EntityCourt(EntityBase, Base):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         PROP_MAPPING = {
-            'private':  lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'isopen':   lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'isfree':   lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'isonair':  lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'price':    lambda _vdvid, _id: PropReal.get_object_property(_vdvid, _id),
-            'location': lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
-            'media':    lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id)
+            'private':   lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
+            'isopen':    lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
+            'isfree':    lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
+            'isonair':   lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
+            'price':     lambda _vdvid, _id: PropReal.get_object_property(_vdvid, _id),
+            'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
+            'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
+            'equipment': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id)
         }
 
 
@@ -111,13 +114,14 @@ class EntityCourt(EntityBase, Base):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         PROP_MAPPING = {
-            'private':  lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'isopen':   lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'isfree':   lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'isonair':  lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'price':    lambda _vdvid, _id: PropReal.delete(_vdvid, _id, False),
-            'location': lambda _vdvid, _id: PropLocation.delete(_vdvid, _id, False),
-            'media':    lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False)
+            'private':   lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
+            'isopen':    lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
+            'isfree':    lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
+            'isonair':   lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
+            'price':     lambda _vdvid, _id: PropReal.delete(_vdvid, _id, False),
+            'location':  lambda _vdvid, _id: PropLocation.delete(_vdvid, _id, False),
+            'media':     lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False),
+            'equipment': lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False)
         }
 
         for key, propid in PROPNAME_MAPPING.items():

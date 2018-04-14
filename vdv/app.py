@@ -398,15 +398,21 @@ def createMedia(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
+    e_mail = req.context['email']
+    ownerid = EntityUser.get_id_from_email(e_mail)
+    media_type = req.params['type']
+    name = req.params['name'] if 'name' in req.params else ''
+    desc = req.params['desc'] if 'desc' in req.params else ''
+
     results = []
-    for key in req._params.keys():
+    for key in (_ for _ in req._params.keys() if _.startswith('file')):
         data = req.get_param(key)
         try:
-            resolver = MediaResolverFactory.produce(data.type.split('/')[0], data.file.read())
+            resolver = MediaResolverFactory.produce(media_type, data.file.read())
             resolver.Resolve()
 
             #TODO:NO NULL HERE AS OWNER
-            id = EntityMedia(0, resolver.type, resolver.url).add()
+            id = EntityMedia(ownerid, media_type, resolver.url, name=name, desc=desc).add()
             if id:
                 results.append(id)
         except Exception as e:

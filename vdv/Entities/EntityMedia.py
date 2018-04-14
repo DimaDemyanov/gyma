@@ -15,16 +15,20 @@ class EntityMedia(EntityBase, Base):
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     ownerid = Column(Integer)
+    name = Column(String)
+    desc = Column(String)
     type    = Column(String)
     url     = Column(Integer)
     created = Column(Date)
 
-    json_serialize_items_list = ['vdvid', 'ownerid', 'type', 'url', 'created']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'type', 'url', 'created']
 
-    def __init__(self, ownerid, type, url):
+    def __init__(self, ownerid, type, url, name='', desc=''):
         super().__init__()
 
         self.ownerid = ownerid
+        self.name = name
+        self.desc = desc
         self.type = type
         self.url = url
 

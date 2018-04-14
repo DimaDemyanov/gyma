@@ -12,22 +12,29 @@ MIN_IMAGE_SIDE = 256
 MAX_ASPECT_RATIO = 1.34
 
 class ImageResolver(MediaResolver):
-    def __init__(self, data):
+    def __init__(self, _type, data):
         super().__init__(data)
-        self.type = 'image'
+
+        type_mapping = {
+            'image': (1024, 256, 1.34),
+            'equipment': (512, 64, 1.34),
+        }
+
+        self.max_image_size, self.min_image_size, self.max_aspect_ratio = \
+            type_mapping[_type] \
+                if _type in type_mapping \
+                else (MAX_IMAGE_SIDE, MIN_IMAGE_SIDE, MAX_ASPECT_RATIO)
+
+        self.type = _type
 
     def Resolve(self):
-        try:
-            img = io.imread(BytesIO(self.data))
-        except Exception as e:
-            print(e)
-            return None
+        img = io.imread(BytesIO(self.data))
 
         w, h = img.shape[1], img.shape[0]
 
         aspect = max(w, h) / min(w, h)
-        if aspect > MAX_ASPECT_RATIO:
-            new_t = int(min(w, h) * MAX_ASPECT_RATIO)
+        if aspect > self.max_aspect_ratio:
+            new_t = int(min(w, h) * self.max_aspect_ratio)
             dt = int((max(w, h) - new_t) / 2)
             if min(w, h) == h:
                 img = img[:, dt:(dt + new_t)]
@@ -37,12 +44,12 @@ class ImageResolver(MediaResolver):
             w, h = img.shape[1], img.shape[0]
 
 
-        if max(w, h) > MAX_IMAGE_SIDE:
-            ds = MAX_IMAGE_SIDE / max(w, h)
+        if max(w, h) > self.max_image_size:
+            ds = self.max_image_size / max(w, h)
             img = rescale(image=img, scale=ds)
 
-        if min(w, h) < MIN_IMAGE_SIDE:
-            return None
+        if min(w, h) < self.min_image_size:
+            raise Exception("Image size too small, minimum side size = %i" % self.min_image_size)
 
         self.url = './images/%s.jpg' % uuid.uuid4().hex
         io.imsave(self.url, img)

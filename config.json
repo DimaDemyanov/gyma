@@ -28,6 +28,33 @@
       }
     },
     {
+      "name": "local_on_dev",
+      "server_host": "vdv.itsociety.su:4201",
+      "swagger_port": "8081",
+      "api_port": "4201",
+      "vdv_db": {
+        "host": "185.185.40.39",
+        "port": 5432,
+        "sid": "vdv_dev",
+        "user": "postgres",
+        "password": "9j46cqOn9q463uPW",
+        "direct": null,
+        "pool_size": 2
+      },
+      "oidc": {
+        "google": {
+          "client_id": "166547794862-lacphj0d9mbmvh5ib474h1iirj9uf71n.apps.googleusercontent.com",
+          "client_secret": "a345X-2KsS2p9EHCx6fjwnDS",
+          "realm": "http://GOOOGLE",
+          "scope": [],
+          "authorization_url": "https://accounts.google.com/o/oauth2/auth",
+          "access_token_url": "https://www.googleapis.com/oauth2/v4/token",
+          "user_info_url": "https://www.googleapis.com/plus/v1/people/me",
+          "check_token_url": "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token="
+        }
+      }
+    },
+    {
       "name": "dev",
       "server_host": "vdv.itsociety.su:4201",
       "swagger_port": "8081",

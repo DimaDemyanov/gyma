@@ -952,6 +952,28 @@
         ],
         "parameters": [
           {
+            "name": "type",
+            "in": "formData",
+            "description": "desired type",
+            "required": true,
+            "type": "string",
+            "enum": ["image", "equipment"]
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "desired name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "desc",
+            "in": "formData",
+            "description": "desired desc",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "file",
             "in": "formData",
             "description": "File contents (Possible to use multiple files, up to 10)",

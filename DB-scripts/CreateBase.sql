@@ -5,7 +5,7 @@ DROP TYPE IF EXISTS vdv_prop_type CASCADE;
 CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post');
 
 DROP TYPE IF EXISTS vdv_media_type CASCADE;
-CREATE TYPE vdv_media_type AS ENUM ('image');
+CREATE TYPE vdv_media_type AS ENUM ('image', 'equipment');
 
 DROP TYPE IF EXISTS vdv_user_admin_type CASCADE;
 CREATE TYPE vdv_user_admin_type AS ENUM ('admin', 'super');
@@ -40,6 +40,8 @@ DROP TABLE IF EXISTS "vdv_media";
 CREATE TABLE "vdv_media" (
 	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY,
 	"ownerid" BIGINT NOT NULL,
+	"name" VARCHAR(256) NOT NULL DEFAULT '',
+	"desc" VARCHAR(4000) NOT NULL DEFAULT '',
 	"type" vdv_media_type NOT NULL,
 	"url" VARCHAR(4000) NOT NULL UNIQUE,
 	"created" TIMESTAMP WITH TIME ZONE NOT NULL
@@ -99,6 +101,7 @@ INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isfree', '
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'isonair', 'bool');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'price', 'real');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'media', 'media');
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'equipment', 'media');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'comment', 'comment');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'like', 'like');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'location', 'location');
