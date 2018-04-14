@@ -76,6 +76,8 @@ class EntityPost(EntityBase, Base):
                         raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
                                         (prop_name, str(PROPNAME_MAPPING)))
 
+                from vdv.Prop.PropPost import PropPost
+                PropPost(userId, PROPNAME_MAPPING["post"], vdvid).add(session, no_commit=True)
                 session.db.commit()
 
         return vdvid
@@ -112,3 +114,7 @@ class EntityPost(EntityBase, Base):
         for key, propid in PROPNAME_MAPPING.items():
             if key in PROP_MAPPING:
                 PROP_MAPPING[key](vdvid, propid)
+
+        from vdv.Prop.PropPost import PropPost
+        for _ in EntityPost.get().filter_by(vdvid=vdvid).all():
+            PropPost.delete(_.userid, PROPNAME_MAPPING["post"], False)

@@ -16,7 +16,7 @@ class PropPost(PropBase, Base):
     @classmethod
     def get_object_property(cls, vdvid, propid):
         with DBConnection() as session:
-            return [_[1].to_dict() for _ in session.db.query(cls, EntityPost).
+            return [EntityPost.get_wide_object(_[1].vdvid) for _ in session.db.query(cls, EntityPost).
                 filter(cls.vdvid == vdvid).
                 filter(cls.propid == propid).
                 filter(cls.value == EntityPost.vdvid).all()]
