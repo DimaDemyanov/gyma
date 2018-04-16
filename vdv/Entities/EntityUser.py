@@ -112,7 +112,7 @@ class EntityUser(EntityBase, Base):
         return vdvid
 
     @classmethod
-    def get_wide_object(cls, vdvid):
+    def get_wide_object(cls, vdvid, fetchPosts=True):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         PROP_MAPPING = {
@@ -125,7 +125,7 @@ class EntityUser(EntityBase, Base):
             'vdvid': vdvid
         }
         for key, propid in PROPNAME_MAPPING.items():
-            if key in PROP_MAPPING:
+            if key in PROP_MAPPING and (fetchPosts or key != 'post'):
                 result.update({key: PROP_MAPPING[key](vdvid, propid)})
 
         return result

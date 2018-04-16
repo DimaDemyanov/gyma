@@ -177,11 +177,14 @@ def getCourtById(**request_handler_args):
     objects = EntityCourt.get().filter_by(vdvid=id).all()
 
     wide_info = EntityCourt.get_wide_object(id)
-    result_arr = [o.to_dict() for o in objects]
-    for item in result_arr:
-        item['prop'] = wide_info
 
-    resp.body = obj_to_json(result_arr)
+    res = []
+    for _ in objects:
+        obj_dict = _.to_dict()
+        obj_dict.update(wide_info)
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res)
     resp.status = falcon.HTTP_200
 
 
@@ -304,11 +307,14 @@ def getUserById(**request_handler_args):
     objects = EntityUser.get().filter_by(vdvid=id).all()
 
     wide_info = EntityUser.get_wide_object(id)
-    result_arr = [o.to_dict() for o in objects]
-    for item in result_arr:
-        item['prop'] = wide_info
 
-    resp.body = obj_to_json(result_arr)
+    res = []
+    for _ in objects:
+        obj_dict = _.to_dict()
+        obj_dict.update(wide_info)
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res)
     resp.status = falcon.HTTP_200
 
 
@@ -374,7 +380,22 @@ def getUserFollowingsPosts(**request_handler_args):
         .order_by(EntityPost.vdvid.desc())\
         .limit(1000).all()
 
-    resp.body = obj_to_json([EntityPost.get_wide_object(_.vdvid) for _ in posts])
+    post_section = []
+    for _ in posts:
+        obj_dict = _.to_dict()
+        obj_dict.update(EntityPost.get_wide_object(_.vdvid))
+        post_section.append(obj_dict)
+
+    users_affected_ids = list(set([_.userid for _ in posts]))
+    users = EntityUser.get().filter(EntityUser.vdvid.in_(users_affected_ids))
+
+    user_section = []
+    for _ in users:
+        obj_dict = _.to_dict()
+        obj_dict.update(EntityUser.get_wide_object(_.vdvid, fetchPosts=False))
+        user_section.append(obj_dict)
+
+    resp.body = obj_to_json({'post': post_section, 'user': user_section})
     resp.status = falcon.HTTP_200
 
 
@@ -623,11 +644,14 @@ def getPostById(**request_handler_args):
     objects = EntityPost.get().filter_by(vdvid=id).all()
 
     wide_info = EntityPost.get_wide_object(id)
-    result_arr = [o.to_dict() for o in objects]
-    for item in result_arr:
-        item['prop'] = wide_info
 
-    resp.body = obj_to_json(result_arr)
+    res = []
+    for _ in objects:
+        obj_dict = _.to_dict()
+        obj_dict.update(wide_info)
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res)
     resp.status = falcon.HTTP_200
 
 
