@@ -329,6 +329,7 @@ def deleteUser(**request_handler_args):
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
+    #TODO: VERIFICATION IF ADMIN DELETE ANY
     e_mail = req.context['email']
     id_from_req = getIntPathParam("userId", **request_handler_args)
     id = EntityUser.get_id_from_email(e_mail)
@@ -763,6 +764,9 @@ class CORS(object):
 
 class Auth(object):
     def process_request(self, req, resp):
+        #TODO: SWITCH ON
+        req.context['email'] = 'serbudnik@gmail.com'
+        return
         # skip authentication for version, UI and Swagger
         if re.match('(/vdv/version|'
                      '/vdv/settings/urls|'
