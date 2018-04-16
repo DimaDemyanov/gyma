@@ -16,12 +16,16 @@ from vdv.auth import auth
 from vdv.db import DBConnection
 from vdv.serve_swagger import SpecServer
 
+from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityCourt import EntityCourt
 from vdv.Entities.EntityUser import EntityUser
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityMedia import EntityMedia
 from vdv.Entities.EntityPost import EntityPost
 from vdv.Entities.EntityFollow import EntityFollow
+
+from vdv.Prop.PropMedia import PropMedia
+
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
 def stringToBool(str):
@@ -851,7 +855,8 @@ if 'server_host' in cfg:
 
     server_host = cfg['server_host']
     swagger_json['host'] = server_host
-    baseURL = '/marsrv'
+
+    baseURL = '/vdv'
     if 'basePath' in swagger_json:
         baseURL = swagger_json['basePath']
 
@@ -859,6 +864,10 @@ if 'server_host' in cfg:
 
     with open('swagger_temp.json', 'wt') as f:
         f.write(json_string)
+
+    EntityBase.host = server_host + baseURL
+    EntityBase.MediaCls = EntityMedia
+    EntityBase.MediaPropCls = PropMedia
 
 with open('swagger_temp.json') as f:
     server.load_spec_swagger(f.read())

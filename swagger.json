@@ -1440,7 +1440,7 @@
           "properties": {
             "avatar": {
               "type": "int",
-              "example": 0
+              "example": "media_id or base64 encoded string"
             },
             "private": {
               "type": "boolean",
@@ -1519,14 +1519,27 @@
               "type": "array",
               "items": {
                 "type": "int",
-                "example": 0
+                "example": "media_id or base64 encoded string"
               }
             },
             "equipment": {
               "type": "array",
               "items": {
-                "type": "int",
-                "example": 0
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "name"
+                  },
+                  "desc": {
+                    "type": "string",
+                    "example": "desc"
+                  },
+                  "media": {
+                    "type": "string",
+                    "example": "base64 encoded image"
+                  }
+                }
               }
             },
             "location": {
@@ -1589,8 +1602,8 @@
             "media": {
               "type": "array",
               "items": {
-                "type": "int",
-                "example": 0
+                "type": ["int", "string"],
+                "example": "media_id or base64 encoded string"
               }
             },
             "location": {

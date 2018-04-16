@@ -46,21 +46,29 @@ class EntityCourt(EntityBase, Base):
 
         PROP_MAPPING = {
             'private':
-                lambda session, _vdvid, _id, _value: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
+                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+                    .add(session=session, no_commit=True),
             'isopen':
-                lambda session, _vdvid, _id, _value: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
+                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+                    .add(session=session, no_commit=True),
             'isfree':
-                lambda session, _vdvid, _id, _value: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
+                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+                    .add(session=session, no_commit=True),
             'isonair':
-                lambda session, _vdvid, _id, _value: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
+                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+                    .add(session=session, no_commit=True),
             'price':
-                lambda session, _vdvid, _id, _value: PropReal(_vdvid, _id, _value).add(session=session, no_commit=True),
+                lambda session, _vdvid, _id, _value, _uid: PropReal(_vdvid, _id, _value)
+                    .add(session=session, no_commit=True),
             'location':
-                lambda s, _vdvid, _id, _val: PropLocation(_vdvid, _id, _val).add(session=s, no_commit=True),
+                lambda s, _vdvid, _id, _val, _uid: PropLocation(_vdvid, _id, _val)
+                    .add(session=s, no_commit=True),
             'media':
-                lambda s, _vdvid, _id, _val : [PropMedia(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val],
+                lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'image', _uid, _vdvid, _id, _)
+                                                    for _ in _val],
             'equipment':
-                lambda s, _vdvid, _id, _val: [PropMedia(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val]
+                lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'equipment', _uid, _vdvid, _id, _)
+                                                    for _ in _val]
         }
 
         if 'ownerid' in data and 'name' in data and 'desc' in data and 'prop' in data :

@@ -44,9 +44,9 @@ class EntityUser(EntityBase, Base):
 
         PROP_MAPPING = {
             'private':
-                lambda session, _vdvid, _id, _value: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
+                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
             'avatar':
-                lambda s, _vdvid, _id, _val: PropMedia(_vdvid, _id, _val).add(session=s, no_commit=True)
+                lambda s, _vdvid, _id, _val, _uid: cls.process_media(s, 'image', _uid, _vdvid, _id, _)
         }
 
         if 'username' in data and 'e_mail' in data and 'prop' in data:

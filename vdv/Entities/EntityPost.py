@@ -7,10 +7,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityLocation import EntityLocation
-from vdv.Entities.EntityComment import EntityComment
-from vdv.Entities.EntityMedia import EntityMedia
-from vdv.Entities.EntityLike import EntityLike
 
 from vdv.Prop.PropLocation import PropLocation
 from vdv.Prop.PropComment import PropComment
@@ -53,13 +49,15 @@ class EntityPost(EntityBase, Base):
 
         PROP_MAPPING = {
             'location':
-                lambda s, _vdvid, _id, _val: PropLocation(_vdvid, _id, _val).add(session=s, no_commit=True),
+                lambda s, _vdvid, _id, _val, _uid: PropLocation(_vdvid, _id, _val).add(session=s, no_commit=True),
             'comment':
-                lambda s, _vdvid, _id, _val: [PropComment(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val],
+                lambda s, _vdvid, _id, _val, _uid: [PropComment(_vdvid, _id, _)
+                                                        .add(session=s, no_commit=True) for _ in _val],
             'media':
-                lambda s, _vdvid, _id, _val: [PropMedia(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val],
+                lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'image', _uid, _vdvid, _id, _) for _ in _val],
             'like':
-                lambda s, _vdvid, _id, _val: [PropLike(_vdvid, _id, _).add(session=s, no_commit=True) for _ in _val]
+                lambda s, _vdvid, _id, _val, _uid: [PropLike(_vdvid, _id, _)
+                                                        .add(session=s, no_commit=True) for _ in _val]
         }
 
         if 'description' in data and "prop" in data:
@@ -72,7 +70,7 @@ class EntityPost(EntityBase, Base):
                 for prop_name, prop_val in data['prop'].items():
 
                     if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                        PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
+                        PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, userId)
                     else:
                         new_entity.delete(vdvid)
                         raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
