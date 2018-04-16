@@ -7,10 +7,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityLocation import EntityLocation
-from vdv.Entities.EntityComment import EntityComment
-from vdv.Entities.EntityMedia import EntityMedia
-from vdv.Entities.EntityLike import EntityLike
 
 from vdv.Prop.PropLocation import PropLocation
 from vdv.Prop.PropComment import PropComment
@@ -96,7 +92,7 @@ class EntityPost(EntityBase, Base):
         }
 
         result = {
-            'vdvid': vdvid,
+            'vdvid': vdvid
         }
         for key, propid in PROPNAME_MAPPING.items():
             if key in PROP_MAPPING:
