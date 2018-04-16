@@ -19,7 +19,7 @@ class EntityBase:
     MediaCls = None
     MediaPropCls = None
 
-    def to_dict(self):
+    def to_dict(self, items=[]):
         def fullfill_entity(key, value):
             if key == 'url':
                 value = '%s%s' % (EntityBase.host, value[1:])
@@ -36,7 +36,7 @@ class EntityBase:
                     return str(entity)
 
         res = OrderedDict([(key, fullfill_entity(key, dictionate_entity(self.__dict__[key])))
-                           for key in self.json_serialize_items_list])
+                           for key in (self.json_serialize_items_list if not len(items) else items)])
         return res
 
     def __init__(self):

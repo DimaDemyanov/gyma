@@ -112,20 +112,20 @@ class EntityUser(EntityBase, Base):
         return vdvid
 
     @classmethod
-    def get_wide_object(cls, vdvid, fetchPosts=True):
+    def get_wide_object(cls, vdvid, items=[]):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         PROP_MAPPING = {
             'private': lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
             'post': lambda _vdvid, _id: PropPost.get_object_property(_vdvid, _id),
-            'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id)
+            'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id, ['vdvid', 'url'])
         }
 
         result = {
             'vdvid': vdvid
         }
         for key, propid in PROPNAME_MAPPING.items():
-            if key in PROP_MAPPING and (fetchPosts or key != 'post'):
+            if key in PROP_MAPPING and (not len(items) or key in items):
                 result.update({key: PROP_MAPPING[key](vdvid, propid)})
 
         return result

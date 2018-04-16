@@ -14,9 +14,9 @@ class PropMedia(PropBase, Base):
         super().__init__(vdvid, propid, value)
 
     @classmethod
-    def get_object_property(cls, vdvid, propid):
+    def get_object_property(cls, vdvid, propid, items=[]):
         with DBConnection() as session:
-            return [_[1].to_dict() for _ in session.db.query(cls, EntityMedia).
+            return [_[1].to_dict(items) for _ in session.db.query(cls, EntityMedia).
                 filter(cls.vdvid == vdvid).
                 filter(cls.propid == propid).
                 filter(cls.value == EntityMedia.vdvid).all()]

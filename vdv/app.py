@@ -386,18 +386,18 @@ def getUserFollowingsPosts(**request_handler_args):
 
     post_section = []
     for _ in posts:
-        obj_dict = _.to_dict()
+        obj_dict = _.to_dict(['vdvid', 'userid', 'description'])
         obj_dict.update(EntityPost.get_wide_object(_.vdvid))
         post_section.append(obj_dict)
 
     users_affected_ids = list(set([_.userid for _ in posts]))
     users = EntityUser.get().filter(EntityUser.vdvid.in_(users_affected_ids))
 
-    user_section = []
+    user_section = {}
     for _ in users:
-        obj_dict = _.to_dict()
-        obj_dict.update(EntityUser.get_wide_object(_.vdvid, fetchPosts=False))
-        user_section.append(obj_dict)
+        obj_dict = _.to_dict(['vdvid', 'username'])
+        obj_dict.update(EntityUser.get_wide_object(_.vdvid, ['private', 'avatar']))
+        user_section.update({_.vdvid: obj_dict})
 
     resp.body = obj_to_json({'post': post_section, 'user': user_section})
     resp.status = falcon.HTTP_200

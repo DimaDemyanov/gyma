@@ -93,7 +93,7 @@ class EntityCourt(EntityBase, Base):
         return vdvid
 
     @classmethod
-    def get_wide_object(cls, vdvid):
+    def get_wide_object(cls, vdvid, items=[]):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         PROP_MAPPING = {
@@ -111,7 +111,7 @@ class EntityCourt(EntityBase, Base):
             'vdvid': vdvid
         }
         for key, propid in PROPNAME_MAPPING.items():
-            if key in PROP_MAPPING:
+            if key in PROP_MAPPING and (not len(items) or key in items):
                 result.update({key: PROP_MAPPING[key](vdvid, propid)})
 
         return result
