@@ -370,12 +370,11 @@ def getUserFollowingsPosts(**request_handler_args):
         .filter_by(vdvid=id)
         .filter(EntityFollow.permit >= EntityUser.PERMIT_ACCESSED).all()]
 
-    res = []
-    for _ in followingIDs:
-        res.extend(EntityUser.get_wide_object(_)['post'])
+    posts = EntityPost.get().filter(EntityPost.userid.in_(followingIDs))\
+        .order_by(EntityPost.vdvid.desc())\
+        .limit(1000).all()
 
-    res = sorted(res, key=lambda x: x['vdvid'], reverse=True)
-    resp.body = obj_to_json(res)
+    resp.body = obj_to_json([EntityPost.get_wide_object(_.vdvid) for _ in posts])
     resp.status = falcon.HTTP_200
 
 
