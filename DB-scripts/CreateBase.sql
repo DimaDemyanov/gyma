@@ -50,29 +50,17 @@ CREATE TABLE "vdv_media" (
 );
 
 
-
-DROP TABLE IF EXISTS "vdv_court_follower";
-CREATE TABLE "vdv_court_follower" (
-	"vdvid" BIGINT NOT NULL PRIMARY KEY,
-	"userid" BIGINT NOT NULL,
-	"permit" int NOT NULL DEFAULT '0',
-	"created" TIMESTAMP WITH TIME ZONE NOT NULL
+DROP TABLE IF EXISTS "vdv_follow";
+CREATE TABLE "vdv_follow" (
+	"vdvid" BIGINT NOT NULL,
+	"followingid" BIGINT NOT NULL,
+	"permit" INT NOT NULL DEFAULT 1,
+	"is_user" BOOLEAN NOT NULL,
+	"created" TIMESTAMP WITH TIME ZONE NOT NULL,
+	PRIMARY KEY (vdvid, followingid)
 ) WITH (
   OIDS=FALSE
 );
-
-
-
-DROP TABLE IF EXISTS "vdv_user_follower";
-CREATE TABLE "vdv_user_follower" (
-	"vdvid" BIGINT NOT NULL PRIMARY KEY,
-	"followerid" BIGINT NOT NULL,
-	"permit" BOOLEAN NOT NULL DEFAULT 'true',
-	"created" TIMESTAMP WITH TIME ZONE NOT NULL
-) WITH (
-  OIDS=FALSE
-);
-
 
 
 DROP TABLE IF EXISTS "vdv_location";

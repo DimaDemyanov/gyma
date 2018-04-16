@@ -24,16 +24,8 @@
       }
     },
     {
-      "name": "user_user",
+      "name": "following",
       "description": "Everything about user followers and following",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
-      "name": "user_court",
-      "description": "Everything about user and courts relations",
       "externalDocs": {
         "description": "Find out more",
         "url": "http://swagger.io"
@@ -550,10 +542,10 @@
         ]
       }
     },
-    "/user/{userId}/following/all": {
+    "/{userId}/following/all": {
       "get": {
         "tags": [
-          "user_user"
+          "following"
         ],
         "summary": "Find followings of user by ID",
         "description": "Returns a list of user followings",
@@ -592,10 +584,44 @@
         ]
       }
     },
-    "/user/{userId}/following/{followingId}": {
+    "/following/post": {
+      "get": {
+        "tags": [
+          "following"
+        ],
+        "summary": "Returns followings posts",
+        "description": "Returns a list of user followings",
+        "operationId": "getUserFollowingsPosts",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/following/{followingId}": {
       "post": {
         "tags": [
-          "user_user"
+          "following"
         ],
         "summary": "Follow",
         "description": "",
@@ -607,14 +633,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of user to attach",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          },
           {
             "name": "followingId",
             "in": "path",
@@ -643,7 +661,7 @@
       },
       "delete": {
         "tags": [
-          "user_user"
+          "following"
         ],
         "summary": "Unfollow",
         "description": "",
@@ -652,14 +670,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of user to detach",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          },
           {
             "name": "followingId",
             "in": "path",
@@ -687,10 +697,10 @@
         ]
       }
     },
-    "/user/{userId}/follower/all": {
+    "/{userId}/follower/all": {
       "get": {
         "tags": [
-          "user_user"
+          "following"
         ],
         "summary": "Find followers of user by ID",
         "description": "Returns a list of user followers",
@@ -729,10 +739,10 @@
         ]
       }
     },
-    "/user/{userId}/follower/request": {
+    "/follower/request": {
       "get": {
         "tags": [
-          "user_user"
+          "following"
         ],
         "summary": "Get followers that requesting following",
         "description": "Returns a list of user possible followers",
@@ -741,14 +751,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of user",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
         ],
         "responses": {
           "200": {
@@ -771,10 +773,10 @@
         ]
       }
     },
-    "/user/{userId}/follower/request/{followerId}": {
+    "/follower/request/{followerId}": {
       "delete": {
         "tags": [
-          "user_user"
+          "following"
         ],
         "summary": "Accept or deny request",
         "description": "",
@@ -783,14 +785,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of user to solve",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          },
           {
             "name": "followerId",
             "in": "path",
@@ -816,143 +810,6 @@
           },
           "405": {
             "description": "Follower not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/user/{userId}/court/all": {
-      "get": {
-        "tags": [
-          "user_court"
-        ],
-        "summary": "Find court by ID",
-        "description": "Returns a user court list",
-        "operationId": "getUserCourts",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of user to proceed",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/Court"
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "User not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/user/{userId}/court/{courtId}": {
-      "post": {
-        "tags": [
-          "user_court"
-        ],
-        "summary": "Add a court",
-        "description": "",
-        "operationId": "userAddCourt",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of user to attach",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "courtId",
-            "in": "path",
-            "description": "ID of following to link",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "user_court"
-        ],
-        "summary": "Delete court from user list",
-        "description": "",
-        "operationId": "userDelCourt",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of user to attach",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "courtId",
-            "in": "path",
-            "description": "ID of following to link",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "405": {
-            "description": "Court not found"
           }
         },
         "security": [
@@ -1579,18 +1436,15 @@
           "example": "Savchuk@itsociety.su"
         },
         "prop": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "example": "private"
-              },
-              "value": {
-                "type": "boolean",
-                "example": false
-              }
+          "type": "object",
+          "properties": {
+            "avatar": {
+              "type": "int",
+              "example": 0
+            },
+            "private": {
+              "type": "boolean",
+              "example": false
             }
           }
         },
@@ -1659,18 +1513,45 @@
           "example": "Very cool workout place"
         },
         "prop": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "example": "media"
-              },
-              "value": {
-                "type": "string",
-                "example": "prop_value"
+          "type": "object",
+          "properties": {
+            "media": {
+              "type": "array",
+              "items": {
+                "type": "int",
+                "example": 0
               }
+            },
+            "equipment": {
+              "type": "array",
+              "items": {
+                "type": "int",
+                "example": 0
+              }
+            },
+            "location": {
+              "type": "int",
+              "example": 0
+            },
+            "private": {
+              "type": "boolean",
+              "example": false
+            },
+            "isopen": {
+              "type": "boolean",
+              "example": false
+            },
+            "isfree": {
+              "type": "boolean",
+              "example": false
+            },
+            "isonair": {
+              "type": "boolean",
+              "example": false
+            },
+            "price": {
+              "type": "int",
+              "example": 0
             }
           }
         },
@@ -1703,18 +1584,18 @@
           "example": "Post about something"
         },
         "prop": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "example": "media"
-              },
-              "value": {
-                "type": "string",
-                "example": "prop_value"
+          "type": "object",
+          "properties": {
+            "media": {
+              "type": "array",
+              "items": {
+                "type": "int",
+                "example": 0
               }
+            },
+            "location": {
+              "type": "int",
+              "example": 0
             }
           }
         },

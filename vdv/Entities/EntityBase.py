@@ -5,6 +5,11 @@ from collections import OrderedDict
 from vdv.db import DBConnection
 
 class EntityBase:
+    PERMIT_NONE = 0
+    PERMIT_ACCESSED = 1
+    PERMIT_ADMIN = 2
+    PERMIT_OWNER = 2
+
     json_serialize_items_list = ['']
 
     def to_dict(self):
@@ -37,7 +42,7 @@ class EntityBase:
         with DBConnection() as session:
             res = session.db.query(cls).filter_by(vdvid=vdvid).all()
 
-            if len(res) == 1:
+            if len(res):
                 [session.db.delete(_) for _ in res]
                 session.db.commit()
             else:

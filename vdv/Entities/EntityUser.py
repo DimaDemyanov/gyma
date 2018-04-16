@@ -2,7 +2,7 @@ from collections import OrderedDict
 import time
 import datetime
 
-from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
+from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
@@ -11,7 +11,6 @@ from vdv.Entities.EntityProp import EntityProp
 from vdv.Prop.PropBool import PropBool
 from vdv.Prop.PropMedia import PropMedia
 from vdv.Prop.PropPost import PropPost
-from vdv.Prop.PropLocation import PropLocation
 
 from vdv.db import DBConnection
 
@@ -58,10 +57,7 @@ class EntityUser(EntityBase, Base):
             vdvid = new_entity.add()
 
             with DBConnection() as session:
-                for prop in data['prop']:
-                    prop_name = prop['name']
-                    prop_val = prop['value']
-
+                for prop_name, prop_val in data['prop'].items():
                     if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
                         PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
                     else:
@@ -107,10 +103,7 @@ class EntityUser(EntityBase, Base):
 
                         session.db.commit()
 
-                        for prop in data['prop']:
-                            prop_name = prop['name']
-                            prop_val = prop['value']
-
+                        for prop_name, prop_val in data['prop'].items():
                             if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
                                 PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
 
@@ -128,10 +121,12 @@ class EntityUser(EntityBase, Base):
             'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id)
         }
 
-        result = []
+        result = {
+            'vdvid': vdvid
+        }
         for key, propid in PROPNAME_MAPPING.items():
             if key in PROP_MAPPING:
-                result.append(OrderedDict([('name', key), ('value', PROP_MAPPING[key](vdvid, propid))]))
+                result.update({key: PROP_MAPPING[key](vdvid, propid)})
 
         return result
 
@@ -163,4 +158,8 @@ class EntityUser(EntityBase, Base):
         except:
             return None
 
-
+    @classmethod
+    def is_private(cls, id):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+        res = PropBool.get_object_property(id, PROPNAME_MAPPING['private'])
+        return res[0] if len(res) else False

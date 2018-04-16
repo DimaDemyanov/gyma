@@ -65,9 +65,7 @@ class EntityPost(EntityBase, Base):
             vdvid = new_entity.add()
 
             with DBConnection() as session:
-                for prop in data['prop']:
-                    prop_name = prop['name']
-                    prop_val = prop['value']
+                for prop_name, prop_val in data['prop'].items():
 
                     if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
                         PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
@@ -93,10 +91,12 @@ class EntityPost(EntityBase, Base):
             'like':     lambda _vdvid, _id: PropLike.get_object_property(_vdvid, _id)
         }
 
-        result = []
+        result = {
+            'vdvid': vdvid
+        }
         for key, propid in PROPNAME_MAPPING.items():
             if key in PROP_MAPPING:
-                result.append(OrderedDict([('name', key), ('value', PROP_MAPPING[key](vdvid, propid))]))
+                result.update({key: PROP_MAPPING[key](vdvid, propid)})
 
         return result
 

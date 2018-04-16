@@ -21,6 +21,7 @@ from vdv.Entities.EntityUser import EntityUser
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityMedia import EntityMedia
 from vdv.Entities.EntityPost import EntityPost
+from vdv.Entities.EntityFollow import EntityFollow
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
 def stringToBool(str):
@@ -356,69 +357,104 @@ def deleteUser(**request_handler_args):
 
     resp.status = falcon.HTTP_400
 
-    
 
-def getUserFollowingsList(**request_handler_args):
+def getUserFollowingsPosts(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
-    
+    e_mail = req.context['email']
+    id = EntityUser.get_id_from_email(e_mail)
+
+    followingIDs = [_.vdvid for _ in EntityFollow.get()
+        .filter_by(vdvid=id)
+        .filter(EntityFollow.permit >= EntityUser.PERMIT_ACCESSED).all()]
+
+    res = []
+    for _ in followingIDs:
+        res.extend(EntityUser.get_wide_object(_)['post'])
+
+    resp.body = obj_to_json(res)
+    resp.status = falcon.HTTP_200
+
 
 def userAddFollowing(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    e_mail = req.context['email']
+    id = EntityUser.get_id_from_email(e_mail)
+
+    id_to_follow = getIntPathParam("followingId", **request_handler_args)
+    EntityFollow(id, id_to_follow, EntityUser.PERMIT_NONE
+                                    if EntityUser.is_private(id_to_follow)
+                                    else EntityUser.PERMIT_ACCESSED, True).add()
+
+    resp.status = falcon.HTTP_200
     
 
 def userDelFollowing(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
-    
+    e_mail = req.context['email']
+    id = EntityUser.get_id_from_email(e_mail)
+
+    id_to_follow = getIntPathParam("followingId", **request_handler_args)
+    EntityFollow.smart_delete(id, id_to_follow)
+
+    resp.status = falcon.HTTP_200
+
+def getUserFollowingsList(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam("userId", **request_handler_args)
+
+    resp.status = falcon.HTTP_200
+    resp.body   = obj_to_json([_.to_dict() for _ in EntityFollow.get()
+                      .filter_by(vdvid=id)
+                      .filter(EntityFollow.permit >= EntityUser.PERMIT_ACCESSED).all()])
+
 
 def getUserFollowersList(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    id = getIntPathParam("userId", **request_handler_args)
+
+    resp.status = falcon.HTTP_200
+    resp.body   = obj_to_json([_.to_dict() for _ in EntityFollow.get()
+                            .filter_by(followingid=id).all()])
     
 
 def getUserFollowersRequestList(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
+    id = getIntPathParam("userId", **request_handler_args)
+
+    resp.status = falcon.HTTP_200
+    resp.body   = obj_to_json([_.to_dict() for _ in EntityFollow.get()
+                        .filter_by(followingid=id)
+                        .filter(EntityFollow.permit == EntityUser.PERMIT_NONE).all()])
     
 
 def userResolveFollowerRequest(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    resp.status = falcon.HTTP_501
-    
+    e_mail = req.context['email']
+    id = EntityUser.get_id_from_email(e_mail)
 
-def getUserCourts(**request_handler_args):
-    req = request_handler_args['req']
-    resp = request_handler_args['resp']
+    id_to_resolve = getIntPathParam('followerId', **request_handler_args)
+    accept = req.params['accept']
 
-    resp.status = falcon.HTTP_501
+    if not accept:
+        EntityFollow.smart_delete(id_to_resolve, id)
+    else:
+        EntityFollow.update(id_to_resolve, id, EntityUser.PERMIT_ACCESSED)
 
-
-def userAddCourt(**request_handler_args):
-    req = request_handler_args['req']
-    resp = request_handler_args['resp']
-
-    resp.status = falcon.HTTP_501
-
-
-def userDelCourt(**request_handler_args):
-    req = request_handler_args['req']
-    resp = request_handler_args['resp']
-
-    resp.status = falcon.HTTP_501
+    resp.status = falcon.HTTP_200
 
 
 def createMedia(**request_handler_args):
@@ -613,21 +649,15 @@ def createPost(**request_handler_args):
         resp.status = falcon.HTTP_405
         return
 
-    try:
-        params = json.loads(req.stream.read().decode('utf-8'))
-        id = EntityPost.add_from_json(params, userId)
+    params = json.loads(req.stream.read().decode('utf-8'))
+    id = EntityPost.add_from_json(params, userId)
 
-        if id:
-            objects = EntityPost.get().filter_by(vdvid=id).all()
+    if id:
+        objects = EntityPost.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
-            resp.status = falcon.HTTP_200
-            return
-    except ValueError:
-        resp.status = falcon.HTTP_405
+        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.status = falcon.HTTP_200
         return
-
-    resp.status = falcon.HTTP_501
 
 
 def updatePost(**request_handler_args):
@@ -683,14 +713,12 @@ operation_handlers = {
     'getMyUser':              [getMyUser],
     'deleteUser':             [deleteUser],
     'getUserFollowingsList':        [getUserFollowingsList],
+    'getUserFollowingsPosts':       [getUserFollowingsPosts],
     'userAddFollowing':             [userAddFollowing],
     'userDelFollowing':             [userDelFollowing],
     'getUserFollowersList':         [getUserFollowersList],
     'getUserFollowersRequestList':  [getUserFollowersRequestList],
     'userResolveFollowerRequest':   [userResolveFollowerRequest],
-    'getUserCourts':                [getUserCourts],
-    'userAddCourt':                 [userAddCourt],
-    'userDelCourt':                 [userDelCourt],
 
     #Media methods
     'createMedia':            [createMedia],
@@ -785,7 +813,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), MultipartMiddleware()])#Auth(),
+wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
 
 server = SpecServer(operation_handlers=operation_handlers)
 
