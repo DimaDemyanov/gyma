@@ -365,7 +365,7 @@ def getUserFollowingsPosts(**request_handler_args):
     e_mail = req.context['email']
     id = EntityUser.get_id_from_email(e_mail)
 
-    followingIDs = [_.vdvid for _ in EntityFollow.get()
+    followingIDs = [_.followingid for _ in EntityFollow.get()
         .filter_by(vdvid=id)
         .filter(EntityFollow.permit >= EntityUser.PERMIT_ACCESSED).all()]
 
