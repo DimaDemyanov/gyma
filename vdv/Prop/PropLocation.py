@@ -20,3 +20,13 @@ class PropLocation(PropBase, Base):
                 filter(cls.vdvid == vdvid).
                 filter(cls.propid == propid).
                 filter(cls.value == EntityLocation.vdvid).all()]
+
+    @classmethod
+    def get_object_in_area(cls, propid, p, r):
+        with DBConnection() as session:
+            return [_[0] for _ in session.db.query(cls, EntityLocation)
+                .filter(cls.propid == propid)
+                .filter(EntityLocation.longitude.between(p[1] - r, p[1] + r))
+                .filter(EntityLocation.latitude.between(p[0] - r, p[0] + r))
+                .filter(cls.value == EntityLocation.vdvid)
+                .all()]

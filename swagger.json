@@ -8,6 +8,54 @@
   "basePath": "/vdv",
   "tags": [
     {
+      "name": "user API",
+      "description": "Unlocked user API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "court API",
+      "description": "Unlocked court API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "follow API",
+      "description": "Unlocked follow API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "location API",
+      "description": "Unlocked location API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "post API",
+      "description": "Unlocked location API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "search API",
+      "description": "Unlocked search API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
       "name": "court",
       "description": "Everything about court",
       "externalDocs": {
@@ -46,13 +94,28 @@
         "description": "Find out more",
         "url": "http://swagger.io"
       }
+    },
+    {
+      "name": "search",
+      "description": "Everything about search",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "post",
+      "description": "Everything about post",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
     }
   ],
   "schemes": [
     "http"
   ],
   "paths": {
-
     "/initDatabase": {
       "post": {
         "summary": "Initialize VDV database",
@@ -127,7 +190,7 @@
     "/court": {
       "post": {
         "tags": [
-          "court"
+          "court", "court API"
         ],
         "summary": "Create a new court",
         "description": "",
@@ -171,7 +234,7 @@
       },
       "put": {
         "tags": [
-          "court"
+          "court", "court API"
         ],
         "summary": "Update existing catalog info",
         "description": "",
@@ -240,7 +303,7 @@
     "/court/{courtId}": {
       "get": {
         "tags": [
-          "court"
+          "court", "court API"
         ],
         "summary": "Find court by ID",
         "description": "Returns a court description",
@@ -280,7 +343,7 @@
       },
       "delete": {
         "tags": [
-          "court"
+          "court", "court API"
         ],
         "summary": "Remove court",
         "description": "",
@@ -323,7 +386,7 @@
     "/user": {
       "post": {
         "tags": [
-          "user"
+          "user", "user API"
         ],
         "summary": "Create a new user",
         "description": "",
@@ -367,7 +430,7 @@
       },
       "put": {
         "tags": [
-          "user"
+          "user", "user API"
         ],
         "summary": "Update existing catalog info",
         "description": "",
@@ -436,7 +499,7 @@
     "/user/me": {
       "get": {
         "tags": [
-          "user"
+          "user", "user API"
         ],
         "summary": "Get my user info",
         "description": "Returns an info of currently authorized user",
@@ -462,7 +525,7 @@
     "/user/{userId}": {
       "get": {
         "tags": [
-          "user"
+          "user", "user API"
         ],
         "summary": "Find user by ID",
         "description": "Returns a user description",
@@ -502,7 +565,7 @@
       },
       "delete": {
         "tags": [
-          "user"
+          "user", "user API"
         ],
         "summary": "Remove court",
         "description": "",
@@ -545,7 +608,7 @@
     "/{userId}/following/all": {
       "get": {
         "tags": [
-          "following"
+          "following", "follow API"
         ],
         "summary": "Find followings of user by ID",
         "description": "Returns a list of user followings",
@@ -587,7 +650,7 @@
     "/following/post": {
       "get": {
         "tags": [
-          "following"
+          "following", "follow API", "post API"
         ],
         "summary": "Returns followings posts",
         "description": "Returns a list of user followings",
@@ -621,7 +684,7 @@
     "/following/{followingId}": {
       "post": {
         "tags": [
-          "following"
+          "following", "follow API"
         ],
         "summary": "Follow",
         "description": "",
@@ -661,7 +724,7 @@
       },
       "delete": {
         "tags": [
-          "following"
+          "following", "follow API"
         ],
         "summary": "Unfollow",
         "description": "",
@@ -700,7 +763,7 @@
     "/{userId}/follower/all": {
       "get": {
         "tags": [
-          "following"
+          "following", "follow API"
         ],
         "summary": "Find followers of user by ID",
         "description": "Returns a list of user followers",
@@ -742,7 +805,7 @@
     "/follower/request": {
       "get": {
         "tags": [
-          "following"
+          "following", "follow API"
         ],
         "summary": "Get followers that requesting following",
         "description": "Returns a list of user possible followers",
@@ -776,7 +839,7 @@
     "/follower/request/{followerId}": {
       "delete": {
         "tags": [
-          "following"
+          "following", "follow API"
         ],
         "summary": "Accept or deny request",
         "description": "",
@@ -1038,7 +1101,7 @@
     "/location": {
       "post": {
         "tags": [
-          "location"
+          "location", "location API"
         ],
         "summary": "Create a new location",
         "description": "",
@@ -1084,7 +1147,7 @@
     "/location/all": {
       "get": {
         "tags": [
-          "location"
+          "location", "location API"
         ],
         "summary": "Get all locations",
         "description": "Returns a list of locations descriptions",
@@ -1110,7 +1173,7 @@
     "/location/{locId}": {
       "get": {
         "tags": [
-          "location"
+          "location", "location API"
         ],
         "summary": "Find location by ID",
         "description": "Returns a location data",
@@ -1186,7 +1249,7 @@
     "/post": {
       "post": {
         "tags": [
-          "post"
+          "post", "post API"
         ],
         "summary": "Create a new post",
         "description": "",
@@ -1230,7 +1293,7 @@
       },
       "put": {
         "tags": [
-          "post"
+          "post", "post API"
         ],
         "summary": "Update existing catalog info",
         "description": "",
@@ -1299,7 +1362,7 @@
     "/post/{postId}": {
       "get": {
         "tags": [
-          "post"
+          "post", "post API"
         ],
         "summary": "Find post by ID",
         "description": "Returns a post description",
@@ -1339,7 +1402,7 @@
       },
       "delete": {
         "tags": [
-          "post"
+          "post", "post API"
         ],
         "summary": "Remove post",
         "description": "",
@@ -1370,6 +1433,49 @@
           },
           "404": {
             "description": "Post not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/search": {
+      "post": {
+        "tags": [
+          "search", "search API"
+        ],
+        "summary": "Request serach",
+        "description": "",
+        "operationId": "search",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "json",
+            "in": "body",
+            "description": "Search encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Search"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
           }
         },
         "security": [
@@ -1575,6 +1681,52 @@
         "updated": {
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
+        }
+      }
+    },
+    "Search": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "string",
+          "example": "(court|user|location)"
+        },
+        "prop": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "substring in [name]"
+            },
+            "location": {
+              "type": "int",
+              "example": 0
+            },
+            "location_area": {
+              "type": "int",
+              "example": "[cx, cy, R]"
+            },
+            "private": {
+              "type": "boolean",
+              "example": false
+            },
+            "isopen": {
+              "type": "boolean",
+              "example": false
+            },
+            "isfree": {
+              "type": "boolean",
+              "example": false
+            },
+            "isonair": {
+              "type": "boolean",
+              "example": false
+            },
+            "price": {
+              "type": "int",
+              "example": "[min, max]"
+            }
+          }
         }
       }
     },

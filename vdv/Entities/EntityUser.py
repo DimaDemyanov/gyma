@@ -20,17 +20,17 @@ class EntityUser(EntityBase, Base):
     __tablename__ = 'vdv_user'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
-    username = Column(String)
+    name = Column(String)
     e_mail = Column(String)
     created = Column(Date)
     updated = Column(Date)
 
-    json_serialize_items_list = ['vdvid', 'username', 'e_mail', 'created', 'updated']
+    json_serialize_items_list = ['vdvid', 'name', 'e_mail', 'created', 'updated']
 
     def __init__(self, username, email):
         super().__init__()
 
-        self.username = username
+        self.name = username
         self.e_mail = email
 
         ts = time.time()

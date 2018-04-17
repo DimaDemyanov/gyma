@@ -24,6 +24,8 @@ from vdv.Entities.EntityMedia import EntityMedia
 from vdv.Entities.EntityPost import EntityPost
 from vdv.Entities.EntityFollow import EntityFollow
 
+from vdv.search import *
+
 from vdv.Prop.PropMedia import PropMedia
 
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
@@ -310,11 +312,13 @@ def getUserById(**request_handler_args):
     id = getIntPathParam("userId", **request_handler_args)
     objects = EntityUser.get().filter_by(vdvid=id).all()
 
-    wide_info = EntityUser.get_wide_object(id)
+    wide_info = EntityUser.get_wide_object(id, ['private', 'avatar', 'post'])
+
+    wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
 
     res = []
     for _ in objects:
-        obj_dict = _.to_dict()
+        obj_dict = _.to_dict(['vdvid', 'name'])
         obj_dict.update(wide_info)
         res.append(obj_dict)
 
@@ -395,7 +399,7 @@ def getUserFollowingsPosts(**request_handler_args):
 
     user_section = {}
     for _ in users:
-        obj_dict = _.to_dict(['vdvid', 'username'])
+        obj_dict = _.to_dict(['vdvid', 'name'])
         obj_dict.update(EntityUser.get_wide_object(_.vdvid, ['private', 'avatar']))
         user_section.update({_.vdvid: obj_dict})
 
@@ -721,6 +725,26 @@ def deletePost(**request_handler_args):
 
     resp.status = falcon.HTTP_400
 
+
+def search(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    params = json.loads(req.stream.read().decode('utf-8'))
+
+    _cls, ids = serach_objects(params)
+
+    result = []
+    for _ in _cls.get().filter(_cls.vdvid.in_(list(ids))).all():
+        obj_dict = _.to_dict()
+        if 'get_wide_object' in _cls.__dict__:
+            obj_dict.update(_cls.get_wide_object(_.vdvid, ['private', 'avatar'] if _cls.__name__ == 'EntityUser' else []))
+
+        result.append(obj_dict)
+
+    resp.body = obj_to_json(result)
+    resp.status = falcon.HTTP_200
+
 operation_handlers = {
     'initDatabase':    [initDatabase],
     'cleanupDatabase': [cleanupDatabase],
@@ -766,7 +790,10 @@ operation_handlers = {
     'getAllPosts':          [getAllPosts],
     'createPost':           [createPost],
     'updatePost':           [updatePost],
-    'deletePost':           [deletePost]
+    'deletePost':           [deletePost],
+
+    #Search methods
+    'search':               [search],
 }
 
 class CORS(object):
