@@ -83,6 +83,24 @@ class EntityPost(EntityBase, Base):
         return vdvid
 
     @classmethod
+    def update_from_json(cls, data):
+        vdvid = None
+
+        if 'id' in data:
+            with DBConnection() as session:
+                vdvid = data['id']
+                entity = session.db.query(EntityPost).filter_by(vdvid=vdvid).all()
+
+                if len(entity):
+                    for _ in entity:
+                        if 'description' in data:
+                            _.description = data['description']
+
+                        session.db.commit()
+
+        return vdvid
+
+    @classmethod
     def get_wide_object(cls, vdvid, items=[]):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
