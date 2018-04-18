@@ -331,11 +331,22 @@ def getMyUser(**request_handler_args):
     resp = request_handler_args['resp']
 
     e_mail = req.context['email']
-    ownerid = EntityUser.get_id_from_email(e_mail)
+    id = EntityUser.get_id_from_email(e_mail)
 
-    objects = EntityUser.get().filter_by(vdvid=ownerid).all()
+    objects = EntityUser.get().filter_by(vdvid=id).all()
 
-    resp.body = obj_to_json([_.to_dict() for _ in objects])
+    #TODO: LIMIT the posts output counts with a paging
+    wide_info = EntityUser.get_wide_object(id, ['private', 'avatar', 'post'])
+
+    wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
+
+    res = []
+    for _ in objects:
+        obj_dict = _.to_dict(['vdvid', 'name'])
+        obj_dict.update(wide_info)
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res)
     resp.status = falcon.HTTP_200
 
 
