@@ -23,6 +23,8 @@ from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityMedia import EntityMedia
 from vdv.Entities.EntityPost import EntityPost
 from vdv.Entities.EntityFollow import EntityFollow
+from vdv.Entities.EntityLike import EntityLike
+from vdv.Entities.EntityComment import EntityComment
 
 from vdv.search import *
 
@@ -756,6 +758,183 @@ def search(**request_handler_args):
     resp.body = obj_to_json(result)
     resp.status = falcon.HTTP_200
 
+
+def getLikeById(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam("likeId", **request_handler_args)
+    objects = EntityLike.get().filter_by(vdvid=id).all()
+
+    res = []
+    for _ in objects:
+        obj_dict = _.to_dict()
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res)
+    resp.status = falcon.HTTP_200
+
+
+def getAllLikes(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    objects = EntityLike.get().all()
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.status = falcon.HTTP_200
+
+
+def updateLike(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        id = EntityLike.update_from_json(params)
+
+        if id:
+            objects = EntityLike.get().filter_by(vdvid=id).all()
+
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
+    resp.status = falcon.HTTP_501
+
+
+def deleteLike(**request_handler_args):
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('likeId', **request_handler_args)
+
+    if id is not None:
+        try:
+            EntityLike.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
+
+        object = EntityLike.get().filter_by(vdvid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
+
+
+def createLike(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    params = json.loads(req.stream.read().decode('utf-8'))
+    userId = EntityUser.get_id_from_email(req.context['email'])
+
+    if userId is None:
+        resp.status = falcon.HTTP_405
+        return
+
+    id = EntityLike.add_from_json(params, userId)
+
+    if id:
+        objects = EntityLike.get().filter_by(vdvid=id).all()
+
+        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.status = falcon.HTTP_200
+        return
+
+
+def getCommentById(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam("commentId", **request_handler_args)
+    objects = EntityComment.get().filter_by(vdvid=id).all()
+
+    res = []
+    for _ in objects:
+        obj_dict = _.to_dict()
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res)
+    resp.status = falcon.HTTP_200
+
+
+def getAllComments(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    objects = EntityComment.get().all()
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.status = falcon.HTTP_200
+
+
+def updateComment(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        id = EntityComment.update_from_json(params)
+
+        if id:
+            objects = EntityComment.get().filter_by(vdvid=id).all()
+
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
+    resp.status = falcon.HTTP_501
+
+
+def deleteComment(**request_handler_args):
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('commentId', **request_handler_args)
+
+    if id is not None:
+        try:
+            EntityComment.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
+
+        object = EntityComment.get().filter_by(vdvid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
+
+
+def createComment(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    params = json.loads(req.stream.read().decode('utf-8'))
+    userId = EntityUser.get_id_from_email(req.context['email'])
+
+    if userId is None:
+        resp.status = falcon.HTTP_405
+        return
+
+    id = EntityComment.add_from_json(params, userId)
+
+    if id:
+        objects = EntityComment.get().filter_by(vdvid=id).all()
+
+        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.status = falcon.HTTP_200
+        return
+
+
 operation_handlers = {
     'initDatabase':    [initDatabase],
     'cleanupDatabase': [cleanupDatabase],
@@ -805,6 +984,20 @@ operation_handlers = {
 
     #Search methods
     'search':               [search],
+
+    # Like methods
+    'getLikeById':          [getLikeById],
+    'getAllLikes':          [getAllLikes],
+    'updateLike':           [updateLike],
+    'deleteLike':           [deleteLike],
+    'createLike':           [createLike],
+
+    # Comment methods
+    'getCommentById':       [getCommentById],
+    'getAllComments':       [getAllComments],
+    'updateComment':        [updateComment],
+    'deleteComment':        [deleteComment],
+    'createComment':        [createComment]
 }
 
 class CORS(object):
