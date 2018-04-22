@@ -202,26 +202,20 @@ def createCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    try:
-        e_mail = req.context['email']
-        ownerid = EntityUser.get_id_from_email(e_mail)
 
-        params = json.loads(req.stream.read().decode('utf-8'))
-        params['ownerid'] = ownerid
+    e_mail = req.context['email']
+    ownerid = EntityUser.get_id_from_email(e_mail)
 
-        id = EntityCourt.add_from_json(params)
+    params = json.loads(req.stream.read().decode('utf-8'))
+    params['ownerid'] = ownerid
 
-        if id:
-            objects = EntityCourt.get().filter_by(vdvid=id).all()
+    id = EntityCourt.add_from_json(params)
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
-            resp.status = falcon.HTTP_200
-            return
-    except ValueError:
-        resp.status = falcon.HTTP_405
-        return
+    if id:
+        objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-    resp.status = falcon.HTTP_405
+        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.status = falcon.HTTP_200
 
     
 def updateCourt(**request_handler_args):
