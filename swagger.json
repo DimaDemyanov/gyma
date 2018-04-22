@@ -56,6 +56,14 @@
       }
     },
     {
+      "name": "comment API",
+      "description": "Unlocked comment API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
       "name": "court",
       "description": "Everything about court",
       "externalDocs": {
@@ -1687,15 +1695,11 @@
         ]
       }
     },
-
-
-
-
-
     "/comment": {
       "post": {
         "tags": [
-          "comment"
+          "comment",
+          "comment API"
         ],
         "summary": "Create a new comment",
         "description": "",
@@ -1739,7 +1743,8 @@
       },
       "put": {
         "tags": [
-          "comment"
+          "comment",
+          "comment API"
         ],
         "summary": "Update existing catalog info",
         "description": "",
@@ -1881,13 +1886,6 @@
         ]
       }
     }
-
-
-
-
-
-
-
   },
   "securityDefinitions": {
     "auth_env": {
@@ -2177,10 +2175,7 @@
         }
       }
     },
-
-
-
-     "Like": {
+    "Like": {
       "type": "object",
       "required": [
         "id"
@@ -2208,8 +2203,6 @@
         }
       }
     },
-
-
     "Comment": {
       "type": "object",
       "required": [
@@ -2220,7 +2213,7 @@
           "type": "integer",
           "format": "int64"
         },
-        "userId": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -2238,9 +2231,6 @@
         }
       }
     },
-
-
-
     "ApiResponse": {
       "type": "object",
       "properties": {

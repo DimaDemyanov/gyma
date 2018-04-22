@@ -18,7 +18,7 @@ class PropBase:
         self.propid = propid
         self.value = value
 
-    def add(self, session, no_commit=False):
+    def add(self, session=None, no_commit=False):
         def proseed(session):
             session.db.add(self)
             if not no_commit:
