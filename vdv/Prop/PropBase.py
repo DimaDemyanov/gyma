@@ -59,7 +59,19 @@ class PropBase:
                 session.db.commit()
             else:
                 if raise_exception:
-                    raise FileNotFoundError('(vdvid, propid) was not found')
+                    raise FileNotFoundError('(vdvid, propid)=(%i, %i) was not found' % (vdvid, propid))
+
+    @classmethod
+    def delete_value(cls, value, raise_exception=True):
+        with DBConnection() as session:
+            res = session.db.query(cls).filter_by(value=value).all()
+
+            if len(res):
+                [session.db.delete(_) for _ in res]
+                session.db.commit()
+            else:
+                if raise_exception:
+                    raise FileNotFoundError('(value)=(%s) was not found' % str(value))
 
     @classmethod
     def get(cls):

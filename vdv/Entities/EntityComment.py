@@ -41,12 +41,12 @@ class EntityComment(EntityBase, Base):
             vdvid = data['vdvid']
 
             new_entity = EntityComment(userId, text)
-            id = new_entity.add()
+            _id = new_entity.add()
 
             from vdv.Prop.PropComment import PropComment
-            PropComment(vdvid, PROPNAME_MAPPING["comment"], id).add()
+            PropComment(vdvid, PROPNAME_MAPPING["comment"], _id).add()
 
-        return id
+        return _id
 
     @classmethod
     def update_from_json(cls, data):

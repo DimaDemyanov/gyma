@@ -29,6 +29,8 @@ from vdv.Entities.EntityComment import EntityComment
 from vdv.search import *
 
 from vdv.Prop.PropMedia import PropMedia
+from vdv.Prop.PropLike import PropLike
+from vdv.Prop.PropComment import PropComment
 
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
@@ -830,6 +832,7 @@ def deleteLike(**request_handler_args):
     if id is not None:
         try:
             EntityLike.delete(id)
+            PropLike.delete_value(id, raise_exception=False)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
             return
@@ -862,7 +865,7 @@ def createLike(**request_handler_args):
         resp.status = falcon.HTTP_200
         return
 
-    resp.status = falcon.HTTP_500
+    resp.status = falcon.HTTP_422
 
 
 def getCommentById(**request_handler_args):
@@ -920,6 +923,7 @@ def deleteComment(**request_handler_args):
     if id is not None:
         try:
             EntityComment.delete(id)
+            PropComment.delete_value(id, raise_exception=False)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
             return

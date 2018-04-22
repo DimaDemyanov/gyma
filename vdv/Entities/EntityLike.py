@@ -5,6 +5,7 @@ from sqlalchemy import Column, Date, Integer, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
+from vdv.Entities.EntityProp import EntityProp
 
 from vdv.db import DBConnection
 
@@ -30,15 +31,23 @@ class EntityLike(EntityBase, Base):
 
     @classmethod
     def add_from_json(cls, data, userId):
-        vdvid = None
+        PROPNAME_MAPPING = EntityProp.map_name_id()
 
-        if 'weight' in data:
+        _id = None
+        if 'weight' in data and 'vdvid' in data:
             weight = data['weight']
+            vdvid = data['vdvid']
 
-            new_entity = EntityLike(userId, weight)
-            vdvid = new_entity.add()
+            from vdv.Prop.PropLike import PropLike
+            likes = PropLike.get_post_user_related(vdvid, PROPNAME_MAPPING['like'], userId)
 
-        return vdvid
+            if not len(likes):
+                new_entity = EntityLike(userId, weight)
+                _id = new_entity.add()
+
+                PropLike(vdvid, PROPNAME_MAPPING['like'], _id).add()
+
+        return _id
 
 
     @classmethod

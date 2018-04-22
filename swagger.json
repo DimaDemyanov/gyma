@@ -48,6 +48,14 @@
       }
     },
     {
+      "name": "like API",
+      "description": "Unlocked like API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
       "name": "search API",
       "description": "Unlocked search API functions",
       "externalDocs": {
@@ -1501,15 +1509,11 @@
         ]
       }
     },
-
-
-
-
-
     "/like": {
       "post": {
         "tags": [
-          "like"
+          "like",
+          "like API"
         ],
         "summary": "Create a new like",
         "description": "",
@@ -1541,8 +1545,8 @@
           "405": {
             "description": "Validation exception"
           },
-          "412": {
-            "description": "Name already taken"
+          "422": {
+            "description": "Like already given"
           }
         },
         "security": [
@@ -1553,7 +1557,8 @@
       },
       "put": {
         "tags": [
-          "like"
+          "like",
+          "like API"
         ],
         "summary": "Update existing catalog info",
         "description": "",
@@ -1662,7 +1667,8 @@
       },
       "delete": {
         "tags": [
-          "like"
+          "like",
+          "like API"
         ],
         "summary": "Remove like",
         "description": "",
@@ -1853,7 +1859,8 @@
       },
       "delete": {
         "tags": [
-          "comment"
+          "comment",
+          "comment API"
         ],
         "summary": "Remove comment",
         "description": "",
@@ -2185,7 +2192,7 @@
           "type": "integer",
           "format": "int64"
         },
-        "userId": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },

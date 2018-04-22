@@ -20,3 +20,13 @@ class PropLike(PropBase, Base):
                 filter(cls.vdvid == vdvid).
                 filter(cls.propid == propid).
                 filter(cls.value == EntityLike.vdvid).all()]
+
+    @classmethod
+    def get_post_user_related(cls, vdvid, propid, userid):
+        with DBConnection() as session:
+            return [_[1].to_dict() for _ in session.db.query(cls, EntityLike).
+                filter(cls.vdvid == vdvid).
+                filter(cls.propid == propid).
+                filter(cls.value == EntityLike.vdvid).
+                filter(EntityLike.userid == userid).
+                all()]
