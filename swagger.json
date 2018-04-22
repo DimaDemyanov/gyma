@@ -134,6 +134,14 @@
         "description": "Find out more",
         "url": "http://swagger.io"
       }
+    },
+    {
+      "name": "comment",
+      "description": "Everything about comment",
+      "externalDocs": { 
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
     }
   ],
   "schemes": [
