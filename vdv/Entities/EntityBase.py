@@ -69,16 +69,20 @@ class EntityBase:
     @classmethod
     def process_media(cls, session, media_type, _owner_id, vdvid, _id, _):
         if EntityBase.MediaCls:
-            if type(_) is str:
-                _name = ''
-                _desc = ''
-                if media_type == 'equipment':
-                    _name = _.name
-                    _desc = _.desc
-                    _ = _.media
+            _name = ''
+            _desc = ''
 
+            if media_type == 'equipment':
+                _name = _['name']
+                _desc = _['desc']
+                _ = _['media']
+
+            if type(_) is str:
                 resolver = MediaResolverFactory.produce(media_type, base64.b64decode(_))
                 resolver.Resolve()
                 _ = EntityBase.MediaCls(_owner_id, media_type, resolver.url, name=_name, desc=_desc).add()
 
-            EntityBase.MediaPropCls(vdvid, _id, _).add(session=session, no_commit=True)
+            if type(_) is int:
+                EntityBase.MediaPropCls(vdvid, _id, _).add(session=session, no_commit=True)
+            else:
+                raise FileNotFoundError("Media has not been created")

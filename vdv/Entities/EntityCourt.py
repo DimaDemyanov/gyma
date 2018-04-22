@@ -82,7 +82,7 @@ class EntityCourt(EntityBase, Base):
             with DBConnection() as session:
                 for prop_name, prop_val in data['prop'].items():
                     if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                        PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
+                        PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, ownerid)
                     else:
                         new_entity.delete(vdvid)
                         raise Exception('{%s} not existed property\nPlease use one of:\n%s' %

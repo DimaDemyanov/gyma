@@ -138,7 +138,7 @@
     {
       "name": "comment",
       "description": "Everything about comment",
-      "externalDocs": { 
+      "externalDocs": {
         "description": "Find out more",
         "url": "http://swagger.io"
       }

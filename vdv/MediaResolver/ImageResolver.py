@@ -17,7 +17,7 @@ class ImageResolver(MediaResolver):
 
         type_mapping = {
             'image': (1024, 256, 1.34),
-            'equipment': (512, 64, 1.34),
+            'equipment': (512, 32, 1.34),
         }
 
         self.max_image_size, self.min_image_size, self.max_aspect_ratio = \
@@ -52,7 +52,7 @@ class ImageResolver(MediaResolver):
             raise Exception("Image size too small, minimum side size = %i" % self.min_image_size)
 
         self.url = './images/%s.jpg' % uuid.uuid4().hex
-        io.imsave(self.url, img)
+        io.imsave(self.url, img[:, :, :3])
         return self.url
 
 
