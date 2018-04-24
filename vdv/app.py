@@ -1042,8 +1042,8 @@ class CORS(object):
 class Auth(object):
     def process_request(self, req, resp):
         #TODO: SWITCH ON
-        req.context['email'] = 'serbudnik@gmail.com'
-        return
+        #req.context['email'] = 'serbudnik@gmail.com'
+        #return
         # skip authentication for version, UI and Swagger
         if re.match('(/vdv/version|'
                      '/vdv/settings/urls|'
