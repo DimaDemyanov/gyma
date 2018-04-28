@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
+from vdv.Entities.EntityCourt import EntityCourt
 
 from vdv.Prop.PropBool import PropBool
 from vdv.Prop.PropMedia import PropMedia
@@ -122,11 +123,17 @@ class EntityUser(EntityBase, Base):
         }
 
         result = {
-            'vdvid': vdvid
+            'vdvid': vdvid,
+            'court': []
         }
         for key, propid in PROPNAME_MAPPING.items():
             if key in PROP_MAPPING and (not len(items) or key in items):
                 result.update({key: PROP_MAPPING[key](vdvid, propid)})
+
+        courts = EntityCourt.get().filter_by(ownerid=vdvid).all()
+
+        for _ in courts:
+            result['court'].append(EntityCourt.get_wide_object(_.vdvid))
 
         return result
 
