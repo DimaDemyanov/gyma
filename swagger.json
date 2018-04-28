@@ -982,7 +982,7 @@
         ],
         "summary": "Update existing catalog info",
         "description": "",
-        "operationId": "updateCourt",
+        "operationId": "updateMedia",
         "consumes": [
           "application/json"
         ],
