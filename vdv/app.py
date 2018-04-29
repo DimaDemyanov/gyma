@@ -1058,10 +1058,14 @@ class Auth(object):
             return # pre-flight requests don't require authentication
 
         token = None
-        if req.auth:
-            token = req.auth.split(" ")[1].strip()
-        else:
-            token = req.params.get('access_token')
+        try:
+            if req.auth:
+                token = req.auth.split(" ")[1].strip()
+            else:
+                token = req.params.get('access_token')
+        except:
+            raise falcon.HTTPUnauthorized(description='Token was not provided in schema [berear <Token>]',
+                                      challenges=['Bearer realm=http://GOOOOGLE'])
 
         error = 'Authorization required.'
         if token:
