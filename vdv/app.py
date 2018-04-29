@@ -382,6 +382,18 @@ def deleteUser(**request_handler_args):
     resp.status = falcon.HTTP_400
 
 
+def getPostAffectedUsers(post):
+    res = [post['userid']]
+
+    for _ in post['comment']:
+        res.append(_['userid'])
+
+    for _ in post['like']:
+        res.append(_['userid'])
+
+    return res
+
+
 def getUserFollowingsPosts(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
@@ -403,7 +415,11 @@ def getUserFollowingsPosts(**request_handler_args):
         obj_dict.update(EntityPost.get_wide_object(_.vdvid))
         post_section.append(obj_dict)
 
-    users_affected_ids = list(set([_.userid for _ in posts]))
+    user_list = []
+    for _ in post_section:
+        user_list.extend(getPostAffectedUsers(_))
+
+    users_affected_ids = list(set(user_list))
     users = EntityUser.get().filter(EntityUser.vdvid.in_(users_affected_ids))
 
     user_section = {}
@@ -662,13 +678,26 @@ def getPostById(**request_handler_args):
 
     wide_info = EntityPost.get_wide_object(id)
 
-    res = []
+    post_section = []
     for _ in objects:
         obj_dict = _.to_dict()
         obj_dict.update(wide_info)
-        res.append(obj_dict)
+        post_section.append(obj_dict)
 
-    resp.body = obj_to_json(res)
+    user_list = []
+    for _ in post_section:
+        user_list.extend(getPostAffectedUsers(_))
+
+    users_affected_ids = list(set(user_list))
+    users = EntityUser.get().filter(EntityUser.vdvid.in_(users_affected_ids))
+
+    user_section = {}
+    for _ in users:
+        obj_dict = _.to_dict(['vdvid', 'name'])
+        obj_dict.update(EntityUser.get_wide_object(_.vdvid, ['private', 'avatar']))
+        user_section.update({_.vdvid: obj_dict})
+
+    resp.body = obj_to_json({'post': post_section, 'user': user_section})
     resp.status = falcon.HTTP_200
 
 
