@@ -599,7 +599,7 @@
         "tags": [
           "user", "user API"
         ],
-        "summary": "Remove court",
+        "summary": "Remove user",
         "description": "",
         "operationId": "deleteUser",
         "produces": [
