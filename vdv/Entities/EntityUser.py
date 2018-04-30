@@ -47,7 +47,7 @@ class EntityUser(EntityBase, Base):
             'private':
                 lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
             'avatar':
-                lambda s, _vdvid, _id, _val, _uid: cls.process_media(s, 'image', _uid, _vdvid, _id, _)
+                lambda s, _vdvid, _id, _val, _uid: cls.process_media(s, 'image', _uid, _vdvid, _id, _val)
         }
 
         if 'username' in data and 'e_mail' in data and 'prop' in data:
@@ -57,16 +57,20 @@ class EntityUser(EntityBase, Base):
             new_entity = EntityUser(username, e_mail)
             vdvid = new_entity.add()
 
-            with DBConnection() as session:
-                for prop_name, prop_val in data['prop'].items():
-                    if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                        PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
-                    else:
-                        new_entity.delete(vdvid)
-                        raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
-                                        (prop_name, str(PROPNAME_MAPPING)))
+            try:
+                with DBConnection() as session:
+                    for prop_name, prop_val in data['prop'].items():
+                        if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
+                            PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, vdvid)
+                        else:
+                            EntityUser.delete(vdvid)
+                            raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
+                                            (prop_name, str(PROPNAME_MAPPING)))
 
-                session.db.commit()
+                    session.db.commit()
+            except Exception as e:
+                EntityUser.delete(vdvid)
+                raise Exception('Internal error')
 
         return vdvid
 
