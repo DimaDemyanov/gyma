@@ -599,7 +599,7 @@
         "tags": [
           "user", "user API"
         ],
-        "summary": "Remove court",
+        "summary": "Remove user",
         "description": "",
         "operationId": "deleteUser",
         "produces": [
@@ -982,7 +982,7 @@
         ],
         "summary": "Update existing catalog info",
         "description": "",
-        "operationId": "updateCourt",
+        "operationId": "updateMedia",
         "consumes": [
           "application/json"
         ],

@@ -20,3 +20,17 @@ class PropMedia(PropBase, Base):
                 filter(cls.vdvid == vdvid).
                 filter(cls.propid == propid).
                 filter(cls.value == EntityMedia.vdvid).all()]
+
+
+    @classmethod
+    def deleteList(cls, vdvid, propid, listIDs, session=None, raise_exception=True):
+        if session:
+            # TODO: Look it
+            res = session.db.query(cls).filter_by(vdvid=vdvid, propid=propid).all()
+
+            if len(res):
+                [session.db.delete(_) for _ in res if _.value in listIDs]
+                session.db.commit()
+            else:
+                if raise_exception:
+                    raise FileNotFoundError('(vdvid, propid)=(%i, %i) was not found' % (vdvid, propid))
