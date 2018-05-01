@@ -67,24 +67,6 @@ class EntityBase:
             return session.db.query(cls)
 
     @classmethod
-    def get_ownerid_entity_id(cls, vdvid, callRaise=False):
-        ownerid = None
-
-        res = cls.get().filter_by(vdvid=vdvid).all()
-
-        if len(res):
-            try:
-                ownerid = res[0].ownerid
-            except:
-                try:
-                    ownerid = res[0].userid
-                except:
-                    if callRaise:
-                        raise Exception("%s doesn't contain field 'ownerid'")
-
-        return ownerid
-
-    @classmethod
     def process_media(cls, session, media_type, _owner_id, vdvid, _id, _):
         if EntityBase.MediaCls:
             _name = ''

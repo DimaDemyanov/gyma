@@ -25,7 +25,6 @@ from vdv.Entities.EntityPost import EntityPost
 from vdv.Entities.EntityFollow import EntityFollow
 from vdv.Entities.EntityLike import EntityLike
 from vdv.Entities.EntityComment import EntityComment
-from vdv.Entities.EntitySuperUser import EntitySuperUser
 
 from vdv.search import *
 
@@ -88,19 +87,6 @@ def guess_response_type(path):
         return extensions_map[ext]
     else:
         return extensions_map['']
-
-
-def garant_change_object(cls, user_email, vdvid):
-    user_id = EntityUser.get_id_from_email(user_email)
-
-    ownerid = cls.get_ownerid_entity_id(vdvid)
-
-    if ownerid is None:
-        return
-
-    if not (EntitySuperUser.is_id_super_admin(user_id) or user_id == ownerid):
-        raise Exception("User '%s' isn't owner of entity with id=%s" % (user_email, vdvid))
-
 
 def date_time_string(timestamp=None):
     weekdayname = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -216,6 +202,7 @@ def createCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
+
     e_mail = req.context['email']
     ownerid = EntityUser.get_id_from_email(e_mail)
 
@@ -235,46 +222,15 @@ def updateCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    email = req.context['email']
-
-    try:
-        params = json.loads(req.stream.read().decode('utf-8'))
-
-        try:
-            garant_change_object(EntityCourt, email, params['id'])
-        except Exception:
-            resp.status = falcon.HTTP_403
-            return
-
-        id = EntityCourt.update_from_json(params)
-
-        if id:
-            objects = EntityCourt.get().filter_by(vdvid=id).all()
-
-            resp.body = obj_to_json([o.to_dict() for o in objects])
-            resp.status = falcon.HTTP_200
-            return
-    except ValueError:
-        resp.status = falcon.HTTP_405
-        return
-
     resp.status = falcon.HTTP_501
     
 
 def deleteCourt(**request_handler_args):
-    req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('courtId', **request_handler_args)
-    email = req.context['email']
 
     if id is not None:
-        try:
-            garant_change_object(EntityCourt, email, id)
-        except Exception:
-            resp.status = falcon.HTTP_403
-            return
-
         try:
             EntityCourt.delete(id)
         except FileNotFoundError:
@@ -320,16 +276,8 @@ def updateUser(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    email = req.context['email']
-    id_email = EntityUser.get_id_from_email(email)
-
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-
-        if params['id'] != id_email or not EntitySuperUser.is_id_super_admin(id_email):
-            resp.status = falcon.HTTP_403
-            return
-
         id = EntityUser.update_from_json(params)
 
         if id:
@@ -405,13 +353,13 @@ def deleteUser(**request_handler_args):
     req = request_handler_args['req']
 
     #TODO: VERIFICATION IF ADMIN DELETE ANY
-    email = req.context['email']
-    id = getIntPathParam("userId", **request_handler_args)
-    id_email = EntityUser.get_id_from_email(email)
+    e_mail = req.context['email']
+    id_from_req = getIntPathParam("userId", **request_handler_args)
+    id = EntityUser.get_id_from_email(e_mail)
 
     if id is not None:
-        if id != id_email or not EntitySuperUser.is_id_super_admin(id_email):
-            resp.status = falcon.HTTP_403
+        if id != id_from_req:
+            resp.status = falcon.HTTP_400
             return
 
         try:
@@ -624,21 +572,13 @@ def getMedia(**request_handler_args):
 
     resp.status = falcon.HTTP_500
 
-
 def deleteMedia(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('mediaId', **request_handler_args)
-    email = req.context['email']
 
     if id:
-        try:
-            garant_change_object(EntityMedia, email, id)
-        except Exception:
-            resp.status = falcon.HTTP_403
-            return
-
         try:
             EntityMedia.delete(id)
         except FileNotFoundError:
@@ -797,17 +737,8 @@ def updatePost(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    email = req.context['email']
-
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-
-        try:
-            garant_change_object(EntityPost, email, params['id'])
-        except Exception:
-            resp.status = falcon.HTTP_403
-            return
-
         id = EntityPost.update_from_json(params)
 
         if id:
@@ -824,19 +755,11 @@ def updatePost(**request_handler_args):
 
 
 def deletePost(**request_handler_args):
-    req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('postId', **request_handler_args)
-    email = req.context['email']
 
     if id is not None:
-        try:
-            garant_change_object(EntityPost, email, id)
-        except Exception:
-            resp.status = falcon.HTTP_403
-            return
-
         try:
             EntityPost.delete(id)
         except FileNotFoundError:
@@ -907,17 +830,8 @@ def updateLike(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    email = req.context['email']
-
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-
-        try:
-            garant_change_object(EntityLike, email, params['id'])
-        except Exception:
-            resp.status = falcon.HTTP_403
-            return
-
         id = EntityLike.update_from_json(params)
 
         if id:
@@ -934,19 +848,11 @@ def updateLike(**request_handler_args):
 
 
 def deleteLike(**request_handler_args):
-    req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('likeId', **request_handler_args)
-    email = req.context['email']
 
     if id is not None:
-        try:
-            garant_change_object(EntityLike, email, id)
-        except Exception:
-            resp.status = falcon.HTTP_403
-            return
-
         try:
             EntityLike.delete(id)
             PropLike.delete_value(id, raise_exception=False)
@@ -1015,17 +921,8 @@ def updateComment(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    email = req.context['email']
-
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-
-        try:
-            garant_change_object(EntityComment, email, params['id'])
-        except Exception:
-            resp.status = falcon.HTTP_403
-            return
-
         id = EntityComment.update_from_json(params)
 
         if id:
@@ -1042,19 +939,11 @@ def updateComment(**request_handler_args):
 
 
 def deleteComment(**request_handler_args):
-    req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('commentId', **request_handler_args)
-    email = req.context['email']
 
     if id is not None:
-        try:
-            garant_change_object(EntityComment, email, id)
-        except Exception:
-            resp.status = falcon.HTTP_403
-            return
-
         try:
             EntityComment.delete(id)
             PropComment.delete_value(id, raise_exception=False)
