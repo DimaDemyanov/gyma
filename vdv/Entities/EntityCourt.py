@@ -12,7 +12,6 @@ from vdv.Prop.PropBool import PropBool
 from vdv.Prop.PropReal import PropReal
 from vdv.Prop.PropMedia import PropMedia
 from vdv.Prop.PropLocation import PropLocation
-from vdv.Prop.PropComment import PropComment
 from vdv.db import DBConnection
 
 Base = declarative_base()
@@ -72,7 +71,7 @@ class EntityCourt(EntityBase, Base):
                                                     for _ in _val]
         }
 
-        if 'ownerid' in data and 'name' in data and 'desc' in data and 'prop' in data:
+        if 'ownerid' in data and 'name' in data and 'desc' in data and 'prop' in data :
             ownerid = data['ownerid']
             name = data['name']
             desc = data['desc']
@@ -90,62 +89,6 @@ class EntityCourt(EntityBase, Base):
                                         (prop_name, str(PROPNAME_MAPPING)))
 
                 session.db.commit()
-
-        return vdvid
-
-    @classmethod
-    def __update_equipment(cls, s, _vdvid, _id, _val, _uid):
-        if 'del' in _val:
-            PropMedia.deleteList(_vdvid, _id, _val['del'], s, False)
-
-        if 'new' in _val:
-            for _val_new in _val['new']:
-                cls.process_media(s, 'equipment', _uid, _vdvid, _id, _val_new)
-
-
-
-    @classmethod
-    def update_from_json(cls, data):
-        PROPNAME_MAPPING = EntityProp.map_name_id()
-
-        vdvid = None
-
-        PROP_MAPPING = {
-            'location':
-                lambda s, _vdvid, _id, _val, _uid:
-                PropLocation(_vdvid, _id, _val).update(session=s)
-                if len(PropLocation.get().filter_by(vdvid=_vdvid, propid=_id).all())
-                else PropLocation(_vdvid, _id, _val).add(session=s),
-            'equipment':
-                lambda s, _vdvid, _id, _val, _uid: cls.__update_equipment(s,_vdvid, _id, _val, _uid),
-            'description':
-                lambda s, _vdvid, _id, _val, _uid:
-                PropComment(_vdvid, _id, _val).update(session=s)
-                if len(PropComment.get().filter_by(vdvid=_vdvid, propid=_id).all())
-                else PropComment(_vdvid, _id, _val).add(session=s),
-        }
-
-        if 'id' in data:
-            with DBConnection() as session:
-                vdvid = data['id']
-                ownerid = data['ownerid']
-                entity = session.db.query(EntityCourt).filter_by(vdvid=vdvid).all()
-
-                if len(entity):
-                    for _ in entity:
-                        if 'username' in data:
-                            _.username = data['username']
-
-                        if 'e_mail' in data:
-                            _.e_mail = data['e_mail']
-
-                        session.db.commit()
-
-                        for prop_name, prop_val in data['prop'].items():
-                            if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                                PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, ownerid)
-
-                        session.db.commit()
 
         return vdvid
 
