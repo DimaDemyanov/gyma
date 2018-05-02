@@ -313,6 +313,8 @@ def getUserById(**request_handler_args):
     wide_info = EntityUser.get_wide_object(id, ['private', 'avatar', 'post'])
 
     wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
+    wide_info['following_amount'] = EntityFollow.get().filter_by(vdvid=id).count()
+    wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
 
     res = []
     for _ in objects:
@@ -337,6 +339,8 @@ def getMyUser(**request_handler_args):
     wide_info = EntityUser.get_wide_object(id, ['private', 'avatar', 'post'])
 
     wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
+    wide_info['following_amount'] = EntityFollow.get().filter_by(vdvid=id).count()
+    wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
 
     res = []
     for _ in objects:
