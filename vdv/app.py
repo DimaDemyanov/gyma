@@ -310,9 +310,15 @@ def getUserById(**request_handler_args):
     id = getIntPathParam("userId", **request_handler_args)
     objects = EntityUser.get().filter_by(vdvid=id).all()
 
+    e_mail = req.context['email']
+    my_id = EntityUser.get_id_from_email(e_mail)
+
     wide_info = EntityUser.get_wide_object(id, ['private', 'avatar', 'post'])
 
     wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
+    followings = EntityFollow.get().filter_by(vdvid=id).all()
+    wide_info['is_me'] = my_id == id
+    wide_info['followed'] = EntityFollow.get().filter_by(vdvid=my_id, followingid=id).count() > 0
     wide_info['following_amount'] = EntityFollow.get().filter_by(vdvid=id).count()
     wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
 
@@ -339,7 +345,10 @@ def getMyUser(**request_handler_args):
     wide_info = EntityUser.get_wide_object(id, ['private', 'avatar', 'post'])
 
     wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
-    wide_info['following_amount'] = EntityFollow.get().filter_by(vdvid=id).count()
+    followings = EntityFollow.get().filter_by(vdvid=id).all()
+    wide_info['is_me'] = True
+    wide_info['followed'] = False
+    wide_info['following_amount'] = len(followings)
     wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
 
     res = []
