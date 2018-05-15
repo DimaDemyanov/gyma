@@ -181,16 +181,25 @@ def getAllCourts(**request_handler_args):
     resp.status = falcon.HTTP_200
 
 def getCourtById(**request_handler_args):
+    req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('courtId', **request_handler_args)
     objects = EntityCourt.get().filter_by(vdvid=id).all()
+
+    e_mail = req.context['email']
+    my_id = EntityUser.get_id_from_email(e_mail)
 
     wide_info = EntityCourt.get_wide_object(id)
 
     res = []
     for _ in objects:
         obj_dict = _.to_dict()
+
+        wide_info['is_mine'] = my_id == obj_dict['ownerid']
+        wide_info['followed'] = EntityFollow.get().filter_by(vdvid=my_id, followingid=id).count() > 0
+        wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
+
         obj_dict.update(wide_info)
         res.append(obj_dict)
 
@@ -316,7 +325,7 @@ def getUserById(**request_handler_args):
     wide_info = EntityUser.get_wide_object(id, ['private', 'avatar', 'post'])
 
     wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
-    followings = EntityFollow.get().filter_by(vdvid=id).all()
+
     wide_info['is_me'] = my_id == id
     wide_info['followed'] = EntityFollow.get().filter_by(vdvid=my_id, followingid=id).count() > 0
     wide_info['following_amount'] = EntityFollow.get().filter_by(vdvid=id).count()
