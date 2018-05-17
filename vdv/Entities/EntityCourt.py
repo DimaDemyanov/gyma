@@ -11,6 +11,7 @@ from vdv.Entities.EntityProp import EntityProp
 from vdv.Prop.PropBool import PropBool
 from vdv.Prop.PropReal import PropReal
 from vdv.Prop.PropMedia import PropMedia
+from vdv.Prop.PropLike import PropLike
 from vdv.Prop.PropLocation import PropLocation
 from vdv.db import DBConnection
 
@@ -104,7 +105,8 @@ class EntityCourt(EntityBase, Base):
             'price':     lambda _vdvid, _id: PropReal.get_object_property(_vdvid, _id),
             'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
             'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
-            'equipment': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id)
+            'equipment': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
+            'like':      lambda _vdvid, _id: PropLike.get_object_property(_vdvid, _id)
         }
 
         result = {

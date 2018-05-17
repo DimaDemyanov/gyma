@@ -41,11 +41,16 @@ class EntityLike(EntityBase, Base):
             from vdv.Prop.PropLike import PropLike
             likes = PropLike.get_post_user_related(vdvid, PROPNAME_MAPPING['like'], userId)
 
-            if not len(likes):
-                new_entity = EntityLike(userId, weight)
-                _id = new_entity.add()
 
-                PropLike(vdvid, PROPNAME_MAPPING['like'], _id).add()
+            if len(likes):
+                for _ in likes:
+                    EntityLike.delete(_['vdvid'])
+                    PropLike.delete_value(_['vdvid'], raise_exception=False)
+
+            new_entity = EntityLike(userId, weight)
+            _id = new_entity.add()
+
+            PropLike(vdvid, PROPNAME_MAPPING['like'], _id).add()
 
         return _id
 
