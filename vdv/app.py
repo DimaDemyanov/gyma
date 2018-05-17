@@ -200,7 +200,9 @@ def getCourtById(**request_handler_args):
         wide_info['followed'] = EntityFollow.get().filter_by(vdvid=my_id, followingid=id).count() > 0
         wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
         wide_info['rate_count'] = len(wide_info['like'])
-        wide_info['rate_avg'] = sum([int(_['weight']) for _ in wide_info['like']]) / float(wide_info['rate_count'])
+        wide_info['rate_avg'] = sum([int(_['weight']) for _ in wide_info['like']]) / float(wide_info['rate_count']) \
+            if wide_info['rate_count'] > 0 \
+            else 0.0
 
         obj_dict.update(wide_info)
         res.append(obj_dict)
