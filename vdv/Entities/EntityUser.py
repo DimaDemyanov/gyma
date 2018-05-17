@@ -76,6 +76,10 @@ class EntityUser(EntityBase, Base):
 
     @classmethod
     def update_from_json(cls, data):
+        def process_avatar(s, _vdvid, _id, _val):
+            PropMedia.delete(_vdvid, _id, False)
+            cls.process_media(s, 'image', _vdvid, _vdvid, _id, _val)
+
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         vdvid = None
@@ -88,9 +92,8 @@ class EntityUser(EntityBase, Base):
                 else PropBool(_vdvid, _id, _value).add(session=session),
             'avatar':
                 lambda s, _vdvid, _id, _val:
-                PropMedia(_vdvid, _id, _val).update(session=s)
-                if len(PropMedia.get().filter_by(vdvid=_vdvid, propid=_id).all())
-                else PropMedia(_vdvid, _id, _val).add(session=session),
+                process_avatar(s, _vdvid, _id, _val)
+
         }
 
         if 'id' in data:
