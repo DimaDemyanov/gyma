@@ -214,6 +214,63 @@ def getCourtById(**request_handler_args):
     resp.status = falcon.HTTP_200
 
 
+def easyCreateCourt(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    e_mail = req.context['email']
+    ownerid = EntityUser.get_id_from_email(e_mail)
+
+    media = []
+    for _ in sorted(req.params.keys()):
+        if _.startswith('Photo'):
+            data = req.get_param(_)
+
+            resolver = MediaResolverFactory.produce('image', data.file.read())
+            resolver.Resolve()
+
+            media.append(EntityMedia(ownerid, 'image', resolver.url, name='', desc='').add())
+
+    equipment = []
+    for _ in sorted(req.params.keys()):
+        if _.startswith('EqPhoto'):
+            name = req.get_param(_.replace('Photo', 'Name'))
+            desc = req.get_param(_.replace('Photo', 'Desc'))
+            data = req.get_param(_)
+
+            resolver = MediaResolverFactory.produce('equipment', data.file.read())
+            resolver.Resolve()
+
+            equipment.append({
+                'name': name,
+                'desc': desc,
+                'media': EntityMedia(ownerid, 'equipment', resolver.url, name=name, desc=desc).add()
+            })
+
+    if 'LocationName' in req.params.keys() and 'Latitude' in req.params.keys() and 'Longitude' in req.params.keys():
+        location = EntityLocation(req.get_param('LocationName'),
+                                  req.get_param('Latitude'),
+                                  req.get_param('Longitude')).add()
+
+    params = {}
+
+    params['ownerid'] = ownerid
+    params['name'] = req.get_param('Name')
+    params['desc'] = req.get_param('Desc')
+    params['prop'] = {}
+    params['prop']['media'] = media
+    params['prop']['equipment'] = equipment
+    params['prop']['location'] = location
+
+    id = EntityCourt.add_from_json(params)
+
+    if id:
+        objects = EntityCourt.get().filter_by(vdvid=id).all()
+
+        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.status = falcon.HTTP_200
+
+
 def createCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
@@ -1023,6 +1080,7 @@ operation_handlers = {
     'createCourt':            [createCourt],
     'updateCourt':            [updateCourt],
     'deleteCourt':            [deleteCourt],
+    'easyCreateCourt':        [easyCreateCourt],
 
     #User methods
     'createUser':             [createUser],

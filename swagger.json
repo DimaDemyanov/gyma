@@ -219,6 +219,219 @@
         ]
       }
     },
+    "/courtEasyCreate": {
+      "post": {
+        "tags": [
+          "court",
+          "court API"
+        ],
+        "summary": "Create a new court through UI",
+        "description": "",
+        "operationId": "easyCreateCourt",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Name",
+            "in": "formData",
+            "description": "Court name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Desc",
+            "in": "formData",
+            "description": "Little court description 10-100 words",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Photo1",
+            "in": "formData",
+            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "Photo2",
+            "in": "formData",
+            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "Photo3",
+            "in": "formData",
+            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "Photo4",
+            "in": "formData",
+            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "Photo5",
+            "in": "formData",
+            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "EqName1",
+            "in": "formData",
+            "description": "Equipment name 1, up to 5 items",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqDesc1",
+            "in": "formData",
+            "description": "Very short equipment description 1",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqPhoto1",
+            "in": "formData",
+            "description": "Equipment photo",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "EqName2",
+            "in": "formData",
+            "description": "Equipment name 2, up to 5 items",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqDesc2",
+            "in": "formData",
+            "description": "Very short equipment description 2",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqPhoto2",
+            "in": "formData",
+            "description": "Equipment photo 2",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "EqName3",
+            "in": "formData",
+            "description": "Equipment name 3, up to 5 items",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqDesc3",
+            "in": "formData",
+            "description": "Very short equipment description 3",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqPhoto3",
+            "in": "formData",
+            "description": "Equipment photo 3",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "EqName4",
+            "in": "formData",
+            "description": "Equipment name 4, up to 5 items",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqDesc4",
+            "in": "formData",
+            "description": "Very short equipment description 4",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqPhoto4",
+            "in": "formData",
+            "description": "Equipment photo 4",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "EqName5",
+            "in": "formData",
+            "description": "Equipment name 5, up to 5 items",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqDesc5",
+            "in": "formData",
+            "description": "Very short equipment description 5",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "EqPhoto5",
+            "in": "formData",
+            "description": "Equipment photo 5",
+            "required": false,
+            "type": "file"
+          },
+          {
+            "name": "LocationName",
+            "in": "formData",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "Latitude",
+            "in": "formData",
+            "description": "",
+            "required": false,
+            "type": "double"
+          },
+          {
+            "name": "Longitude",
+            "in": "formData",
+            "description": "",
+            "required": false,
+            "type": "double"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Name already taken"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/court": {
       "post": {
         "tags": [
