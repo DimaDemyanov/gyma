@@ -62,7 +62,7 @@
       "vdv_db": {
         "host": "80.78.255.87",
         "port": 5432,
-        "sid": "vdv_dev",
+        "sid": "postgres",
         "user": "postgres",
         "password": "LaiukiKepta20002015",
         "direct": null,
