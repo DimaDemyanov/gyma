@@ -60,11 +60,11 @@
       "swagger_port": "8081",
       "api_port": "4201",
       "vdv_db": {
-        "host": "185.185.40.39",
+        "host": "80.78.255.87",
         "port": 5432,
         "sid": "vdv_dev",
         "user": "postgres",
-        "password": "9j46cqOn9q463uPW",
+        "password": "LaiukiKepta20002015",
         "direct": null,
         "pool_size": 20
       },
