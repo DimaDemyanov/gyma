@@ -65,6 +65,9 @@ def serach_objects(params):
     _type = params["object"]
     _prop = params["prop"]
 
+    if not len(_prop.items()):
+        _prop["name"] = ""
+
     res = set([])
     for k, v in _prop.items():
         new_set = set([_.vdvid
