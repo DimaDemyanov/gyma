@@ -23,6 +23,10 @@ class EntityBase:
         def fullfill_entity(key, value):
             if key == 'url':
                 value = '%s%s' % (EntityBase.host, value[1:])
+            if key == 'latitude':
+                value = float(value)
+            if key == 'longitude':
+                value = float(value)
             return value
 
         def dictionate_entity(entity):
