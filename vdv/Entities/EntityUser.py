@@ -17,6 +17,8 @@ from vdv.db import DBConnection
 
 Base = declarative_base()
 
+
+
 class EntityUser(EntityBase, Base):
     __tablename__ = 'vdv_user'
 
@@ -25,6 +27,8 @@ class EntityUser(EntityBase, Base):
     e_mail = Column(String)
     created = Column(Date)
     updated = Column(Date)
+    #access =
+    # Добавить поля password, is_admin, is_arendo
 
     json_serialize_items_list = ['vdvid', 'name', 'e_mail', 'created', 'updated']
 

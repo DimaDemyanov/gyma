@@ -8,9 +8,9 @@
       "vdv_db": {
         "host": "localhost",
         "port": 5432,
-        "sid": "vdv",
-        "user": "VDV",
-        "password": "vdv",
+        "sid": "vdv_dev",
+        "user": "postgres",
+        "password": "12345678",
         "direct": null,
         "pool_size": 2
       },

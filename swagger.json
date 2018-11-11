@@ -24,8 +24,8 @@
       }
     },
     {
-      "name": "follow API",
-      "description": "Unlocked follow API functions",
+      "name": "request API",
+      "description": "Unlocked request API functions",
       "externalDocs": {
         "description": "Find out more",
         "url": "http://swagger.io"
@@ -33,14 +33,6 @@
     },
     {
       "name": "location API",
-      "description": "Unlocked location API functions",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
-      "name": "post API",
       "description": "Unlocked location API functions",
       "externalDocs": {
         "description": "Find out more",
@@ -80,6 +72,14 @@
       }
     },
     {
+      "name": "sport",
+      "description": "Everything about sport",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
       "name": "user",
       "description": "Everything about users",
       "externalDocs": {
@@ -88,8 +88,8 @@
       }
     },
     {
-      "name": "following",
-      "description": "Everything about user followers and following",
+      "name": "request",
+      "description": "Everything about users",
       "externalDocs": {
         "description": "Find out more",
         "url": "http://swagger.io"
@@ -114,14 +114,6 @@
     {
       "name": "search",
       "description": "Everything about search",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
-      "name": "post",
-      "description": "Everything about post",
       "externalDocs": {
         "description": "Find out more",
         "url": "http://swagger.io"
@@ -850,14 +842,14 @@
         ]
       }
     },
-    "/{userId}/following/all": {
+    "/request/{userId}/all": {
       "get": {
         "tags": [
-          "following", "follow API"
+          "request", "request API"
         ],
-        "summary": "Find followings of user by ID",
-        "description": "Returns a list of user followings",
-        "operationId": "getUserFollowingsList",
+        "summary": "Get all user requests",
+        "description": "Returns a requests of specified user",
+        "operationId": "getAllUserRequests",
         "produces": [
           "application/json"
         ],
@@ -877,12 +869,6 @@
             "schema": {
               "$ref": "#/definitions/ApiResponse"
             }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "User not found"
           }
         },
         "security": [
@@ -892,18 +878,26 @@
         ]
       }
     },
-    "/following/post": {
+    "/request/{courtId}/all": {
       "get": {
         "tags": [
-          "following", "follow API", "post API"
+          "request", "request API"
         ],
-        "summary": "Returns followings posts",
-        "description": "Returns a list of user followings",
-        "operationId": "getUserFollowingsPosts",
+        "summary": "Get all requests on court",
+        "description": "Returns a requests of specified court",
+        "operationId": "getAllCourtRequests",
         "produces": [
           "application/json"
         ],
         "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
         ],
         "responses": {
           "200": {
@@ -911,12 +905,6 @@
             "schema": {
               "$ref": "#/definitions/ApiResponse"
             }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "User not found"
           }
         },
         "security": [
@@ -926,14 +914,15 @@
         ]
       }
     },
-    "/following/{followingId}": {
+    "/request": {
       "post": {
         "tags": [
-          "following", "follow API"
+          "request",
+          "request API"
         ],
-        "summary": "Follow",
+        "summary": "Create a new request",
         "description": "",
-        "operationId": "userAddFollowing",
+        "operationId": "createRequest",
         "consumes": [
           "application/json"
         ],
@@ -942,12 +931,13 @@
         ],
         "parameters": [
           {
-            "name": "followingId",
-            "in": "path",
-            "description": "ID of following to link",
+            "name": "new_request",
+            "in": "body",
+            "description": "Request encoded in JSON string",
             "required": true,
-            "type": "integer",
-            "format": "int64"
+            "schema": {
+              "$ref": "#/definitions/Request"
+            }
           }
         ],
         "responses": {
@@ -959,6 +949,9 @@
           },
           "405": {
             "description": "Validation exception"
+          },
+          "412": {
+            "description": "Request already taken"
           }
         },
         "security": [
@@ -966,22 +959,25 @@
             "auth_env": []
           }
         ]
-      },
+      }
+    },
+    "/request/{requestId}": {
       "delete": {
         "tags": [
-          "following", "follow API"
+          "request",
+          "request API"
         ],
-        "summary": "Unfollow",
+        "summary": "Remove request item",
         "description": "",
-        "operationId": "userDelFollowing",
+        "operationId": "deleteRequest",
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "followingId",
+            "name": "requestId",
             "in": "path",
-            "description": "ID of following to unlink",
+            "description": "Court id to unlink",
             "required": true,
             "type": "integer",
             "format": "int64"
@@ -992,132 +988,7 @@
             "description": "Invalid ID supplied"
           },
           "404": {
-            "description": "User not found"
-          },
-          "405": {
-            "description": "Following not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/{userId}/follower/all": {
-      "get": {
-        "tags": [
-          "following", "follow API"
-        ],
-        "summary": "Find followers of user by ID",
-        "description": "Returns a list of user followers",
-        "operationId": "getUserFollowersList",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of user",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "User not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/follower/request": {
-      "get": {
-        "tags": [
-          "following", "follow API"
-        ],
-        "summary": "Get followers that requesting following",
-        "description": "Returns a list of user possible followers",
-        "operationId": "getUserFollowersRequestList",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "User not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/follower/request/{followerId}": {
-      "delete": {
-        "tags": [
-          "following", "follow API"
-        ],
-        "summary": "Accept or deny request",
-        "description": "",
-        "operationId": "userResolveFollowerRequest",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "followerId",
-            "in": "path",
-            "description": "ID of following to possible follow",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "accept",
-            "in": "query",
-            "description": "will the follower be accepted?",
-            "required": true,
-            "type": "boolean"
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "405": {
-            "description": "Follower not found"
+            "description": "Request not found"
           }
         },
         "security": [
@@ -1491,208 +1362,12 @@
         ]
       }
     },
-    "/post": {
-      "post": {
-        "tags": [
-          "post", "post API"
-        ],
-        "summary": "Create a new post",
-        "description": "",
-        "operationId": "createPost",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "new_post",
-            "in": "body",
-            "description": "Post encoded in JSON string",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Post"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          },
-          "405": {
-            "description": "Validation exception"
-          },
-          "412": {
-            "description": "Name already taken"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "post", "post API"
-        ],
-        "summary": "Update existing catalog info",
-        "description": "",
-        "operationId": "updatePost",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "new_post",
-            "in": "body",
-            "description": "Post encoded in JSON string",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Post"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Post not found"
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/post/all": {
-      "get": {
-        "tags": [
-          "post"
-        ],
-        "summary": "Get all posts",
-        "description": "Returns a list of posts descriptions",
-        "operationId": "getAllPosts",
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/post/{postId}": {
-      "get": {
-        "tags": [
-          "post", "post API"
-        ],
-        "summary": "Find post by ID",
-        "description": "Returns a post description",
-        "operationId": "getPostById",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "postId",
-            "in": "path",
-            "description": "ID of post to return",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/Post"
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "User not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "post", "post API"
-        ],
-        "summary": "Remove post",
-        "description": "",
-        "operationId": "deletePost",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "postId",
-            "in": "path",
-            "description": "Post id to unlink",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "hard",
-            "in": "query",
-            "description": "Hard-delete (no undo)",
-            "required": false,
-            "type": "boolean"
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Post not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
     "/search": {
       "post": {
         "tags": [
           "search", "search API"
         ],
-        "summary": "Request serach",
+        "summary": "Request search",
         "description": "",
         "operationId": "search",
         "consumes": [
@@ -2113,6 +1788,109 @@
           }
         ]
       }
+    },
+    "/sport": {
+      "post": {
+        "tags": [
+          "sport"
+        ],
+        "summary": "Create a new sport",
+        "description": "",
+        "operationId": "createSport",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_sport",
+            "in": "body",
+            "description": "Comment encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Sport"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Name already taken"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "sport"
+        ],
+        "summary": "Remove sport",
+        "description": "",
+        "operationId": "deleteSport",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "sport name",
+            "in": "path",
+            "description": "Sport name to unlink",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid name supplied"
+          },
+          "404": {
+            "description": "Sport not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "sport"
+        ],
+        "summary": "Find all available sports",
+        "description": "Returns a sports data",
+        "operationId": "getSports",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
     }
   },
   "securityDefinitions": {
@@ -2170,6 +1948,15 @@
           "type": "string",
           "example": "Savchuk@itsociety.su"
         },
+        "password": {
+          "type": "string",
+          "example": "12345678"
+        },
+        "access": {
+          "type": "string",
+          "example": "admin",
+          "variatns": "admin, user, landlord"
+        },
         "prop": {
           "type": "object",
           "properties": {
@@ -2190,6 +1977,34 @@
         "updated": {
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
+        }
+      }
+    },
+    "Request": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "courtid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "username": {
+          "type": "string",
+          "example": "Daniil"
+        },
+        "time_begin": {
+          "type": "string",
+          "example": "2018-03-28 20:00:00+00:00"
+        },
+        "time_end": {
+          "type": "string",
+          "example": "2018-03-28 21:30:00+00:00"
         }
       }
     },
@@ -2246,6 +2061,10 @@
         "desc": {
           "type": "string",
           "example": "Very cool workout place"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int64"
         },
         "prop": {
           "type": "object",
@@ -2359,50 +2178,6 @@
         }
       }
     },
-    "Post": {
-      "type": "object",
-      "required": [
-        "id"
-      ],
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "userId": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "description": {
-          "type": "string",
-          "example": "Post about something"
-        },
-        "prop": {
-          "type": "object",
-          "properties": {
-            "media": {
-              "type": "array",
-              "items": {
-                "type": ["int", "string"],
-                "example": "media_id or base64 encoded string"
-              }
-            },
-            "location": {
-              "type": "int",
-              "example": 0
-            }
-          }
-        },
-        "created": {
-          "type": "string",
-          "example": "2018-03-28 20:24:00+00:00"
-        },
-        "updated": {
-          "type": "string",
-          "example": "2018-03-28 20:24:00+00:00"
-        }
-      }
-    },
     "Like": {
       "type": "object",
       "required": [
@@ -2456,6 +2231,22 @@
         "updated": {
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
+        }
+      }
+    },
+    "Sport": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string",
+          "example": "Footboll // English only("
         }
       }
     },

@@ -172,6 +172,31 @@ def cleanupDatabase(**request_handler_args):
 
     resp.status = falcon.HTTP_501
 
+def createRequest(**request_handler_args):   # TODO: implement it
+    resp = request_handler_args['resp']
+    resp.status = falcon.HTTP_200
+
+def getAllUserRequests(**request_handler_args):   # TODO: implement it
+    resp = request_handler_args['resp']
+    resp.status = falcon.HTTP_200
+
+def getAllCourtRequests(**request_handler_args):   # TODO: implement it
+    resp = request_handler_args['resp']
+    resp.status = falcon.HTTP_200
+
+def deleteRequest(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    resp.status = falcon.HTTP_200
+
+def createSport(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    resp.status = falcon.HTTP_200
+
+def deleteSport(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    resp.status = falcon.HTTP_200
+
+
 def getAllCourts(**request_handler_args):
     resp = request_handler_args['resp']
 
@@ -1074,6 +1099,16 @@ operation_handlers = {
     'getVersion':      [getVersion],
     'httpDefault':     [httpDefault],
 
+    #Request methods
+    'createRequest':          [createRequest],
+    'getAllCourtRequests':    [getAllCourtRequests],
+    'getAllUserRequests':     [getAllUserRequests],
+    'deleteRequest':          [deleteRequest],
+
+    #Sport methods
+    'createSport':            [createSport],
+    'deleteSport':            [deleteSport],
+
     #Court methods
     'getAllCourts':           [getAllCourts],
     'getCourtById':           [getCourtById],
@@ -1086,7 +1121,7 @@ operation_handlers = {
     'createUser':             [createUser],
     'updateUser':             [updateUser],
     'getAllUsers':            [getAllUsers],
-    'getUser':                [getUserById],
+        'getUser':                [getUserById],
     'getMyUser':              [getMyUser],
     'deleteUser':             [deleteUser],
     'getUserFollowingsList':        [getUserFollowingsList],
@@ -1173,27 +1208,31 @@ class Auth(object):
         if req.method == 'OPTIONS':
             return # pre-flight requests don't require authentication
 
-        token = None
-        try:
-            if req.auth:
-                token = req.auth.split(" ")[1].strip()
-            else:
-                token = req.params.get('access_token')
-        except:
-            raise falcon.HTTPUnauthorized(description='Token was not provided in schema [berear <Token>]',
-                                      challenges=['Bearer realm=http://GOOOOGLE'])
+        # token = None
+        # try:
+        #     if req.auth:
+        #         token = req.auth.split(" ")[1].strip()
+        #     else:
+        #         token = req.params.get('access_token')
+        # except:
+        #     raise falcon.HTTPUnauthorized(description='Token was not provided in schema [berear <Token>]',
+        #                               challenges=['Bearer realm=http://GOOOOGLE'])
 
-        error = 'Authorization required.'
-        if token:
-            error, res, email = auth.Validate(token, auth.PROVIDER.GOOGLE)
-            if not error:
-                req.context['email'] = email
+        error = None#'Authorization required.'
+        #if token:
+        email = req.params.get('email')
+        password = req.params.get('pass')
+        #error, res, email = auth.Validate(token, auth.PROVIDER.GOOGLE)
+        if not error:
+            req.context['email'] = email
 
-                if not EntityUser.get_id_from_email(email) and not re.match('(/vdv/user).*', req.relative_uri):
-                    raise falcon.HTTPUnavailableForLegalReasons(description=
-                                                                "Requestor [%s] not existed as user yet" % email)
+            if not EntityUser.get_id_from_email(email) and not re.match('(/vdv/user).*', req.relative_uri)\
+                    and not (re.match('(/vdv/initDatabase).*', req.relative_uri) and password == "123"):
+                raise falcon.HTTPUnavailableForLegalReasons(description=
+                                                            "Requestor [%s] not existed as user yet" % email)
 
                 return # passed access token is valid
+
 
         raise falcon.HTTPUnauthorized(description=error,
                                       challenges=['Bearer realm=http://GOOOOGLE'])
@@ -1214,7 +1253,9 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
+wsgi_app = api = falcon.API(middleware=[CORS(), MultipartMiddleware()])
+#Auth(),
+
 
 server = SpecServer(operation_handlers=operation_handlers)
 
