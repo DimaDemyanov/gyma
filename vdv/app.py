@@ -5,14 +5,19 @@ import mimetypes
 import os
 import posixpath
 import re
+from datetime import datetime, timedelta
+import jwt
 import time
 from collections import OrderedDict
+from datetime import timedelta
 
 import falcon
 from falcon_multipart.middleware import MultipartMiddleware
 
 from vdv import utils
+from vdv.Entities.EntityRequest import EntityRequest
 from vdv.auth import auth
+#from vdv.auth import JWT_SIGN_ALGORITHM
 from vdv.db import DBConnection
 from vdv.serve_swagger import SpecServer
 
@@ -33,6 +38,10 @@ from vdv.Prop.PropLike import PropLike
 from vdv.Prop.PropComment import PropComment
 
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
+
+JWT_SIGN_ALGORITHM = 'HS256'
+JWT_PUBLIC_KEY = 'secretterces123'
+JWT_EXP_TIME = 3600
 
 def stringToBool(str):
     # empty string is included because we allow empty-valued flags in query
@@ -173,8 +182,25 @@ def cleanupDatabase(**request_handler_args):
     resp.status = falcon.HTTP_501
 
 def createRequest(**request_handler_args):   # TODO: implement it
+    req = request_handler_args['req']
     resp = request_handler_args['resp']
-    resp.status = falcon.HTTP_200
+
+    try:
+        e_mail = req.context['email']
+    except:
+        resp.status = falcon.HTTP_400
+    # ownerid = EntityUser.get_id_from_email(e_mail)
+
+    params = json.loads(req.stream.read().decode('utf-8'))
+    # params['ownerid'] = ownerid
+    try:
+        id = EntityRequest.add_from_json(params)
+    except:
+        resp.status = falcon.HTTP_412
+        return
+    if id:
+        objects = EntityCourt.get().filter_by(vdvid=id).all()
+        resp.status = falcon.HTTP_200
 
 def getAllUserRequests(**request_handler_args):   # TODO: implement it
     resp = request_handler_args['resp']
@@ -193,6 +219,18 @@ def createSport(**request_handler_args):  # TODO: implement it
     resp.status = falcon.HTTP_200
 
 def deleteSport(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    resp.status = falcon.HTTP_200
+
+def createTime(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    resp.status = falcon.HTTP_200
+
+def getSports(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    resp.status = falcon.HTTP_200
+
+def deleteTime(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     resp.status = falcon.HTTP_200
 
@@ -300,15 +338,19 @@ def createCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-
-    e_mail = req.context['email']
-    ownerid = EntityUser.get_id_from_email(e_mail)
+    try:
+        e_mail = req.context['email']
+    except:
+        resp.status = falcon.HTTP_400
+    #ownerid = EntityUser.get_id_from_email(e_mail)
 
     params = json.loads(req.stream.read().decode('utf-8'))
-    params['ownerid'] = ownerid
-
-    id = EntityCourt.add_from_json(params)
-
+    #params['ownerid'] = ownerid
+    try:
+        id = EntityCourt.add_from_json(params)
+    except:
+        resp.status = falcon.HTTP_412
+        return
     if id:
         objects = EntityCourt.get().filter_by(vdvid=id).all()
 
@@ -355,8 +397,11 @@ def createUser(**request_handler_args):
 
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-        id = EntityUser.add_from_json(params)
-
+        try:
+            id = EntityUser.add_from_json(params)
+        except:
+            resp.status = falcon.HTTP_412
+            return
         if id:
             objects = EntityUser.get().filter_by(vdvid=id).all()
 
@@ -1092,12 +1137,37 @@ def createComment(**request_handler_args):
 
     resp.status = falcon.HTTP_500
 
+def login(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    email = req.params.get('email')
+    password = req.params.get('pass')
+
+    passwordBase = EntityUser.get_password_from_email(email)
+
+    if password != passwordBase or password == None:
+        resp.status = falcon.HTTP_405
+
+    payload = {
+        'user_id': EntityUser.get_id_from_email(email),
+        'e_mail': email,
+        'exp': datetime.datetime.utcnow() + timedelta(seconds=JWT_EXP_TIME)
+    }
+    jwt_token = jwt.encode(payload, JWT_PUBLIC_KEY, JWT_SIGN_ALGORITHM)
+    resp.body = obj_to_json({'token': jwt_token.decode('utf-8'),
+                        'isAdmin': "false"})
+
+
 
 operation_handlers = {
     'initDatabase':    [initDatabase],
     'cleanupDatabase': [cleanupDatabase],
     'getVersion':      [getVersion],
     'httpDefault':     [httpDefault],
+
+    #Auth
+    'login':           [login],
 
     #Request methods
     'createRequest':          [createRequest],
@@ -1108,6 +1178,11 @@ operation_handlers = {
     #Sport methods
     'createSport':            [createSport],
     'deleteSport':            [deleteSport],
+    'getSports':              [getSports],
+
+    #Court time methods
+    'createTime':             [createTime],
+    'deleteTime':             [deleteTime],
 
     #Court methods
     'getAllCourts':           [getAllCourts],
@@ -1189,6 +1264,9 @@ class CORS(object):
             #    if acrh:
             #        resp.set_header('Access-Control-Allow-Headers', acrh)
 
+class Auth1(object):
+    def process_request(self, req, resp):
+        req.context['email'] = 'dima.demyanov.1997@gmail.com'
 
 class Auth(object):
     def process_request(self, req, resp):
@@ -1219,19 +1297,34 @@ class Auth(object):
         #                               challenges=['Bearer realm=http://GOOOOGLE'])
 
         error = None#'Authorization required.'
-        #if token:
+        # #if token:
         email = req.params.get('email')
         password = req.params.get('pass')
-        #error, res, email = auth.Validate(token, auth.PROVIDER.GOOGLE)
+        # #error, res, email = auth.Validate(token, auth.PROVIDER.GOOGLE)
+        #
+        # req.user = None
+        jwt_token = req.headers.get('AUTH')
+        if jwt_token:
+            try:
+                payload = jwt.decode(jwt_token, JWT_PUBLIC_KEY,
+                                     algorithms=[JWT_SIGN_ALGORITHM])
+                id = EntityUser.get_id_from_email(email)
+                req.context['email'] = payload.get('e_mail')
+            except (jwt.DecodeError, jwt.ExpiredSignatureError):
+                return falcon.HTTPUnauthorized(description="Something goes wrong",
+                                      challenges=['Bearer realm=http://GOOOOGLE'])
+            return
+
         if not error:
             req.context['email'] = email
 
             if not EntityUser.get_id_from_email(email) and not re.match('(/vdv/user).*', req.relative_uri)\
+                    and not (re.match('(/vdv/login).*', req.relative_uri))\
                     and not (re.match('(/vdv/initDatabase).*', req.relative_uri) and password == "123"):
                 raise falcon.HTTPUnavailableForLegalReasons(description=
                                                             "Requestor [%s] not existed as user yet" % email)
 
-                return # passed access token is valid
+            return # passed access token is valid
 
 
         raise falcon.HTTPUnauthorized(description=error,
@@ -1253,7 +1346,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), MultipartMiddleware()])
+wsgi_app = api = falcon.API(middleware=[CORS(), Auth1(), MultipartMiddleware()])
 #Auth(),
 
 

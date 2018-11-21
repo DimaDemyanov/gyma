@@ -24,17 +24,19 @@ class EntityCourt(EntityBase, Base):
     ownerid = Column(Integer)
     name = Column(String)
     desc = Column(String)
+    price = Column(Integer)
     created = Column(Date)
     updated = Column(Date)
 
-    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'created', 'updated']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'created', 'updated']
 
-    def __init__(self, ownerid, name, desc):
+    def __init__(self, ownerid, name, desc, price):
         super().__init__()
 
         self.ownerid = ownerid
         self.name = name
         self.desc = desc
+        self.price = price
 
         ts = time.time()
         self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
@@ -58,9 +60,6 @@ class EntityCourt(EntityBase, Base):
             'isonair':
                 lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
                     .add(session=session, no_commit=True),
-            'price':
-                lambda session, _vdvid, _id, _value, _uid: PropReal(_vdvid, _id, _value)
-                    .add(session=session, no_commit=True),
             'location':
                 lambda s, _vdvid, _id, _val, _uid: PropLocation(_vdvid, _id, _val)
                     .add(session=s, no_commit=True),
@@ -72,12 +71,13 @@ class EntityCourt(EntityBase, Base):
                                                     for _ in _val]
         }
 
-        if 'ownerid' in data and 'name' in data and 'desc' in data and 'prop' in data :
+        if 'ownerid' in data and 'name' in data and 'desc' in data and 'prop' in data and 'price' in data :
             ownerid = data['ownerid']
             name = data['name']
             desc = data['desc']
+            price = data['price']
 
-            new_entity = EntityCourt(ownerid, name, desc)
+            new_entity = EntityCourt(ownerid, name, desc, price)
             vdvid = new_entity.add()
 
             with DBConnection() as session:

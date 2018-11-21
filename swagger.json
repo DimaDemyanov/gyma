@@ -32,6 +32,14 @@
       }
     },
     {
+      "name": "court time API",
+      "description": "Unlocked request API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
       "name": "location API",
       "description": "Unlocked location API functions",
       "externalDocs": {
@@ -998,6 +1006,86 @@
         ]
       }
     },
+    "/time": {
+      "post": {
+        "tags": [
+          "court time API"
+        ],
+        "summary": "Create a new court time",
+        "description": "",
+        "operationId": "createTime",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_request",
+            "in": "body",
+            "description": "Court time encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Time already taken"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "court time API"
+        ],
+        "summary": "Remove time item",
+        "description": "",
+        "operationId": "deleteTime",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "timeId",
+            "in": "path",
+            "description": "time id to unlink",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Time not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/media": {
       "post": {
         "tags": [
@@ -1049,47 +1137,6 @@
             "schema": {
               "$ref": "#/definitions/ApiResponse"
             }
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "court"
-        ],
-        "summary": "Update existing catalog info",
-        "description": "",
-        "operationId": "updateCourt",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "new_court",
-            "in": "body",
-            "description": "Court encoded in JSON string",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Court"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Court not found"
           },
           "405": {
             "description": "Validation exception"
@@ -1891,6 +1938,52 @@
           }
         ]
       }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "login"
+        ],
+        "summary": "Logging in",
+        "description": "",
+        "operationId": "login",
+        "consumes": [
+          "formData"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "body",
+            "description": "Check access and generate token",
+            "required": true
+          },
+          {
+            "name": "pass",
+            "in": "body",
+            "description": "Check access and generate token",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
     }
   },
   "securityDefinitions": {
@@ -1980,6 +2073,30 @@
         }
       }
     },
+    "day_time": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "courtid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "time_begin": {
+          "type": "string",
+          "example": "2018-03-28 20:00:00+00:00"
+        },
+        "time_end": {
+          "type": "string",
+          "example": "2018-03-28 21:30:00+00:00"
+        }
+      }
+    },
     "Request": {
       "type": "object",
       "required": [
@@ -1994,9 +2111,9 @@
           "type": "integer",
           "format": "int64"
         },
-        "username": {
+        "email": {
           "type": "string",
-          "example": "Daniil"
+          "example": "dm@mail.ru"
         },
         "time_begin": {
           "type": "string",
@@ -2005,6 +2122,39 @@
         "time_end": {
           "type": "string",
           "example": "2018-03-28 21:30:00+00:00"
+        }
+      }
+    },
+    "Login": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "login": {
+          "type": "string",
+          "format": "string"
+        },
+        "password": {
+          "type": "string",
+          "example": "string"
+        }
+      }
+    },
+    "LoginResponse": {
+
+      "type": "object",
+      "required": [
+        "sig"
+      ],
+      "properties": {
+        "sig": {
+          "type": "string",
+          "format": "string"
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "example": "false"
         }
       }
     },

@@ -1,4 +1,4 @@
-from jose import jwt
+import jwt
 
 oidc_params = {
     'client_id': 'star',

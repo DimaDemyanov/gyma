@@ -27,6 +27,7 @@ class EntityUser(EntityBase, Base):
     e_mail = Column(String)
     created = Column(Date)
     updated = Column(Date)
+    password = Column(String)
     #access =
     # Добавить поля password, is_admin, is_arendo
 
@@ -173,6 +174,13 @@ class EntityUser(EntityBase, Base):
     def get_id_from_email(cls, e_mail):
         try:
             return cls.get().filter_by(e_mail=e_mail).all()[0].vdvid
+        except:
+            return None
+
+    @classmethod
+    def get_password_from_email(cls, e_mail):
+        try:
+            return cls.get().filter_by(e_mail=e_mail).all()[0].password
         except:
             return None
 
