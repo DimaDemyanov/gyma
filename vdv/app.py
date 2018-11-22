@@ -124,6 +124,7 @@ def httpDefault(**request_handler_args):
     if os.path.isdir(path):
         for index in "index.html", "index.htm", "test-search.html":
             index = os.path.join(path + '/', index)
+            logger.info(index + '      ' + os.getcwd())
             if os.path.exists(index):
                 path = index
                 break
@@ -397,11 +398,11 @@ def createUser(**request_handler_args):
 
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-        try:
-            id = EntityUser.add_from_json(params)
-        except:
-            resp.status = falcon.HTTP_412
-            return
+        # try:
+        id = EntityUser.add_from_json(params)
+        # except:
+        #     resp.status = falcon.HTTP_412
+        #     return
         if id:
             objects = EntityUser.get().filter_by(vdvid=id).all()
 
@@ -1331,7 +1332,8 @@ class Auth(object):
                                       challenges=['Bearer realm=http://GOOOOGLE'])
 
 
-logging.getLogger().setLevel(logging.DEBUG)
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 args = utils.RegisterLaunchArguments()
 
 cfgPath = args.cfgpath
@@ -1346,7 +1348,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), Auth1(), MultipartMiddleware()])
+wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
 #Auth(),
 
 

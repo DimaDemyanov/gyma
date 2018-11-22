@@ -28,16 +28,18 @@ class EntityUser(EntityBase, Base):
     created = Column(Date)
     updated = Column(Date)
     password = Column(String)
-    #access =
+    access = Column(String)
     # Добавить поля password, is_admin, is_arendo
 
-    json_serialize_items_list = ['vdvid', 'name', 'e_mail', 'created', 'updated']
+    json_serialize_items_list = ['vdvid', 'name', 'e_mail', 'created', 'updated', 'access']
 
-    def __init__(self, username, email):
+    def __init__(self, username, email, password, access):
         super().__init__()
 
         self.name = username
         self.e_mail = email
+        self.password = password
+        self.access = access
 
         ts = time.time()
         self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
@@ -55,11 +57,13 @@ class EntityUser(EntityBase, Base):
                 lambda s, _vdvid, _id, _val, _uid: cls.process_media(s, 'image', _uid, _vdvid, _id, _val)
         }
 
-        if 'username' in data and 'e_mail' in data and 'prop' in data:
+        if 'username' in data and 'e_mail' in data and 'password' in data and 'access' in data and 'prop' in data:
             username = data['username']
             e_mail = data['e_mail']
+            password = data['password']
+            access = data['access']
 
-            new_entity = EntityUser(username, e_mail)
+            new_entity = EntityUser(username, e_mail, password, access)
             vdvid = new_entity.add()
 
             try:
