@@ -40,9 +40,10 @@ class SpecServer():
     def __call__(self, req, resp, **kwargs):
         # this is the main entry point to inbound request processing
         log.info("SpecServer called on path = %s" % req.path)
-        self.req = req
-        self.resp = resp
-        self.process_inbound_request(req, resp)
+        if not req.path.startwith("/vdv/swagger-ui") or req.path == "/vdv/swagger-ui":
+            self.req = req
+            self.resp = resp
+            self.process_inbound_request(req, resp)
 
 
     def process_inbound_request(self, req, resp):
@@ -202,7 +203,7 @@ class SpecServer():
             # if the item is a function then it's just a request handler - execute it
             log.info("Sending request to operation_request_handler: {}".format(item))
             item(**request_handler_args)
-
+            return
             ####### OUR JOB IS FINISHED - WHAT HAPPENS NEXT?
             # control returns to Falcon and Falcon returns the response object to the client
 
