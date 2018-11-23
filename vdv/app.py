@@ -147,6 +147,7 @@ def httpDefault(**request_handler_args):
             if path.endswith('index.html'):
                 str = buffer.decode()
                 str = str.replace('127.0.0.1:4201', server_host)
+                logger.info(str)
                 buffer = str.encode()
                 length = len(buffer)
 

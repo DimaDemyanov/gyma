@@ -40,10 +40,10 @@ class SpecServer():
     def __call__(self, req, resp, **kwargs):
         # this is the main entry point to inbound request processing
         log.info("SpecServer called on path = %s" % req.path)
-        if not req.path.startwith("/vdv/swagger-ui") or req.path == "/vdv/swagger-ui":
-            self.req = req
-            self.resp = resp
-            self.process_inbound_request(req, resp)
+        #if not req.path.startswith("/vdv/swagger-ui") or req.path == "/vdv/swagger-ui":
+        self.req = req
+        self.resp = resp
+        self.process_inbound_request(req, resp)
 
 
     def process_inbound_request(self, req, resp):
