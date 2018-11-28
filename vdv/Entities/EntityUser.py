@@ -109,7 +109,8 @@ class EntityUser(EntityBase, Base):
             with DBConnection() as session:
                 vdvid = data['id']
                 entity = session.db.query(EntityUser).filter_by(vdvid=vdvid).all()
-
+                if len(entity) == 0:
+                    vdvid = -1          # No user with givven id
                 if len(entity):
                     for _ in entity:
                         if 'username' in data:

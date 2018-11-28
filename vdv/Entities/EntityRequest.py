@@ -6,8 +6,6 @@ from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityCourt import EntityCourt
 
 from vdv.Prop.PropBool import PropBool
 from vdv.Prop.PropMedia import PropMedia
@@ -23,19 +21,15 @@ class EntityRequest(EntityBase, Base):
     __tablename__ = 'vdv_request'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
-    courtid = Column(Integer)
-    email = Column(String)
     time_begin = Column(Date)
     time_end = Column(Date)
 
 
-    json_serialize_items_list = ['vdvid', 'courtid', 'e_mail', 'time_begin', 'time_end']
+    json_serialize_items_list = ['vdvid', 'time_begin', 'time_end']
 
-    def __init__(self, courtid, email, time_begin, time_end):
+    def __init__(self, time_begin, time_end):
         super().__init__()
 
-        self.courtid = courtid
-        self.email = email
         self.time_begin = time_begin
         self.time_end = time_end
 
@@ -43,16 +37,11 @@ class EntityRequest(EntityBase, Base):
     def add_from_json(cls, data):
         vdvid = None
 
-        if 'courtid' in data and 'email' in data and 'time_begin' in data and 'time_end' in data:
-            courtid = data['courtid']
-            email = data['email']
+        if 'time_begin' in data and 'time_end' in data:
             time_begin = data['time_begin']
             time_end = data['time_end']
 
-            if(not EntityCourt.get().get(courtid)):
-                raise Exception("Request courtid not match any of existed")
-
-            new_entity = EntityRequest(courtid, email, time_begin, time_end)
+            new_entity = EntityRequest(time_begin, time_end)
             vdvid = new_entity.add()
 
             try:
@@ -69,7 +58,8 @@ class EntityRequest(EntityBase, Base):
             except Exception as e:
                 EntityRequest.delete(vdvid)
                 raise Exception('Internal error')
-
+        else:
+            raise Exception('Validation exception')
         return vdvid
 
     @classmethod
@@ -118,69 +108,59 @@ class EntityRequest(EntityBase, Base):
         #
         # return vdvid
 
-    @classmethod
-    def get_wide_object(cls, vdvid, items=[]):
-        PROPNAME_MAPPING = EntityProp.map_name_id()
-
-        PROP_MAPPING = {
-            'private': lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'post': lambda _vdvid, _id: PropPost.get_object_property(_vdvid, _id),
-            'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id, ['vdvid', 'url'])
-        }
-
-        result = {
-            'vdvid': vdvid,
-            'court': []
-        }
-        for key, propid in PROPNAME_MAPPING.items():
-            if key in PROP_MAPPING and (not len(items) or key in items):
-                result.update({key: PROP_MAPPING[key](vdvid, propid)})
-
-        courts = EntityCourt.get().filter_by(ownerid=vdvid).all()
-
-        for _ in courts:
-            result['court'].append(EntityCourt.get_wide_object(_.vdvid))
-
-        return result
+    # @classmethod
+    # def get_wide_object(cls, vdvid, items=[]):
+    #     PROPNAME_MAPPING = EntityProp.map_name_id()
+    #
+    #     PROP_MAPPING = {
+    #         'private': lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
+    #         'post': lambda _vdvid, _id: PropPost.get_object_property(_vdvid, _id),
+    #         'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id, ['vdvid', 'url'])
+    #     }
+    #
+    #     result = {
+    #         'vdvid': vdvid,
+    #         'court': []
+    #     }
+    #     for key, propid in PROPNAME_MAPPING.items():
+    #         if key in PROP_MAPPING and (not len(items) or key in items):
+    #             result.update({key: PROP_MAPPING[key](vdvid, propid)})
+    #
+    #     courts = EntityCourt.get().filter_by(ownerid=vdvid).all()
+    #
+    #     for _ in courts:
+    #         result['court'].append(EntityCourt.get_wide_object(_.vdvid))
+    #
+    #     return result
 
     @classmethod
     def delete_wide_object(cls, vdvid):
-        PROPNAME_MAPPING = EntityProp.map_name_id()
+        EntityRequest.delete(cls, vdvid)
 
-        PROP_MAPPING = {
-            'private': lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'post': lambda _vdvid, _id: PropPost.delete(_vdvid, _id, False),
-            'avatar': lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False)
-        }
+    # @classmethod
+    # def get_id_from_username(cls, username):
+    #     try:
+    #         return cls.get().filter_by(username=username).all()[0].vdvid
+    #     except:
+    #         return None
+    #
+    # @classmethod
+    # def get_id_from_email(cls, e_mail):
+    #     try:
+    #         return cls.get().filter_by(e_mail=e_mail).all()[0].vdvid
+    #     except:
+    #         return None
+    #
+    # @classmethod
+    # def get_password_from_email(cls, e_mail):
+    #     try:
+    #         return cls.get().filter_by(e_mail=e_mail).all()[0].password
+    #     except:
+    #         return None
 
-        for key, propid in PROPNAME_MAPPING.items():
-            if key in PROP_MAPPING:
-                PROP_MAPPING[key](vdvid, propid)
-
-    @classmethod
-    def get_id_from_username(cls, username):
-        try:
-            return cls.get().filter_by(username=username).all()[0].vdvid
-        except:
-            return None
-
-    @classmethod
-    def get_id_from_email(cls, e_mail):
-        try:
-            return cls.get().filter_by(e_mail=e_mail).all()[0].vdvid
-        except:
-            return None
-
-    @classmethod
-    def get_password_from_email(cls, e_mail):
-        try:
-            return cls.get().filter_by(e_mail=e_mail).all()[0].password
-        except:
-            return None
-
-    @classmethod
-    def is_private(cls, id):
-        PROPNAME_MAPPING = EntityProp.map_name_id()
-        res = PropBool.get_object_property(id, PROPNAME_MAPPING['private'])
-        return res[0] if len(res) else False
+    # @classmethod
+    # def is_private(cls, id):
+    #     PROPNAME_MAPPING = EntityProp.map_name_id()
+    #     res = PropBool.get_object_property(id, PROPNAME_MAPPING['private'])
+    #     return res[0] if len(res) else False
 

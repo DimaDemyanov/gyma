@@ -13,6 +13,7 @@ from vdv.Prop.PropReal import PropReal
 from vdv.Prop.PropMedia import PropMedia
 from vdv.Prop.PropLike import PropLike
 from vdv.Prop.PropLocation import PropLocation
+from vdv.Prop.PropRequest import PropRequest
 from vdv.db import DBConnection
 
 Base = declarative_base()
@@ -63,6 +64,9 @@ class EntityCourt(EntityBase, Base):
             'location':
                 lambda s, _vdvid, _id, _val, _uid: PropLocation(_vdvid, _id, _val)
                     .add(session=s, no_commit=True),
+            'request':
+                lambda s, _vdvid, _id, _val, _uid: [PropRequest(_vdvid, _id, _).add(session=s, no_commit=True)
+                                                    for _ in _val],
             'media':
                 lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'image', _uid, _vdvid, _id, _)
                                                     for _ in _val],
@@ -104,6 +108,7 @@ class EntityCourt(EntityBase, Base):
             'isonair':   lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
             'price':     lambda _vdvid, _id: PropReal.get_object_property(_vdvid, _id),
             'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
+            'request': lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
             'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
             'equipment': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
             'like':      lambda _vdvid, _id: PropLike.get_object_property(_vdvid, _id)
@@ -129,6 +134,7 @@ class EntityCourt(EntityBase, Base):
             'isonair':   lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
             'price':     lambda _vdvid, _id: PropReal.delete(_vdvid, _id, False),
             'location':  lambda _vdvid, _id: PropLocation.delete(_vdvid, _id, False),
+            'request': lambda _vdvid, _id: PropRequest.delete(_vdvid, _id, False),
             'media':     lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False),
             'equipment': lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False)
         }

@@ -2,7 +2,7 @@ DROP SEQUENCE IF EXISTS vdv_seq;
 CREATE SEQUENCE vdv_seq start with 1 increment by 1;
 
 DROP TYPE IF EXISTS vdv_prop_type CASCADE;
-CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post');
+CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request');
 
 DROP TYPE IF EXISTS vdv_media_type CASCADE;
 CREATE TYPE vdv_media_type AS ENUM ('image', 'equipment');
@@ -40,8 +40,6 @@ CREATE TABLE "vdv_user" (
 DROP TABLE IF EXISTS "vdv_request";
 CREATE TABLE "vdv_request" (
 	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY,
-	"courtid" BIGSERIAL NOT NULL,
-	"email" VARCHAR(256) NOT NULL,
 	"time_begin" TIMESTAMP WITH TIME ZONE NOT NULL,
 	"time_end" TIMESTAMP WITH TIME ZONE NOT NULL
 ) WITH (
@@ -107,6 +105,7 @@ INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'comment', 
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'like', 'like');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'location', 'location');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'post', 'post');
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'request', 'request');
 
 DROP TABLE IF EXISTS "vdv_prop_bool";
 CREATE TABLE "vdv_prop_bool" (
@@ -175,6 +174,16 @@ CREATE TABLE "vdv_prop_like" (
 
 DROP TABLE IF EXISTS "vdv_prop_location";
 CREATE TABLE "vdv_prop_location" (
+	"vdvid" BIGINT NOT NULL,
+	"propid" BIGINT NOT NULL,
+	"value" BIGINT NOT NULL,
+	PRIMARY KEY (vdvid, propid, value)
+) WITH (
+  OIDS=FALSE
+);
+
+DROP TABLE IF EXISTS "vdv_prop_request";
+CREATE TABLE "vdv_prop_request" (
 	"vdvid" BIGINT NOT NULL,
 	"propid" BIGINT NOT NULL,
 	"value" BIGINT NOT NULL,

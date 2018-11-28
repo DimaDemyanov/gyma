@@ -7,6 +7,8 @@ import posixpath
 import re
 from datetime import datetime, timedelta
 import jwt
+from sqlalchemy import and_
+from sqlalchemy import or_
 import time
 from collections import OrderedDict
 from datetime import timedelta
@@ -183,7 +185,7 @@ def cleanupDatabase(**request_handler_args):
 
     resp.status = falcon.HTTP_501
 
-def createRequest(**request_handler_args):   # TODO: implement it
+def createRequest(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
@@ -192,29 +194,67 @@ def createRequest(**request_handler_args):   # TODO: implement it
     except:
         resp.status = falcon.HTTP_400
     # ownerid = EntityUser.get_id_from_email(e_mail)
-
     params = json.loads(req.stream.read().decode('utf-8'))
+    # time_begin = params['time_begin']
+    # time_end = params['time_end']
+    # courtid = params['courtid']
+    # objects = EntityRequest.get().filter(and_(EntityRequest.courtid == courtid,or_(and_(EntityRequest.time_begin >= time_begin, EntityRequest.time_begin < time_end),
+    #                                             and_(EntityRequest.time_end > time_begin, EntityRequest.time_end <= time_end)))).all()
+    # if objects:
+    #     resp.status = falcon.HTTP_412
+    #     return
     # params['ownerid'] = ownerid
+    # if not EntityCourt.get().get(params['courtid']) or not EntityUser.get().get(params['userid']):
+    #     resp.status = falcon.HTTP_411
+    #     return
     try:
         id = EntityRequest.add_from_json(params)
     except:
         resp.status = falcon.HTTP_412
         return
     if id:
-        objects = EntityCourt.get().filter_by(vdvid=id).all()
+        objects = EntityRequest.get().filter_by(vdvid=id).all()
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
 
-def getAllUserRequests(**request_handler_args):   # TODO: implement it
+def getAllUserRequests(**request_handler_args):
     resp = request_handler_args['resp']
+
+    id = getIntPathParam('userId', **request_handler_args)
+
+    objects = EntityRequest.get().filter_by(userid=id).all()
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
 
-def getAllCourtRequests(**request_handler_args):   # TODO: implement it
+def getAllCourtRequests(**request_handler_args):
     resp = request_handler_args['resp']
+
+    id = getIntPathParam('courtId', **request_handler_args)
+
+    objects = EntityRequest.get().filter_by(courtid=id).all()
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
 
-def deleteRequest(**request_handler_args):  # TODO: implement it
+def deleteRequest(**request_handler_args):
     resp = request_handler_args['resp']
-    resp.status = falcon.HTTP_200
+
+    id = getIntPathParam('requestId', **request_handler_args)
+
+    if id is not None:
+        try:
+            EntityRequest.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
+
+        object = EntityRequest.get().filter_by(vdvid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
 
 def createSport(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
@@ -344,13 +384,14 @@ def createCourt(**request_handler_args):
         e_mail = req.context['email']
     except:
         resp.status = falcon.HTTP_400
-    #ownerid = EntityUser.get_id_from_email(e_mail)
+    ownerid = EntityUser.get_id_from_email(e_mail)
 
     params = json.loads(req.stream.read().decode('utf-8'))
     #params['ownerid'] = ownerid
     try:
         id = EntityCourt.add_from_json(params)
-    except:
+    except Exception as e:
+        logger.info(e)
         resp.status = falcon.HTTP_412
         return
     if id:
@@ -399,6 +440,10 @@ def createUser(**request_handler_args):
 
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
+        if EntityUser.get().filter_by(name=params["username"]).all()\
+            or EntityUser.get().filter_by(e_mail=params["e_mail"]).all():
+            resp.status = falcon.HTTP_412
+            return
         # try:
         id = EntityUser.add_from_json(params)
         # except:
@@ -424,7 +469,9 @@ def updateUser(**request_handler_args):
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
         id = EntityUser.update_from_json(params)
-
+        if id == -1:
+            resp.status = falcon.HTTP_404
+            return
         if id:
             objects = EntityUser.get().filter_by(vdvid=id).all()
 
@@ -454,6 +501,10 @@ def getUserById(**request_handler_args):
 
     id = getIntPathParam("userId", **request_handler_args)
     objects = EntityUser.get().filter_by(vdvid=id).all()
+
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
 
     e_mail = req.context['email']
     my_id = EntityUser.get_id_from_email(e_mail)
@@ -1268,7 +1319,7 @@ class CORS(object):
 
 class Auth1(object):
     def process_request(self, req, resp):
-        req.context['email'] = 'dima.demyanov.1997@gmail.com'
+        req.context['email'] = 'Savchuk@itsociety.su'
 
 class Auth(object):
     def process_request(self, req, resp):
@@ -1320,7 +1371,7 @@ class Auth(object):
         if not error:
             req.context['email'] = email
 
-            if not EntityUser.get_id_from_email(email) and not re.match('(/vdv/user).*', req.relative_uri)\
+            if not EntityUser.get_id_from_email(email) and not req.relative_uri == '/vdv/user'\
                     and not (re.match('(/vdv/login).*', req.relative_uri))\
                     and not (re.match('(/vdv/initDatabase).*', req.relative_uri) and password == "123"):
                 raise falcon.HTTPUnavailableForLegalReasons(description=
@@ -1349,7 +1400,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
+wsgi_app = api = falcon.API(middleware=[CORS(), Auth1(), MultipartMiddleware()])
 #Auth(),
 
 
