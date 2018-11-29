@@ -677,7 +677,7 @@
         "tags": [
           "user", "user API"
         ],
-        "summary": "Update existing catalog info",
+        "summary": "Update existing catalog info !!  ID required",
         "description": "",
         "operationId": "updateUser",
         "consumes": [
@@ -2038,20 +2038,24 @@
         },
         "username": {
           "type": "string",
-          "example": "Daniil"
+          "example": "Daniil",
+          "required": "true"
         },
         "e_mail": {
           "type": "string",
-          "example": "Savchuk@itsociety.su"
+          "example": "Savchuk@itsociety.su",
+          "required": "true"
         },
         "password": {
           "type": "string",
-          "example": "12345678"
+          "example": "12345678",
+          "required": "true"
         },
         "access": {
           "type": "string",
           "example": "admin",
-          "variatns": "admin, user, landlord"
+          "variatns": "admin, user, landlord, coach",
+          "required": "true"
         },
         "prop": {
           "type": "object",
@@ -2082,17 +2086,15 @@
           "type": "integer",
           "format": "int64"
         },
-        "courtid": {
-          "type": "integer",
-          "format": "int64"
-        },
         "time_begin": {
           "type": "string",
-          "example": "2018-03-28 20:00:00+00:00"
+          "example": "2018-03-28 20:00:00+00:00",
+          "required": "true"
         },
         "time_end": {
           "type": "string",
-          "example": "2018-03-28 21:30:00+00:00"
+          "example": "2018-03-28 21:30:00+00:00",
+          "required": "true"
         }
       }
     },
@@ -2108,13 +2110,19 @@
           "type": "integer",
           "format": "int64"
         },
+        "userid": {
+          "type": "integer",
+          "example": "0"
+        },
         "time_begin": {
           "type": "string",
-          "example": "2018-03-28 20:00:00+00:00"
+          "example": "2018-03-28 20:00:00+00:00",
+          "required": "true"
         },
         "time_end": {
           "type": "string",
-          "example": "2018-03-28 21:30:00+00:00"
+          "example": "2018-03-28 21:30:00+00:00",
+          "required": "true"
         }
       }
     },
@@ -2126,11 +2134,13 @@
       "properties": {
         "login": {
           "type": "string",
-          "format": "string"
+          "format": "string",
+          "required": "true"
         },
         "password": {
           "type": "string",
-          "example": "string"
+          "example": "12345678",
+          "required": "true"
         }
       }
     },
@@ -2163,7 +2173,8 @@
         },
         "type": {
           "type": "string",
-          "example": "enum: [image, video, text]"
+          "example": "enum: [image, video, text]",
+          "required": "true"
         },
         "storage": {
           "type": "string",
@@ -2195,15 +2206,18 @@
         },
         "ownerid": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "required": "true"
         },
         "name": {
           "type": "string",
-          "example": "Workout"
+          "example": "Workout",
+          "required": "true"
         },
         "desc": {
           "type": "string",
-          "example": "Very cool workout place"
+          "example": "Very cool workout place",
+          "required": "true"
         },
         "price": {
           "type": "integer",

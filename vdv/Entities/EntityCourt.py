@@ -75,7 +75,7 @@ class EntityCourt(EntityBase, Base):
                                                     for _ in _val]
         }
 
-        if 'ownerid' in data and 'name' in data and 'desc' in data and 'prop' in data and 'price' in data :
+        if 'ownerid' in data and 'name' in data and 'desc' in data and 'price' in data :
             ownerid = data['ownerid']
             name = data['name']
             desc = data['desc']
@@ -84,6 +84,7 @@ class EntityCourt(EntityBase, Base):
             new_entity = EntityCourt(ownerid, name, desc, price)
             vdvid = new_entity.add()
 
+        if 'prop' in data:
             with DBConnection() as session:
                 for prop_name, prop_val in data['prop'].items():
                     if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:

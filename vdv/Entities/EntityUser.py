@@ -57,7 +57,7 @@ class EntityUser(EntityBase, Base):
                 lambda s, _vdvid, _id, _val, _uid: cls.process_media(s, 'image', _uid, _vdvid, _id, _val)
         }
 
-        if 'username' in data and 'e_mail' in data and 'password' in data and 'access' in data and 'prop' in data:
+        if 'username' in data and 'e_mail' in data and 'password' in data and 'access' in data:
             username = data['username']
             e_mail = data['e_mail']
             password = data['password']
@@ -66,6 +66,7 @@ class EntityUser(EntityBase, Base):
             new_entity = EntityUser(username, e_mail, password, access)
             vdvid = new_entity.add()
 
+        if 'prop' in data:
             try:
                 with DBConnection() as session:
                     for prop_name, prop_val in data['prop'].items():
@@ -113,17 +114,16 @@ class EntityUser(EntityBase, Base):
                     vdvid = -1          # No user with givven id
                 if len(entity):
                     for _ in entity:
-                        if 'username' in data:
-                            _.username = data['username']
+                        if 'name' in data:
+                            _.name = data['name']
 
                         if 'e_mail' in data:
                             _.e_mail = data['e_mail']
 
-                        session.db.commit()
-
-                        for prop_name, prop_val in data['prop'].items():
-                            if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                                PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
+                        if 'prop' in data:
+                            for prop_name, prop_val in data['prop'].items():
+                                if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
+                                    PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
 
                         session.db.commit()
 

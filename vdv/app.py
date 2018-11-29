@@ -124,7 +124,7 @@ def httpDefault(**request_handler_args):
     path = path.replace(baseURL, '.')
 
     if os.path.isdir(path):
-        for index in "index1.html", "index.htm", "test-search.html":
+        for index in "index.html", "index.htm", "test-search.html":
             index = os.path.join(path + '/', index)
             logger.info(index + '      ' + os.getcwd())
             if os.path.exists(index):
@@ -193,20 +193,8 @@ def createRequest(**request_handler_args):
         e_mail = req.context['email']
     except:
         resp.status = falcon.HTTP_400
-    # ownerid = EntityUser.get_id_from_email(e_mail)
+
     params = json.loads(req.stream.read().decode('utf-8'))
-    # time_begin = params['time_begin']
-    # time_end = params['time_end']
-    # courtid = params['courtid']
-    # objects = EntityRequest.get().filter(and_(EntityRequest.courtid == courtid,or_(and_(EntityRequest.time_begin >= time_begin, EntityRequest.time_begin < time_end),
-    #                                             and_(EntityRequest.time_end > time_begin, EntityRequest.time_end <= time_end)))).all()
-    # if objects:
-    #     resp.status = falcon.HTTP_412
-    #     return
-    # params['ownerid'] = ownerid
-    # if not EntityCourt.get().get(params['courtid']) or not EntityUser.get().get(params['userid']):
-    #     resp.status = falcon.HTTP_411
-    #     return
     try:
         id = EntityRequest.add_from_json(params)
     except:

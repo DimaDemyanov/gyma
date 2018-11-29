@@ -21,15 +21,17 @@ class EntityRequest(EntityBase, Base):
     __tablename__ = 'vdv_request'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
+    userid = Column(Integer)
     time_begin = Column(Date)
     time_end = Column(Date)
 
 
-    json_serialize_items_list = ['vdvid', 'time_begin', 'time_end']
+    json_serialize_items_list = ['vdvid','userid', 'time_begin', 'time_end']
 
-    def __init__(self, time_begin, time_end):
+    def __init__(self,userid, time_begin, time_end):
         super().__init__()
 
+        self.userid =  userid
         self.time_begin = time_begin
         self.time_end = time_end
 
@@ -37,7 +39,7 @@ class EntityRequest(EntityBase, Base):
     def add_from_json(cls, data):
         vdvid = None
 
-        if 'time_begin' in data and 'time_end' in data:
+        if 'time_begin' in data and 'time_end' and 'userid' in data:
             time_begin = data['time_begin']
             time_end = data['time_end']
 
