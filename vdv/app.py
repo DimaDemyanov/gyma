@@ -124,7 +124,7 @@ def httpDefault(**request_handler_args):
     path = path.replace(baseURL, '.')
 
     if os.path.isdir(path):
-        for index in "index.html", "index.htm", "test-search.html":
+        for index in "index1.html", "index.htm", "test-search.html":
             index = os.path.join(path + '/', index)
             logger.info(index + '      ' + os.getcwd())
             if os.path.exists(index):
