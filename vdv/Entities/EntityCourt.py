@@ -75,12 +75,14 @@ class EntityCourt(EntityBase, Base):
                                                     for _ in _val]
         }
 
-        if 'ownerid' in data and 'name' in data and 'desc' in data and 'price' in data :
+        if 'ownerid' in data and 'name' in data and 'desc' in data:
             ownerid = data['ownerid']
             name = data['name']
             desc = data['desc']
-            price = data['price']
-
+            if 'price' in data:
+                price = data['price']
+            else:
+                price = -1
             new_entity = EntityCourt(ownerid, name, desc, price)
             vdvid = new_entity.add()
 
@@ -95,6 +97,72 @@ class EntityCourt(EntityBase, Base):
                                         (prop_name, str(PROPNAME_MAPPING)))
 
                 session.db.commit()
+
+        return vdvid
+
+    @classmethod
+    def update_from_json(cls, data):
+        def process_avatar(s, _vdvid, _id, _val):
+            PropMedia.delete(_vdvid, _id, False)
+            cls.process_media(s, 'image', _vdvid, _vdvid, _id, _val)
+
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
+        vdvid = None
+
+        PROP_MAPPING = {
+            'private':
+                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+                    .update(session=session, no_commit=True),
+            'isopen':
+                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+                    .update(session=session, no_commit=True),
+            'isfree':
+                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+                    .update(session=session, no_commit=True),
+            'isonair':
+                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+                    .update(session=session, no_commit=True),
+            'location':
+                lambda s, _vdvid, _id, _val, _uid: PropLocation(_vdvid, _id, _val)
+                    .update(session=s, no_commit=True),
+            'request':
+                lambda s, _vdvid, _id, _val, _uid: [PropRequest(_vdvid, _id, _).update(session=s, no_commit=True)
+                                                    for _ in _val],
+            'media':
+                lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'image', _uid, _vdvid, _id, _)
+                                                    for _ in _val],
+            'equipment':
+                lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'equipment', _uid, _vdvid, _id, _)
+                                                    for _ in _val]
+        }
+
+        if 'id' in data:
+            with DBConnection() as session:
+                vdvid = data['id']
+                entity = session.db.query(EntityCourt).filter_by(vdvid=vdvid).all()
+                if len(entity) == 0:
+                    vdvid = -1  # No user with givven id
+                if len(entity):
+                    for _ in entity:
+                        if 'ownerid' in data:
+                            _.ownerid = data['ownerid']
+
+                        if 'name' in data:
+                            _.name = data['name']
+
+                        if 'desc' in data:
+                            _.desc = data['desc']
+
+                        if 'price' in data:
+                            _.price = data['price']
+
+                        if 'prop' in data:
+                            for prop_name, prop_val in data['prop'].items():
+                                if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
+                                    PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
+
+                        session.db.commit()
 
         return vdvid
 
