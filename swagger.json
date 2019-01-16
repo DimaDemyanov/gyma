@@ -2145,7 +2145,6 @@
       }
     },
     "LoginResponse": {
-
       "type": "object",
       "required": [
         "sig"
