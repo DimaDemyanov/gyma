@@ -10,7 +10,7 @@
         "port": 5432,
         "sid": "vdv_dev",
         "user": "postgres",
-        "password": "12345678",
+        "password": "123",
         "direct": null,
         "pool_size": 2
       },
@@ -25,6 +25,10 @@
           "user_info_url": "https://www.googleapis.com/plus/v1/people/me",
           "check_token_url": "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token="
         }
+      },
+      "smsservice": {
+        "login": "dm1024",
+        "password": "dm120397"
       }
     },
     {

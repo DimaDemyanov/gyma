@@ -4,9 +4,13 @@ import logging
 import mimetypes
 import os
 import posixpath
+import random
 import re
 from datetime import datetime, timedelta
+from urllib.parse import parse_qs
+
 import jwt
+import requests
 from sqlalchemy import and_
 from sqlalchemy import or_
 import time
@@ -17,15 +21,17 @@ import falcon
 from falcon_multipart.middleware import MultipartMiddleware
 
 from vdv import utils
+from vdv.Entities.EntityLandlord import EntityLandlord
 from vdv.Entities.EntityRequest import EntityRequest
+from vdv.Entities.EntityValidation import EntityValidation
 from vdv.auth import auth
-#from vdv.auth import JWT_SIGN_ALGORITHM
+# from vdv.auth import JWT_SIGN_ALGORITHM
 from vdv.db import DBConnection
 from vdv.serve_swagger import SpecServer
 
 from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityCourt import EntityCourt
-from vdv.Entities.EntityUser import EntityUser
+from vdv.Entities.EntityAccount import EntityAccount
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityMedia import EntityMedia
 from vdv.Entities.EntityPost import EntityPost
@@ -45,9 +51,11 @@ JWT_SIGN_ALGORITHM = 'HS256'
 JWT_PUBLIC_KEY = 'secretterces123'
 JWT_EXP_TIME = 3600
 
+
 def stringToBool(str):
     # empty string is included because we allow empty-valued flags in query
     return str.lower() in ['true', '1', 'yes', 'y', '']
+
 
 def safeToInt(s):
     if not s:
@@ -57,12 +65,15 @@ def safeToInt(s):
     except ValueError:
         return None
 
+
 def obj_to_json(obj):
     return json.dumps(obj, indent=2)
+
 
 def getPathParam(name, **request_handler_args):
     # Falcon fails to strip the rest of the query from path param
     return request_handler_args['uri_fields'][name].partition('?')[0]
+
 
 def getIntPathParam(name, **request_handler_args):
     s = getPathParam(name, **request_handler_args)
@@ -71,12 +82,14 @@ def getIntPathParam(name, **request_handler_args):
     except ValueError:
         return None
 
+
 def getStrPathParam(name, **request_handler_args):
     s = getPathParam(name, **request_handler_args)
     try:
         return str(s)
     except ValueError:
         return None
+
 
 def guess_response_type(path):
     if not mimetypes.inited:
@@ -99,6 +112,7 @@ def guess_response_type(path):
     else:
         return extensions_map['']
 
+
 def date_time_string(timestamp=None):
     weekdayname = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
@@ -110,10 +124,11 @@ def date_time_string(timestamp=None):
         timestamp = time.time()
     year, month, day, hh, mm, ss, wd, y, z = time.gmtime(timestamp)
     s = "%s, %02d %3s %4d %02d:%02d:%02d GMT" % (
-            weekdayname[wd],
-            day, monthname[month], year,
-            hh, mm, ss)
+        weekdayname[wd],
+        day, monthname[month], year,
+        hh, mm, ss)
     return s
+
 
 def httpDefault(**request_handler_args):
     req = request_handler_args['req']
@@ -124,7 +139,7 @@ def httpDefault(**request_handler_args):
     path = path.replace(baseURL, '.')
 
     if os.path.isdir(path):
-        for index in "index1.html", "index.htm", "test-search.html":
+        for index in "index.html", "index.htm", "test-search.html":
             index = os.path.join(path + '/', index)
             logger.info(index + '      ' + os.getcwd())
             if os.path.exists(index):
@@ -152,10 +167,24 @@ def httpDefault(**request_handler_args):
                 logger.info(str)
                 buffer = str.encode()
                 length = len(buffer)
-
     except IOError:
-        resp.status = falcon.HTTP_404
-        return
+        try:
+            with open('swagger-ui/' + path, 'rb') as f:
+                resp.status = falcon.HTTP_200
+
+                fs = os.fstat(f.fileno())
+                length = fs[6]
+
+                buffer = f.read()
+                if path.endswith('index.html'):
+                    str = buffer.decode()
+                    str = str.replace('127.0.0.1:4201', server_host)
+                    logger.info(str)
+                    buffer = str.encode()
+                    length = len(buffer)
+        except IOError:
+            resp.status = falcon.HTTP_404
+            return
 
     resp.set_header("Content-type", ctype)
     resp.set_header("Content-Length", length)
@@ -164,26 +193,30 @@ def httpDefault(**request_handler_args):
     resp.set_header("Path", path)
     resp.body = buffer
 
+
 def getVersion(**request_handler_args):
     resp = request_handler_args['resp']
     resp.status = falcon.HTTP_501
     with open("VERSION") as f:
         resp.body = obj_to_json({"version": f.read()})
 
+
 def initDatabase(**request_handler_args):
     resp = request_handler_args['resp']
 
-    #with DBConnection() as db:
+    # with DBConnection() as db:
     #    db.init()
 
     resp.status = falcon.HTTP_501
 
+
 def cleanupDatabase(**request_handler_args):
     resp = request_handler_args['resp']
-    #with DBConnection() as db:
+    # with DBConnection() as db:
     #    db.Cleanup()
 
     resp.status = falcon.HTTP_501
+
 
 def createRequest(**request_handler_args):
     req = request_handler_args['req']
@@ -205,6 +238,7 @@ def createRequest(**request_handler_args):
         resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
 
+
 def getAllUserRequests(**request_handler_args):
     resp = request_handler_args['resp']
 
@@ -215,6 +249,7 @@ def getAllUserRequests(**request_handler_args):
     resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
 
+
 def getAllCourtRequests(**request_handler_args):
     resp = request_handler_args['resp']
 
@@ -224,6 +259,7 @@ def getAllCourtRequests(**request_handler_args):
 
     resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
+
 
 def deleteRequest(**request_handler_args):
     resp = request_handler_args['resp']
@@ -244,21 +280,26 @@ def deleteRequest(**request_handler_args):
 
     resp.status = falcon.HTTP_400
 
+
 def createSport(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     resp.status = falcon.HTTP_200
+
 
 def deleteSport(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     resp.status = falcon.HTTP_200
 
+
 def createTime(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     resp.status = falcon.HTTP_200
 
+
 def getSports(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     resp.status = falcon.HTTP_200
+
 
 def deleteTime(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
@@ -273,6 +314,7 @@ def getAllCourts(**request_handler_args):
     resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
 
+
 def getCourtById(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
@@ -281,7 +323,7 @@ def getCourtById(**request_handler_args):
     objects = EntityCourt.get().filter_by(vdvid=id).all()
 
     e_mail = req.context['email']
-    my_id = EntityUser.get_id_from_email(e_mail)
+    my_id = EntityAccount.get_id_from_email(e_mail)
 
     wide_info = EntityCourt.get_wide_object(id)
 
@@ -312,7 +354,7 @@ def easyCreateCourt(**request_handler_args):
     resp = request_handler_args['resp']
 
     e_mail = req.context['email']
-    ownerid = EntityUser.get_id_from_email(e_mail)
+    ownerid = EntityAccount.get_id_from_email(e_mail)
 
     media = []
     for _ in sorted(req.params.keys()):
@@ -372,10 +414,9 @@ def createCourt(**request_handler_args):
         e_mail = req.context['email']
     except:
         resp.status = falcon.HTTP_400
-    ownerid = EntityUser.get_id_from_email(e_mail)
 
     params = json.loads(req.stream.read().decode('utf-8'))
-    #params['ownerid'] = ownerid
+    params['ispublished'] = False
     try:
         id = EntityCourt.add_from_json(params)
     except Exception as e:
@@ -388,7 +429,7 @@ def createCourt(**request_handler_args):
         resp.body = obj_to_json([o.to_dict() for o in objects])
         resp.status = falcon.HTTP_200
 
-    
+
 def updateCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
@@ -410,7 +451,7 @@ def updateCourt(**request_handler_args):
         return
 
     resp.status = falcon.HTTP_501
-    
+
 
 def deleteCourt(**request_handler_args):
     resp = request_handler_args['resp']
@@ -436,25 +477,25 @@ def deleteCourt(**request_handler_args):
             return
 
     resp.status = falcon.HTTP_400
-    
 
-def createUser(**request_handler_args):
+
+def createAccount(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     try:
-        params = json.loads(req.stream.read().decode('utf-8'))
-        if EntityUser.get().filter_by(name=params["username"]).all()\
-            or EntityUser.get().filter_by(e_mail=params["e_mail"]).all():
+        data = req.stream.read().decode('utf-8')
+        params = json.loads(data)
+        if EntityAccount.get().filter_by(phone=params["phone"]).all():
             resp.status = falcon.HTTP_412
             return
         # try:
-        id = EntityUser.add_from_json(params)
+        id = EntityAccount.add_from_json(params)
         # except:
         #     resp.status = falcon.HTTP_412
         #     return
         if id:
-            objects = EntityUser.get().filter_by(vdvid=id).all()
+            objects = EntityAccount.get().filter_by(vdvid=id).all()
 
             resp.body = obj_to_json([o.to_dict() for o in objects])
             resp.status = falcon.HTTP_200
@@ -464,7 +505,34 @@ def createUser(**request_handler_args):
         return
 
     resp.status = falcon.HTTP_501
-    
+
+def createLandlord(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    try:
+        data = req.stream.read().decode('utf-8')
+        params = json.loads(data)
+        if EntityLandlord.get().filter_by(accountid=params["accountid"]).all():
+            resp.status = falcon.HTTP_412
+            return
+        # try:
+        id = EntityLandlord.add_from_json(params)
+        # except:
+        #     resp.status = falcon.HTTP_412
+        #     return
+        if id:
+            objects = EntityLandlord.get().filter_by(vdvid=id).all()
+
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
+    resp.status = falcon.HTTP_501
+
 
 def updateUser(**request_handler_args):
     req = request_handler_args['req']
@@ -472,12 +540,12 @@ def updateUser(**request_handler_args):
 
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-        id = EntityUser.update_from_json(params)
+        id = EntityAccount.update_from_json(params)
         if id == -1:
             resp.status = falcon.HTTP_404
             return
         if id:
-            objects = EntityUser.get().filter_by(vdvid=id).all()
+            objects = EntityAccount.get().filter_by(vdvid=id).all()
 
             resp.body = obj_to_json([o.to_dict() for o in objects])
             resp.status = falcon.HTTP_200
@@ -487,33 +555,33 @@ def updateUser(**request_handler_args):
         return
 
     resp.status = falcon.HTTP_501
-    
+
 
 def getAllUsers(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    objects = EntityUser.get().all()
+    objects = EntityAccount.get().all()
 
     resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
-    
+
 
 def getUserById(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam("userId", **request_handler_args)
-    objects = EntityUser.get().filter_by(vdvid=id).all()
+    objects = EntityAccount.get().filter_by(vdvid=id).all()
 
     if len(objects) == 0:
         resp.status = falcon.HTTP_404
         return
 
     e_mail = req.context['email']
-    my_id = EntityUser.get_id_from_email(e_mail)
+    my_id = EntityAccount.get_id_from_email(e_mail)
 
-    wide_info = EntityUser.get_wide_object(id, ['private', 'avatar', 'post'])
+    wide_info = EntityAccount.get_wide_object(id, ['private', 'avatar', 'post'])
 
     wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
 
@@ -537,12 +605,12 @@ def getMyUser(**request_handler_args):
     resp = request_handler_args['resp']
 
     e_mail = req.context['email']
-    id = EntityUser.get_id_from_email(e_mail)
+    id = EntityAccount.get_id_from_email(e_mail)
 
-    objects = EntityUser.get().filter_by(vdvid=id).all()
+    objects = EntityAccount.get().filter_by(vdvid=id).all()
 
-    #TODO: LIMIT the posts output counts with a paging
-    wide_info = EntityUser.get_wide_object(id, ['private', 'avatar', 'post'])
+    # TODO: LIMIT the posts output counts with a paging
+    wide_info = EntityAccount.get_wide_object(id, ['private', 'avatar', 'post'])
 
     wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
     followings = EntityFollow.get().filter_by(vdvid=id).all()
@@ -565,10 +633,10 @@ def deleteUser(**request_handler_args):
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
-    #TODO: VERIFICATION IF ADMIN DELETE ANY
+    # TODO: VERIFICATION IF ADMIN DELETE ANY
     e_mail = req.context['email']
     id_from_req = getIntPathParam("userId", **request_handler_args)
-    id = EntityUser.get_id_from_email(e_mail)
+    id = EntityAccount.get_id_from_email(e_mail)
 
     if id is not None:
         if id != id_from_req:
@@ -576,18 +644,18 @@ def deleteUser(**request_handler_args):
             return
 
         try:
-            EntityUser.delete(id)
+            EntityAccount.delete(id)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
             return
 
         try:
-            EntityUser.delete_wide_object(id)
+            EntityAccount.delete_wide_object(id)
         except FileNotFoundError:
             resp.status = falcon.HTTP_405
             return
 
-        object = EntityUser.get().filter_by(vdvid=id).all()
+        object = EntityAccount.get().filter_by(vdvid=id).all()
         if not len(object):
             resp.status = falcon.HTTP_200
             return
@@ -612,14 +680,14 @@ def getUserFollowingsPosts(**request_handler_args):
     resp = request_handler_args['resp']
 
     e_mail = req.context['email']
-    id = EntityUser.get_id_from_email(e_mail)
+    id = EntityAccount.get_id_from_email(e_mail)
 
     followingIDs = [_.followingid for _ in EntityFollow.get()
         .filter_by(vdvid=id)
-        .filter(EntityFollow.permit >= EntityUser.PERMIT_ACCESSED).all()]
+        .filter(EntityFollow.permit >= EntityAccount.PERMIT_ACCESSED).all()]
 
-    posts = EntityPost.get().filter(EntityPost.userid.in_(followingIDs))\
-        .order_by(EntityPost.vdvid.desc())\
+    posts = EntityPost.get().filter(EntityPost.userid.in_(followingIDs)) \
+        .order_by(EntityPost.vdvid.desc()) \
         .limit(1000).all()
 
     post_section = []
@@ -633,12 +701,12 @@ def getUserFollowingsPosts(**request_handler_args):
         user_list.extend(getPostAffectedUsers(_))
 
     users_affected_ids = list(set(user_list))
-    users = EntityUser.get().filter(EntityUser.vdvid.in_(users_affected_ids))
+    users = EntityAccount.get().filter(EntityAccount.vdvid.in_(users_affected_ids))
 
     user_section = {}
     for _ in users:
         obj_dict = _.to_dict(['vdvid', 'name'])
-        obj_dict.update(EntityUser.get_wide_object(_.vdvid, ['private', 'avatar']))
+        obj_dict.update(EntityAccount.get_wide_object(_.vdvid, ['private', 'avatar']))
         user_section.update({_.vdvid: obj_dict})
 
     resp.body = obj_to_json({'post': post_section, 'user': user_section})
@@ -650,27 +718,28 @@ def userAddFollowing(**request_handler_args):
     resp = request_handler_args['resp']
 
     e_mail = req.context['email']
-    id = EntityUser.get_id_from_email(e_mail)
+    id = EntityAccount.get_id_from_email(e_mail)
 
     id_to_follow = getIntPathParam("followingId", **request_handler_args)
-    EntityFollow(id, id_to_follow, EntityUser.PERMIT_NONE
-                                    if EntityUser.is_private(id_to_follow)
-                                    else EntityUser.PERMIT_ACCESSED, True).add()
+    EntityFollow(id, id_to_follow, EntityAccount.PERMIT_NONE
+    if EntityAccount.is_private(id_to_follow)
+    else EntityAccount.PERMIT_ACCESSED, True).add()
 
     resp.status = falcon.HTTP_200
-    
+
 
 def userDelFollowing(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     e_mail = req.context['email']
-    id = EntityUser.get_id_from_email(e_mail)
+    id = EntityAccount.get_id_from_email(e_mail)
 
     id_to_follow = getIntPathParam("followingId", **request_handler_args)
     EntityFollow.smart_delete(id, id_to_follow)
 
     resp.status = falcon.HTTP_200
+
 
 def getUserFollowingsList(**request_handler_args):
     req = request_handler_args['req']
@@ -679,9 +748,9 @@ def getUserFollowingsList(**request_handler_args):
     id = getIntPathParam("userId", **request_handler_args)
 
     resp.status = falcon.HTTP_200
-    resp.body   = obj_to_json([_.to_dict() for _ in EntityFollow.get()
-                      .filter_by(vdvid=id)
-                      .filter(EntityFollow.permit >= EntityUser.PERMIT_ACCESSED).all()])
+    resp.body = obj_to_json([_.to_dict() for _ in EntityFollow.get()
+                            .filter_by(vdvid=id)
+                            .filter(EntityFollow.permit >= EntityAccount.PERMIT_ACCESSED).all()])
 
 
 def getUserFollowersList(**request_handler_args):
@@ -691,9 +760,9 @@ def getUserFollowersList(**request_handler_args):
     id = getIntPathParam("userId", **request_handler_args)
 
     resp.status = falcon.HTTP_200
-    resp.body   = obj_to_json([_.to_dict() for _ in EntityFollow.get()
+    resp.body = obj_to_json([_.to_dict() for _ in EntityFollow.get()
                             .filter_by(followingid=id).all()])
-    
+
 
 def getUserFollowersRequestList(**request_handler_args):
     req = request_handler_args['req']
@@ -702,17 +771,17 @@ def getUserFollowersRequestList(**request_handler_args):
     id = getIntPathParam("userId", **request_handler_args)
 
     resp.status = falcon.HTTP_200
-    resp.body   = obj_to_json([_.to_dict() for _ in EntityFollow.get()
-                        .filter_by(followingid=id)
-                        .filter(EntityFollow.permit == EntityUser.PERMIT_NONE).all()])
-    
+    resp.body = obj_to_json([_.to_dict() for _ in EntityFollow.get()
+                            .filter_by(followingid=id)
+                            .filter(EntityFollow.permit == EntityAccount.PERMIT_NONE).all()])
+
 
 def userResolveFollowerRequest(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     e_mail = req.context['email']
-    id = EntityUser.get_id_from_email(e_mail)
+    id = EntityAccount.get_id_from_email(e_mail)
 
     id_to_resolve = getIntPathParam('followerId', **request_handler_args)
     accept = req.params['accept']
@@ -720,7 +789,7 @@ def userResolveFollowerRequest(**request_handler_args):
     if not accept:
         EntityFollow.smart_delete(id_to_resolve, id)
     else:
-        EntityFollow.update(id_to_resolve, id, EntityUser.PERMIT_ACCESSED)
+        EntityFollow.update(id_to_resolve, id, EntityAccount.PERMIT_ACCESSED)
 
     resp.status = falcon.HTTP_200
 
@@ -730,7 +799,7 @@ def createMedia(**request_handler_args):
     resp = request_handler_args['resp']
 
     e_mail = req.context['email']
-    ownerid = EntityUser.get_id_from_email(e_mail)
+    ownerid = EntityAccount.get_id_from_email(e_mail)
     media_type = req.params['type']
     name = req.params['name'] if 'name' in req.params else ''
     desc = req.params['desc'] if 'desc' in req.params else ''
@@ -742,7 +811,7 @@ def createMedia(**request_handler_args):
             resolver = MediaResolverFactory.produce(media_type, data.file.read())
             resolver.Resolve()
 
-            #TODO:NO NULL HERE AS OWNER
+            # TODO:NO NULL HERE AS OWNER
             id = EntityMedia(ownerid, media_type, resolver.url, name=name, desc=desc).add()
             if id:
                 results.append(id)
@@ -784,6 +853,7 @@ def getMedia(**request_handler_args):
         return
 
     resp.status = falcon.HTTP_500
+
 
 def deleteMedia(**request_handler_args):
     req = request_handler_args['req']
@@ -876,7 +946,7 @@ def getAllLocations(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    objects = EntityLocation.get().all()#PropLike.get_object_property(0, 0)#
+    objects = EntityLocation.get().all()  # PropLike.get_object_property(0, 0)#
 
     resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
@@ -902,12 +972,12 @@ def getPostById(**request_handler_args):
         user_list.extend(getPostAffectedUsers(_))
 
     users_affected_ids = list(set(user_list))
-    users = EntityUser.get().filter(EntityUser.vdvid.in_(users_affected_ids))
+    users = EntityAccount.get().filter(EntityAccount.vdvid.in_(users_affected_ids))
 
     user_section = {}
     for _ in users:
         obj_dict = _.to_dict(['vdvid', 'name'])
-        obj_dict.update(EntityUser.get_wide_object(_.vdvid, ['private', 'avatar']))
+        obj_dict.update(EntityAccount.get_wide_object(_.vdvid, ['private', 'avatar']))
         user_section.update({_.vdvid: obj_dict})
 
     resp.body = obj_to_json({'post': post_section, 'user': user_section})
@@ -923,11 +993,12 @@ def getAllPosts(**request_handler_args):
     resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
 
+
 def createPost(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    userId = EntityUser.get_id_from_email(req.context['email'])
+    userId = EntityAccount.get_id_from_email(req.context['email'])
 
     if userId is None:
         resp.status = falcon.HTTP_405
@@ -1005,7 +1076,8 @@ def search(**request_handler_args):
     for _ in _cls.get().filter(_cls.vdvid.in_(list(ids))).all():
         obj_dict = _.to_dict()
         if 'get_wide_object' in _cls.__dict__:
-            obj_dict.update(_cls.get_wide_object(_.vdvid, ['private', 'avatar'] if _cls.__name__ == 'EntityUser' else []))
+            obj_dict.update(
+                _cls.get_wide_object(_.vdvid, ['private', 'avatar'] if _cls.__name__ == 'EntityAccount' else []))
 
         result.append(obj_dict)
 
@@ -1086,7 +1158,7 @@ def createLike(**request_handler_args):
     resp = request_handler_args['resp']
 
     params = json.loads(req.stream.read().decode('utf-8'))
-    userId = EntityUser.get_id_from_email(req.context['email'])
+    userId = EntityAccount.get_id_from_email(req.context['email'])
 
     if userId is None:
         resp.status = falcon.HTTP_405
@@ -1177,7 +1249,7 @@ def createComment(**request_handler_args):
     resp = request_handler_args['resp']
 
     params = json.loads(req.stream.read().decode('utf-8'))
-    userId = EntityUser.get_id_from_email(req.context['email'])
+    userId = EntityAccount.get_id_from_email(req.context['email'])
 
     if userId is None:
         resp.status = falcon.HTTP_405
@@ -1194,6 +1266,105 @@ def createComment(**request_handler_args):
 
     resp.status = falcon.HTTP_500
 
+
+def sendkey(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    key = random.randint(10000, 99999)
+
+    post_data = parse_qs(req.stream.read().decode('utf-8'))
+
+    phone = post_data['phone'][0]
+    accounts = EntityAccount.get().filter_by(phone = phone).all()
+    if not accounts:
+        resp.status = falcon.HTTP_411
+        return
+    accountid = accounts[0].vdvid
+
+    validations = EntityValidation.get().filter_by(accountid = accountid).all()
+
+    ts = time.time()
+    curr_time = datetime.datetime.fromtimestamp(ts)
+
+    if validations:
+        for validation in validations:
+            if validation.time_send.year != curr_time.year  \
+                or validation.time_send.month != curr_time.month \
+                or validation.time_send.day != curr_time.day or validation.times_a_day < 2:
+
+                data = {
+                   'id' : validation.vdvid,
+                   'code' : key,
+                   'times_a_day' : 1 if validation.time_send.year != curr_time.year  \
+                or validation.time_send.month != curr_time.month \
+                or validation.time_send.day != curr_time.day else 2,
+                   'time_send' : curr_time.strftime('%Y-%m-%d %H:%M')
+                }
+
+                EntityValidation.update(data = data)
+            else:
+                resp.status = falcon.HTTP_406
+                return
+    else:
+        data = {
+            'code' : key,
+            'times_a_day' : 1,
+            'time_send' : curr_time.strftime('%Y-%m-%d %H:%M'),
+            'accountid' : accountid
+        }
+        EntityValidation.create(data = data)
+
+
+
+    print(key)
+    # sms_login = cfg['smsservice']['login']
+    # sms_pswd = cfg['smsservice']['password']
+    #
+    # data = {'login' : sms_login,
+    #         'psw' : sms_pswd,
+    #         'phones' : phone,
+    #         'mes' : key
+    #         }
+    # r = requests.get('https://smsc.ru/sys/send.php', params = data)
+    resp.status = falcon.HTTP_200
+
+def validate(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    post_data = parse_qs(req.stream.read().decode('utf-8'))
+
+    phone = post_data['phone'][0]
+    key = post_data['key'][0]
+
+    accounts = EntityAccount.get().filter_by(phone=phone).all()
+    if not accounts:
+        resp.status = falcon.HTTP_411
+        return
+    accountid = accounts[0].vdvid
+
+    validations = EntityValidation.get().filter_by(accountid=accountid).all()
+
+    if not validations:
+        resp.status = falcon.HTTP_407
+        return
+
+    if validations:
+        for validation in validations:
+            if validation.code == int(key):
+                payload = {
+                    'accountid': accountid,
+                    'exp': datetime.datetime.utcnow() + timedelta(seconds=JWT_EXP_TIME)
+                }
+                jwt_token = jwt.encode(payload, JWT_PUBLIC_KEY, JWT_SIGN_ALGORITHM)
+                resp.body = jwt_token
+                resp.status = falcon.HTTP_200
+                return
+
+    resp.status = falcon.HTTP_405
+    return
+
 def login(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
@@ -1201,105 +1372,110 @@ def login(**request_handler_args):
     email = req.params.get('email')
     password = req.params.get('pass')
 
-    passwordBase = EntityUser.get_password_from_email(email)
+    passwordBase = EntityAccount.get_password_from_email(email)
 
     if password != passwordBase or password == None:
         resp.status = falcon.HTTP_405
 
     payload = {
-        'user_id': EntityUser.get_id_from_email(email),
+        'user_id': EntityAccount.get_id_from_email(email),
         'e_mail': email,
         'exp': datetime.datetime.utcnow() + timedelta(seconds=JWT_EXP_TIME)
     }
     jwt_token = jwt.encode(payload, JWT_PUBLIC_KEY, JWT_SIGN_ALGORITHM)
     resp.body = obj_to_json({'token': jwt_token.decode('utf-8'),
-                        'isAdmin': "false"})
-
+                             'isAdmin': "false"})
 
 
 operation_handlers = {
-    'initDatabase':    [initDatabase],
+    'initDatabase': [initDatabase],
     'cleanupDatabase': [cleanupDatabase],
-    'getVersion':      [getVersion],
-    'httpDefault':     [httpDefault],
+    'getVersion': [getVersion],
+    'httpDefault': [httpDefault],
 
-    #Auth
-    'login':           [login],
+    # Auth
+    'login': [login],
+    'sendkey': [sendkey],
+    'validate': [validate],
 
-    #Request methods
-    'createRequest':          [createRequest],
-    'getAllCourtRequests':    [getAllCourtRequests],
-    'getAllUserRequests':     [getAllUserRequests],
-    'deleteRequest':          [deleteRequest],
+    # Request methods
+    'createRequest': [createRequest],
+    'getAllCourtRequests': [getAllCourtRequests],
+    'getAllUserRequests': [getAllUserRequests],
+    'deleteRequest': [deleteRequest],
 
-    #Sport methods
-    'createSport':            [createSport],
-    'deleteSport':            [deleteSport],
-    'getSports':              [getSports],
+    # Sport methods
+    'createSport': [createSport],
+    'deleteSport': [deleteSport],
+    'getSports': [getSports],
 
-    #Court time methods
-    'createTime':             [createTime],
-    'deleteTime':             [deleteTime],
+    # Court time methods
+    'createTime': [createTime],
+    'deleteTime': [deleteTime],
 
-    #Court methods
-    'getAllCourts':           [getAllCourts],
-    'getCourtById':           [getCourtById],
-    'createCourt':            [createCourt],
-    'updateCourt':            [updateCourt],
-    'deleteCourt':            [deleteCourt],
-    'easyCreateCourt':        [easyCreateCourt],
+    # Court methods
+    'getAllCourts': [getAllCourts],
+    'getCourtById': [getCourtById],
+    'createCourt': [createCourt],
+    'updateCourt': [updateCourt],
+    'deleteCourt': [deleteCourt],
+    'easyCreateCourt': [easyCreateCourt],
 
-    #User methods
-    'createUser':             [createUser],
-    'updateUser':             [updateUser],
-    'getAllUsers':            [getAllUsers],
-        'getUser':                [getUserById],
-    'getMyUser':              [getMyUser],
-    'deleteUser':             [deleteUser],
-    'getUserFollowingsList':        [getUserFollowingsList],
-    'getUserFollowingsPosts':       [getUserFollowingsPosts],
-    'userAddFollowing':             [userAddFollowing],
-    'userDelFollowing':             [userDelFollowing],
-    'getUserFollowersList':         [getUserFollowersList],
-    'getUserFollowersRequestList':  [getUserFollowersRequestList],
-    'userResolveFollowerRequest':   [userResolveFollowerRequest],
+    # User methods
+    'createAccount': [createAccount],
+    'updateUser': [updateUser],
+    'getAllUsers': [getAllUsers],
+    'getUser': [getUserById],
+    'getMyUser': [getMyUser],
+    'deleteUser': [deleteUser],
+    'getUserFollowingsList': [getUserFollowingsList],
+    'getUserFollowingsPosts': [getUserFollowingsPosts],
+    'userAddFollowing': [userAddFollowing],
+    'userDelFollowing': [userDelFollowing],
+    'getUserFollowersList': [getUserFollowersList],
+    'getUserFollowersRequestList': [getUserFollowersRequestList],
+    'userResolveFollowerRequest': [userResolveFollowerRequest],
 
-    #Media methods
-    'createMedia':            [createMedia],
-    'getAllOwnerMedias':      [getAllOwnerMedias],
-    'getMedia':               [getMedia],
-    'deleteMedia':            [deleteMedia],
+    # Special users methods
+    'createLandlord': [createLandlord],
 
-    #Location methods
-    'createLocation':         [createLocation],
-    'getLocationById':        [getLocationById],
-    'deleteLocation':         [deleteLocation],
-    'getAllLocations':        [getAllLocations],
+    # Media methods
+    'createMedia': [createMedia],
+    'getAllOwnerMedias': [getAllOwnerMedias],
+    'getMedia': [getMedia],
+    'deleteMedia': [deleteMedia],
 
-    #Post methods
-    'getPostById':          [getPostById],
-    'getAllPosts':          [getAllPosts],
-    'createPost':           [createPost],
-    'updatePost':           [updatePost],
-    'deletePost':           [deletePost],
+    # Location methods
+    'createLocation': [createLocation],
+    'getLocationById': [getLocationById],
+    'deleteLocation': [deleteLocation],
+    'getAllLocations': [getAllLocations],
 
-    #Search methods
-    'search':               [search],
+    # Post methods
+    'getPostById': [getPostById],
+    'getAllPosts': [getAllPosts],
+    'createPost': [createPost],
+    'updatePost': [updatePost],
+    'deletePost': [deletePost],
+
+    # Search methods
+    'search': [search],
 
     # Like methods
-    'getLikeById':          [getLikeById],
-    'getAllLikes':          [getAllLikes],
-    'updateLike':           [updateLike],
-    'deleteLike':           [deleteLike],
-    'createLike':           [createLike],
+    'getLikeById': [getLikeById],
+    'getAllLikes': [getAllLikes],
+    'updateLike': [updateLike],
+    'deleteLike': [deleteLike],
+    'createLike': [createLike],
 
     # Comment methods
-    'getCommentById':       [getCommentById],
-    'getAllComments':       [getAllComments],
-    'updateComment':        [updateComment],
-    'deleteComment':        [deleteComment],
-    'createComment':        [createComment]
+    'getCommentById': [getCommentById],
+    'getAllComments': [getAllComments],
+    'updateComment': [updateComment],
+    'deleteComment': [deleteComment],
+    'createComment': [createComment]
 }
+
 
 class CORS(object):
     def process_response(self, req, resp, resource):
@@ -1321,27 +1497,29 @@ class CORS(object):
             #    if acrh:
             #        resp.set_header('Access-Control-Allow-Headers', acrh)
 
+
 class Auth1(object):
     def process_request(self, req, resp):
         req.context['email'] = 'Savchuk@itsociety.su'
 
+
 class Auth(object):
     def process_request(self, req, resp):
-        #TODO: SWITCH ON
-        #req.context['email'] = 'serbudnik@gmail.com'
-        #return
+        # TODO: SWITCH ON
+        # req.context['email'] = 'serbudnik@gmail.com'
+        # return
         # skip authentication for version, UI and Swagger
         if re.match('(/vdv/version|'
-                     '/vdv/settings/urls|'
-                     '/vdv/images|'
-                     '/vdv/ui|'
-                     '/vdv/swagger\.json|'
-                     '/vdv/swagger-temp\.json|'
-                     '/vdv/swagger-ui).*', req.relative_uri):
+                    '/vdv/settings/urls|'
+                    '/vdv/images|'
+                    '/vdv/ui|'
+                    '/vdv/swagger\.json|'
+                    '/vdv/swagger-temp\.json|'
+                    '/vdv/swagger-ui).*', req.relative_uri):
             return
 
         if req.method == 'OPTIONS':
-            return # pre-flight requests don't require authentication
+            return  # pre-flight requests don't require authentication
 
         # token = None
         # try:
@@ -1353,7 +1531,7 @@ class Auth(object):
         #     raise falcon.HTTPUnauthorized(description='Token was not provided in schema [berear <Token>]',
         #                               challenges=['Bearer realm=http://GOOOOGLE'])
 
-        error = None#'Authorization required.'
+        error = None  # 'Authorization required.'
         # #if token:
         email = req.params.get('email')
         password = req.params.get('pass')
@@ -1365,24 +1543,23 @@ class Auth(object):
             try:
                 payload = jwt.decode(jwt_token, JWT_PUBLIC_KEY,
                                      algorithms=[JWT_SIGN_ALGORITHM])
-                id = EntityUser.get_id_from_email(email)
+                id = EntityAccount.get_id_from_email(email)
                 req.context['email'] = payload.get('e_mail')
             except (jwt.DecodeError, jwt.ExpiredSignatureError):
                 return falcon.HTTPUnauthorized(description="Something goes wrong",
-                                      challenges=['Bearer realm=http://GOOOOGLE'])
+                                               challenges=['Bearer realm=http://GOOOOGLE'])
             return
 
         if not error:
             req.context['email'] = email
 
-            if not EntityUser.get_id_from_email(email) and not req.relative_uri == '/vdv/user'\
-                    and not (re.match('(/vdv/login).*', req.relative_uri))\
+            if not EntityAccount.get_id_from_email(email) and not req.relative_uri == '/vdv/user' \
+                    and not (re.match('(/vdv/login).*', req.relative_uri)) \
                     and not (re.match('(/vdv/initDatabase).*', req.relative_uri) and password == "123"):
                 raise falcon.HTTPUnavailableForLegalReasons(description=
                                                             "Requestor [%s] not existed as user yet" % email)
 
-            return # passed access token is valid
-
+            return  # passed access token is valid
 
         raise falcon.HTTPUnauthorized(description=error,
                                       challenges=['Bearer realm=http://GOOOOGLE'])
@@ -1405,7 +1582,7 @@ with open(cfgPath) as f:
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
 wsgi_app = api = falcon.API(middleware=[CORS(), Auth1(), MultipartMiddleware()])
-#Auth(),
+# Auth(),
 
 
 server = SpecServer(operation_handlers=operation_handlers)

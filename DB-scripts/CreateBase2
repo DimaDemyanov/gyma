@@ -1,0 +1,170 @@
+
+
+DROP TYPE IF EXISTS vdv_prop_type CASCADE;
+CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request');
+
+DROP TABLE IF EXISTS "vdv_prop";
+CREATE TABLE "vdv_prop" (
+	"vdvid" BIGSERIAL NOT NULL PRIMARY KEY,
+	"name" VARCHAR(40) NOT NULL UNIQUE,
+	"type" vdv_prop_type NOT NULL
+) WITH (
+  OIDS=FALSE
+);
+
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'location', 'location');
+
+DROP SEQUENCE IF EXISTS vdv_seq;
+CREATE SEQUENCE vdv_seq start with 1 increment by 1;
+
+DROP TYPE IF EXISTS vdv_media_type CASCADE;
+CREATE TYPE vdv_media_type AS ENUM ('image', 'equipment');
+
+DROP TABLE IF EXISTS "vdv_media" CASCADE;
+
+CREATE TABLE "vdv_media" (
+	"vdvid" BIGSERIAL NOT NULL,
+	"ownerid" int8,
+	"name" varchar(256) NOT NULL DEFAULT ''::character varying,
+	"desc" varchar(4000) NOT NULL DEFAULT ''::character varying,
+	"type" vdv_media_type NOT NULL,
+	"url" varchar(4000) NOT NULL,
+	"created" timestamp with time zone NOT NULL,
+	CONSTRAINT "vdv_media_pkey" PRIMARY KEY("vdvid"),
+	CONSTRAINT "vdv_media_url_key" UNIQUE("url")
+)
+WITH (
+	OIDS = False
+);
+
+ALTER TABLE "vdv_media" OWNER TO "postgres";
+
+DROP TABLE IF EXISTS "vdv_account" CASCADE;
+
+CREATE TABLE "vdv_account" (
+	"vdvid" BIGSERIAL NOT NULL,
+	"name" varchar(256),
+	"phone" varchar(30) NOT NULL,
+	"created" timestamp with time zone,
+	"updated" timestamp with time zone,
+	"mediaid" int8,
+	"email" varchar(256),
+	"password" varchar(256),
+	PRIMARY KEY("vdvid"),
+	CONSTRAINT "Ref_vdv_account_to_vdv_media" FOREIGN KEY ("mediaid")
+		REFERENCES "vdv_media"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
+
+DROP TABLE IF EXISTS "vdv_validation" CASCADE;
+
+CREATE TABLE "vdv_validation" (
+	"vdvid" BIGSERIAL NOT NULL,
+	"accountid" int8,
+	"code" int8,
+	"time_send" timestamp with time zone,
+	"times_a_day" int4,
+	PRIMARY KEY("vdvid"),
+	CONSTRAINT "Ref_vdv_validation_to_vdv_account" FOREIGN KEY ("accountid")
+		REFERENCES "vdv_account"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
+
+
+DROP TABLE IF EXISTS "vdv_landlord" CASCADE;
+
+CREATE TABLE "vdv_landlord" (
+	"vdvid" BIGSERIAL NOT NULL,
+	"accountid" int8,
+	"money" int4,
+	PRIMARY KEY("vdvid"),
+	CONSTRAINT "Ref_vdv_landlord_to_vdv_account" FOREIGN KEY ("accountid")
+		REFERENCES "vdv_account"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+)
+WITH (
+	OIDS = False
+);
+
+ALTER TABLE "vdv_landlord" OWNER TO "postgres";
+
+DROP TABLE IF EXISTS "vdv_court" CASCADE;
+
+CREATE TABLE "vdv_court" (
+	"vdvid" BIGSERIAL NOT NULL,
+	"ownerid" BIGSERIAL NOT NULL,
+	"name" varchar(256) NOT NULL,
+	"desc" varchar(4000) NOT NULL DEFAULT ''::character varying,
+	"price" int4,
+	"time_begin" timestamp with time zone,
+	"time_end" timestamp with time zone,
+	"request_time" timestamp with time zone,
+	"ispublished" bool,
+	"created" timestamp with time zone NOT NULL,
+	"updated" timestamp with time zone NOT NULL,
+	"vdv_prop_location_propid" int8,
+	CONSTRAINT "vdv_court_pkey" PRIMARY KEY("vdvid"),
+	CONSTRAINT "vdv_court_name_key" UNIQUE("name"),
+	CONSTRAINT "Ref_vdv_court_to_vdv_landlord" FOREIGN KEY ("ownerid")
+		REFERENCES "vdv_landlord"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+)
+WITH (
+	OIDS = False
+);
+
+ALTER TABLE "vdv_court" OWNER TO "postgres";
+
+DROP TABLE IF EXISTS "vdv_location" CASCADE;
+
+CREATE TABLE "vdv_location" (
+	"vdvid" BIGSERIAL NOT NULL,
+	"name" varchar(256) NOT NULL,
+	"latitude" float4 NOT NULL,
+	"longitude" float4 NOT NULL,
+	CONSTRAINT "vdv_location_pkey" PRIMARY KEY("vdvid"),
+	CONSTRAINT "vdv_location_name_key" UNIQUE("name")
+)
+WITH (
+	OIDS = False
+);
+
+ALTER TABLE "vdv_location" OWNER TO "postgres";
+
+DROP TABLE IF EXISTS "vdv_prop_location" CASCADE;
+
+CREATE TABLE "vdv_prop_location" (
+	"vdvid" int8 NOT NULL,
+	"propid" int8 NOT NULL,
+	"value" int8 NOT NULL,
+	CONSTRAINT "vdv_prop_location_pkey" PRIMARY KEY("vdvid","propid","value"),
+	CONSTRAINT "Ref_vdv_prop_location_to_vdv_location" FOREIGN KEY ("vdvid")
+		REFERENCES "vdv_location"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE,
+	CONSTRAINT "Ref_vdv_prop_location_to_vdv_court" FOREIGN KEY ("value")
+		REFERENCES "vdv_court"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+)
+WITH (
+	OIDS = False
+);
+
+ALTER TABLE "vdv_prop_location" OWNER TO "postgres";

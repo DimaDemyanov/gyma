@@ -52,7 +52,7 @@ class EntityRequest(EntityBase, Base):
                     #     if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
                     #         PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, vdvid)
                     #     else:
-                    #         EntityUser.delete(vdvid)
+                    #         EntityAccount.delete(vdvid)
                     #         raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
                     #                         (prop_name, str(PROPNAME_MAPPING)))
 
@@ -90,7 +90,7 @@ class EntityRequest(EntityBase, Base):
         # if 'id' in data:
         #     with DBConnection() as session:
         #         vdvid = data['id']
-        #         entity = session.db.query(EntityUser).filter_by(vdvid=vdvid).all()
+        #         entity = session.db.query(EntityAccount).filter_by(vdvid=vdvid).all()
         #
         #         if len(entity):
         #             for _ in entity:

@@ -6,7 +6,7 @@ from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityUser import EntityUser
+from vdv.Entities.EntityAccount import EntityAccount
 from vdv.Entities.EntityCourt import EntityCourt
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityProp import EntityProp
@@ -37,7 +37,7 @@ def serach_objects(params):
     meta_prop_name.update({'location_area': meta_prop_name['location']})
 
     meta_object_map = {
-        'user': EntityUser,
+        'user': EntityAccount,
         'court': EntityCourt,
         'location': EntityLocation,
         'post': EntityPost

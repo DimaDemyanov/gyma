@@ -50,7 +50,8 @@ class ImageResolver(MediaResolver):
 
         if min(w, h) < self.min_image_size:
             raise Exception("Image size too small, minimum side size = %i" % self.min_image_size)
-
+        file = open('./images/%s.jpg' % uuid.uuid4().hex, 'w+')
+        file.close()
         self.url = './images/%s.jpg' % uuid.uuid4().hex
         io.imsave(self.url, img[:, :, :3])
         return self.url

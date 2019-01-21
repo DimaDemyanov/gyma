@@ -2,7 +2,7 @@ from collections import OrderedDict
 import datetime
 import time
 
-from sqlalchemy import Column, String, Integer, Date, Sequence
+from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
@@ -26,21 +26,28 @@ class EntityCourt(EntityBase, Base):
     name = Column(String)
     desc = Column(String)
     price = Column(Integer)
+    time_begin = Column(Date)
+    time_end = Column(Date)
+    request_time = Column(Date)
+    ispublished = Column(Boolean)
     created = Column(Date)
     updated = Column(Date)
 
-    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'created', 'updated']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'time_end', 'request_time', 'ispublished', 'created', 'updated']
 
-    def __init__(self, ownerid, name, desc, price):
+    def __init__(self, ownerid, name, desc, price, time_begin, time_end, ispublished):
         super().__init__()
 
         self.ownerid = ownerid
         self.name = name
         self.desc = desc
         self.price = price
+        self.time_begin = time_begin
+        self.time_end = time_end
+        self.ispublished = ispublished
 
         ts = time.time()
-        self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
+        self.request_time = self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
 
     @classmethod
     def add_from_json(cls, data):
@@ -49,24 +56,24 @@ class EntityCourt(EntityBase, Base):
         vdvid = None
 
         PROP_MAPPING = {
-            'private':
-                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-                    .add(session=session, no_commit=True),
-            'isopen':
-                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-                    .add(session=session, no_commit=True),
-            'isfree':
-                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-                    .add(session=session, no_commit=True),
-            'isonair':
-                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-                    .add(session=session, no_commit=True),
+            # 'private':
+            #     lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+            #         .add(session=session, no_commit=True),
+            # 'isopen':
+            #     lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+            #         .add(session=session, no_commit=True),
+            # 'isfree':
+            #     lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+            #         .add(session=session, no_commit=True),
+            # 'isonair':
+            #     lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
+            #         .add(session=session, no_commit=True),
             'location':
                 lambda s, _vdvid, _id, _val, _uid: PropLocation(_vdvid, _id, _val)
                     .add(session=s, no_commit=True),
-            'request':
-                lambda s, _vdvid, _id, _val, _uid: [PropRequest(_vdvid, _id, _).add(session=s, no_commit=True)
-                                                    for _ in _val],
+            # 'request':
+            #     lambda s, _vdvid, _id, _val, _uid: [PropRequest(_vdvid, _id, _).add(session=s, no_commit=True)
+            #                                         for _ in _val],
             'media':
                 lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'image', _uid, _vdvid, _id, _)
                                                     for _ in _val],
@@ -75,15 +82,24 @@ class EntityCourt(EntityBase, Base):
                                                     for _ in _val]
         }
 
-        if 'ownerid' in data and 'name' in data and 'desc' in data:
+        if 'ownerid' in data and 'name' in data and 'time_begin' in data and 'time_end':
             ownerid = data['ownerid']
             name = data['name']
-            desc = data['desc']
+            time_begin = data['time_begin']
+            time_end = data['time_end']
+            if 'ispublished' in data:
+                ispublished = data['ispublished']
+            else:
+                ispublished = False
             if 'price' in data:
                 price = data['price']
             else:
                 price = -1
-            new_entity = EntityCourt(ownerid, name, desc, price)
+            if 'desc' in data:
+                desc = data['desc']
+            else:
+                desc = ''
+            new_entity = EntityCourt(ownerid, name, desc, price, time_begin, time_end, ispublished)
             vdvid = new_entity.add()
 
         if 'prop' in data:

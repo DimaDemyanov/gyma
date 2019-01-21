@@ -16,6 +16,14 @@
       }
     },
     {
+      "name": "special users API",
+      "description": "API for special users",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
       "name": "court API",
       "description": "Unlocked court API functions",
       "externalDocs": {
@@ -89,6 +97,14 @@
     },
     {
       "name": "user",
+      "description": "Everything about users",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "special users",
       "description": "Everything about users",
       "externalDocs": {
         "description": "Find out more",
@@ -206,223 +222,7 @@
         ],
         "responses": {
           "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/Job"
-            }
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/courtEasyCreate": {
-      "post": {
-        "tags": [
-          "court",
-          "court API"
-        ],
-        "summary": "Create a new court through UI",
-        "description": "",
-        "operationId": "easyCreateCourt",
-        "consumes": [
-          "multipart/form-data"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "Name",
-            "in": "formData",
-            "description": "Court name",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "Desc",
-            "in": "formData",
-            "description": "Little court description 10-100 words",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "Photo1",
-            "in": "formData",
-            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
-            "required": true,
-            "type": "file"
-          },
-          {
-            "name": "Photo2",
-            "in": "formData",
-            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
-            "required": false,
-            "type": "file"
-          },
-          {
-            "name": "Photo3",
-            "in": "formData",
-            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
-            "required": false,
-            "type": "file"
-          },
-          {
-            "name": "Photo4",
-            "in": "formData",
-            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
-            "required": false,
-            "type": "file"
-          },
-          {
-            "name": "Photo5",
-            "in": "formData",
-            "description": "Main court photo, up to 5 items, at least one, preferable 1024x720px",
-            "required": false,
-            "type": "file"
-          },
-          {
-            "name": "EqName1",
-            "in": "formData",
-            "description": "Equipment name 1, up to 5 items",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqDesc1",
-            "in": "formData",
-            "description": "Very short equipment description 1",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqPhoto1",
-            "in": "formData",
-            "description": "Equipment photo",
-            "required": false,
-            "type": "file"
-          },
-          {
-            "name": "EqName2",
-            "in": "formData",
-            "description": "Equipment name 2, up to 5 items",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqDesc2",
-            "in": "formData",
-            "description": "Very short equipment description 2",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqPhoto2",
-            "in": "formData",
-            "description": "Equipment photo 2",
-            "required": false,
-            "type": "file"
-          },
-          {
-            "name": "EqName3",
-            "in": "formData",
-            "description": "Equipment name 3, up to 5 items",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqDesc3",
-            "in": "formData",
-            "description": "Very short equipment description 3",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqPhoto3",
-            "in": "formData",
-            "description": "Equipment photo 3",
-            "required": false,
-            "type": "file"
-          },
-          {
-            "name": "EqName4",
-            "in": "formData",
-            "description": "Equipment name 4, up to 5 items",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqDesc4",
-            "in": "formData",
-            "description": "Very short equipment description 4",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqPhoto4",
-            "in": "formData",
-            "description": "Equipment photo 4",
-            "required": false,
-            "type": "file"
-          },
-          {
-            "name": "EqName5",
-            "in": "formData",
-            "description": "Equipment name 5, up to 5 items",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqDesc5",
-            "in": "formData",
-            "description": "Very short equipment description 5",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "EqPhoto5",
-            "in": "formData",
-            "description": "Equipment photo 5",
-            "required": false,
-            "type": "file"
-          },
-          {
-            "name": "LocationName",
-            "in": "formData",
-            "description": "",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "Latitude",
-            "in": "formData",
-            "description": "",
-            "required": false,
-            "type": "double"
-          },
-          {
-            "name": "Longitude",
-            "in": "formData",
-            "description": "",
-            "required": false,
-            "type": "double"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          },
-          "405": {
-            "description": "Validation exception"
-          },
-          "412": {
-            "description": "Name already taken"
+            "description": "successful operation"
           }
         },
         "security": [
@@ -435,7 +235,8 @@
     "/court": {
       "post": {
         "tags": [
-          "court", "court API"
+          "court",
+          "court API"
         ],
         "summary": "Create a new court",
         "description": "",
@@ -479,7 +280,8 @@
       },
       "put": {
         "tags": [
-          "court", "court API"
+          "court",
+          "court API"
         ],
         "summary": "Update existing catalog info",
         "description": "",
@@ -548,7 +350,8 @@
     "/court/{courtId}": {
       "get": {
         "tags": [
-          "court", "court API"
+          "court",
+          "court API"
         ],
         "summary": "Find court by ID",
         "description": "Returns a court description",
@@ -588,7 +391,8 @@
       },
       "delete": {
         "tags": [
-          "court", "court API"
+          "court",
+          "court API"
         ],
         "summary": "Remove court",
         "description": "",
@@ -631,7 +435,8 @@
     "/user": {
       "post": {
         "tags": [
-          "user", "user API"
+          "user",
+          "user API"
         ],
         "summary": "Create a new user",
         "description": "",
@@ -649,7 +454,7 @@
             "description": "User encoded in JSON string",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/User"
+              "$ref": "#/definitions/Account"
             }
           }
         ],
@@ -664,7 +469,7 @@
             "description": "Validation exception"
           },
           "412": {
-            "description": "Name already taken"
+            "description": "Phone already exists"
           }
         },
         "security": [
@@ -675,7 +480,8 @@
       },
       "put": {
         "tags": [
-          "user", "user API"
+          "user",
+          "user API"
         ],
         "summary": "Update existing catalog info !!  ID required",
         "description": "",
@@ -693,7 +499,7 @@
             "description": "User encoded in JSON string",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/User"
+              "$ref": "#/definitions/Account"
             }
           }
         ],
@@ -744,7 +550,8 @@
     "/user/me": {
       "get": {
         "tags": [
-          "user", "user API"
+          "user",
+          "user API"
         ],
         "summary": "Get my user info",
         "description": "Returns an info of currently authorized user",
@@ -770,7 +577,8 @@
     "/user/{userId}": {
       "get": {
         "tags": [
-          "user", "user API"
+          "user",
+          "user API"
         ],
         "summary": "Find user by ID",
         "description": "Returns a user description",
@@ -792,7 +600,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/User"
+              "$ref": "#/definitions/Account"
             }
           },
           "400": {
@@ -810,7 +618,8 @@
       },
       "delete": {
         "tags": [
-          "user", "user API"
+          "user",
+          "user API"
         ],
         "summary": "Remove court",
         "description": "deleteUser (can only be applied to authorized user)",
@@ -850,10 +659,54 @@
         ]
       }
     },
+    "/landlord": {
+      "post": {
+        "tags": [
+          "special users API",
+          "special users"
+        ],
+        "description": "Create a landlord",
+        "operationId": "createLandlord",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_landlord",
+            "in": "body",
+            "description": "User encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LandLord"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Phone already exists"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/request/allByUser/{userId}": {
       "get": {
         "tags": [
-          "request", "request API"
+          "request",
+          "request API"
         ],
         "summary": "Get all user requests",
         "description": "Returns a requests of specified user",
@@ -889,7 +742,8 @@
     "/request/allByCourt/{courtId}": {
       "get": {
         "tags": [
-          "request", "request API"
+          "request",
+          "request API"
         ],
         "summary": "Get all requests on court",
         "description": "Returns a requests of specified court",
@@ -1110,7 +964,10 @@
             "description": "desired type",
             "required": true,
             "type": "string",
-            "enum": ["image", "equipment"]
+            "enum": [
+              "image",
+              "equipment"
+            ]
           },
           {
             "name": "name",
@@ -1267,7 +1124,8 @@
     "/location": {
       "post": {
         "tags": [
-          "location", "location API"
+          "location",
+          "location API"
         ],
         "summary": "Create a new location",
         "description": "",
@@ -1313,7 +1171,8 @@
     "/location/all": {
       "get": {
         "tags": [
-          "location", "location API"
+          "location",
+          "location API"
         ],
         "summary": "Get all locations",
         "description": "Returns a list of locations descriptions",
@@ -1339,7 +1198,8 @@
     "/location/{locId}": {
       "get": {
         "tags": [
-          "location", "location API"
+          "location",
+          "location API"
         ],
         "summary": "Find location by ID",
         "description": "Returns a location data",
@@ -1415,7 +1275,8 @@
     "/search": {
       "post": {
         "tags": [
-          "search", "search API"
+          "search",
+          "search API"
         ],
         "summary": "Request search",
         "description": "",
@@ -1942,43 +1803,88 @@
         ]
       }
     },
-    "/login": {
+    "/sendkey": {
       "post": {
         "tags": [
           "login"
         ],
-        "summary": "Logging in",
+        "summary": "Send validation key on phone",
         "description": "",
-        "operationId": "login",
+        "operationId": "sendkey",
         "consumes": [
-          "formData"
+          "application/x-www-form-urlencoded"
         ],
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "email",
-            "in": "body",
-            "description": "Check access and generate token",
-            "required": true
+            "in": "formData",
+            "name": "phone",
+            "type": "string",
+            "description": "A person's phone."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "411": {
+            "description": "There is no accounts with given phone"
+          },
+          "412": {
+            "description": "Key cannot be send"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/validate": {
+      "post": {
+        "tags": [
+          "login"
+        ],
+        "summary": "Check key and generate token",
+        "operationId": "validate",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "key",
+            "type": "string",
+            "description": "A person's key."
           },
           {
-            "name": "pass",
-            "in": "body",
-            "description": "Check access and generate token",
-            "required": true
+            "in": "formData",
+            "name": "phone",
+            "type": "string",
+            "description": "A person's phone."
           }
         ],
         "responses": {
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/LoginResponse"
+              "type": "string"
             }
           },
           "405": {
             "description": "Validation exception"
+          },
+          "406": {
+            "description": "There was no key send on given phone"
+          },
+          "411": {
+            "description": "There is no accounts with given phone"
           }
         },
         "security": [
@@ -2002,10 +1908,11 @@
     }
   },
   "definitions": {
-    "Location": {
+    "Account": {
       "type": "object",
       "required": [
-        "id"
+        "name",
+        "phone"
       ],
       "properties": {
         "id": {
@@ -2014,57 +1921,15 @@
         },
         "name": {
           "type": "string",
-          "example": "Super club Huba Buba"
+          "example": "Максимов Михаил Александрович"
         },
-        "latitude": {
-          "type": "float",
-          "example": 40.7127753
+        "phone": {
+          "type": "string",
+          "example": "+79315839083"
         },
-        "longitude": {
-          "type": "float",
-          "example": -74.0059728
-        }
-      }
-    },
-    "User": {
-      "type": "object",
-      "required": [
-        "id"
-      ],
-      "properties": {
-        "id": {
+        "mediaid": {
           "type": "integer",
           "format": "int64"
-        },
-        "username": {
-          "type": "string",
-          "example": "Daniil",
-          "required": "true"
-        },
-        "e_mail": {
-          "type": "string",
-          "example": "Savchuk@itsociety.su",
-          "required": "true"
-        },
-        "password": {
-          "type": "string",
-          "example": "12345678",
-          "required": "true"
-        },
-        "access": {
-          "type": "string",
-          "example": "admin",
-          "variatns": "admin, user, landlord, coach",
-          "required": "true"
-        },
-        "prop": {
-          "type": "object",
-          "properties": {
-            "avatar": {
-              "type": "int",
-              "example": "media_id or base64 encoded string"
-            }
-          }
         },
         "created": {
           "type": "string",
@@ -2073,10 +1938,119 @@
         "updated": {
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
+        },
+        "e_mail": {
+          "type": "string",
+          "example": "maximov@itsociety.su"
+        },
+        "password": {
+          "type": "string",
+          "example": "12345678"
         }
       }
     },
-    "day_time": {
+    "LandLord": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "accountid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "money": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "Court": {
+      "type": "object",
+      "required": [
+        "ownerid",
+        "price",
+        "time_begin",
+        "time_end",
+        "request_time"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "ownerid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string",
+          "example": "Workout"
+        },
+        "desc": {
+          "type": "string",
+          "example": "Very cool workout place"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "time_begin": {
+          "type": "string",
+          "example": "2018-03-28 20:24:00+00:00"
+        },
+        "time_end": {
+          "type": "string",
+          "example": "2018-03-28 20:24:00+00:00"
+        },
+        "request_time": {
+          "type": "string",
+          "example": "2018-03-28 20:24:00+00:00"
+        },
+        "ispublished": {
+          "type": "boolean",
+          "example": true
+        },
+        "created": {
+          "type": "string",
+          "example": "2018-03-28 20:24:00+00:00"
+        },
+        "updated": {
+          "type": "string",
+          "example": "2018-03-28 20:24:00+00:00"
+        },
+        "prop": {
+          "type": "object",
+          "properties": {
+            "media": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "example": "media_id or base64 encoded string"
+              }
+            },
+            "equipment": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Футбольный мяч"
+                  }
+                }
+              }
+            },
+            "location": {
+              "type": "integer",
+              "example": 0
+            }
+          }
+        }
+      }
+    },
+    "Time": {
       "type": "object",
       "required": [
         "id"
@@ -2088,13 +2062,11 @@
         },
         "time_begin": {
           "type": "string",
-          "example": "2018-03-28 20:00:00+00:00",
-          "required": "true"
+          "example": "2018-03-28 20:00:00+00:00"
         },
         "time_end": {
           "type": "string",
-          "example": "2018-03-28 21:30:00+00:00",
-          "required": "true"
+          "example": "2018-03-28 21:30:00+00:00"
         }
       }
     },
@@ -2116,13 +2088,11 @@
         },
         "time_begin": {
           "type": "string",
-          "example": "2018-03-28 20:00:00+00:00",
-          "required": "true"
+          "example": "2018-03-28 20:00:00+00:00"
         },
         "time_end": {
           "type": "string",
-          "example": "2018-03-28 21:30:00+00:00",
-          "required": "true"
+          "example": "2018-03-28 21:30:00+00:00"
         }
       }
     },
@@ -2134,18 +2104,15 @@
       "properties": {
         "login": {
           "type": "string",
-          "format": "string",
-          "required": "true"
+          "format": "string"
         },
         "password": {
           "type": "string",
-          "example": "12345678",
-          "required": "true"
+          "example": "12345678"
         }
       }
     },
     "LoginResponse": {
-
       "type": "object",
       "required": [
         "sig"
@@ -2173,8 +2140,7 @@
         },
         "type": {
           "type": "string",
-          "example": "enum: [image, video, text]",
-          "required": "true"
+          "example": "enum: [image, video, text]"
         },
         "storage": {
           "type": "string",
@@ -2183,111 +2149,6 @@
         "url": {
           "type": "string",
           "example": "https://youtube.com/supervideo/542341"
-        },
-        "created": {
-          "type": "string",
-          "example": "2018-03-28 20:24:00+00:00"
-        },
-        "updated": {
-          "type": "string",
-          "example": "2018-03-28 20:24:00+00:00"
-        }
-      }
-    },
-    "Court": {
-      "type": "object",
-      "required": [
-        "id"
-      ],
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "ownerid": {
-          "type": "integer",
-          "format": "int64",
-          "required": "true"
-        },
-        "name": {
-          "type": "string",
-          "example": "Workout",
-          "required": "true"
-        },
-        "desc": {
-          "type": "string",
-          "example": "Very cool workout place",
-          "required": "true"
-        },
-        "price": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "prop": {
-          "type": "object",
-          "properties": {
-            "media": {
-              "type": "array",
-              "items": {
-                "type": "int",
-                "example": "media_id or base64 encoded string"
-              }
-            },
-            "request": {
-              "type": "array",
-              "items": {
-                "type": "int",
-                "example": "request_id"
-              }
-            },
-            "time": {
-              "type": "array",
-              "items": {
-                "type": "int",
-                "example": "time_id"
-              }
-            },
-            "equipment": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "example": "name"
-                  },
-                  "desc": {
-                    "type": "string",
-                    "example": "desc"
-                  },
-                  "media": {
-                    "type": "string",
-                    "example": "base64 encoded image"
-                  }
-                }
-              }
-            },
-            "location": {
-              "type": "int",
-              "example": 0
-            },
-            "private": {
-              "type": "boolean",
-              "example": false
-            },
-            "isopen": {
-              "type": "boolean",
-              "example": false
-            },
-            "isfree": {
-              "type": "boolean",
-              "example": false
-            },
-            "isonair": {
-              "type": "boolean",
-              "example": false
-            }
-          }
         },
         "created": {
           "type": "string",
@@ -2314,11 +2175,11 @@
               "example": "substring in [name]"
             },
             "location": {
-              "type": "int",
+              "type": "integer",
               "example": 0
             },
             "location_area": {
-              "type": "int",
+              "type": "integer",
               "example": "[cx, cy, R]"
             },
             "private": {
@@ -2338,7 +2199,7 @@
               "example": false
             },
             "price": {
-              "type": "int",
+              "type": "integer",
               "example": "[min, max]"
             }
           }
@@ -2398,6 +2259,33 @@
         "updated": {
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
+        }
+      }
+    },
+    "Location": {
+      "type": "object",
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string",
+          "example": "Super club Huba Buba"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "float",
+          "example": 40.7127753
+        },
+        "longitude": {
+          "type": "number",
+          "format": "float",
+          "example": -74.0059728
         }
       }
     },

@@ -19,68 +19,80 @@ Base = declarative_base()
 
 
 
-class EntityUser(EntityBase, Base):
-    __tablename__ = 'vdv_user'
+class EntityAccount(EntityBase, Base):
+    __tablename__ = 'vdv_account'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     name = Column(String)
-    e_mail = Column(String)
+    phone = Column(String)
     created = Column(Date)
     updated = Column(Date)
+    mediaid = Column(Integer)
+    email = Column(String)
     password = Column(String)
-    access = Column(String)
     # Добавить поля password, is_admin, is_arendo
 
-    json_serialize_items_list = ['vdvid', 'name', 'e_mail', 'created', 'updated', 'access']
+    json_serialize_items_list = ['vdvid', 'name', 'phone', 'created', 'updated', 'mediaid', 'email', 'password']
 
-    def __init__(self, username, email, password, access):
+    def __init__(self, username, phone, mediaid, email, password):
         super().__init__()
 
         self.name = username
-        self.e_mail = email
+        self.phone = phone
+        self.mediaid = mediaid
+        self.email = email
         self.password = password
-        self.access = access
 
         ts = time.time()
         self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
 
     @classmethod
     def add_from_json(cls, data):
-        PROPNAME_MAPPING = EntityProp.map_name_id()
+        #PROPNAME_MAPPING = EntityProp.map_name_id()
 
         vdvid = None
 
-        PROP_MAPPING = {
-            'private':
-                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
-            'avatar':
-                lambda s, _vdvid, _id, _val, _uid: cls.process_media(s, 'image', _uid, _vdvid, _id, _val)
-        }
+        # PROP_MAPPING = {
+        #     'private':
+        #         lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
+        #     'avatar':
+        #         lambda s, _vdvid, _id, _val, _uid: cls.process_media(s, 'image', _uid, _vdvid, _id, _val)
+        # }
 
-        if 'username' in data and 'e_mail' in data and 'password' in data and 'access' in data:
-            username = data['username']
-            e_mail = data['e_mail']
-            password = data['password']
-            access = data['access']
+        if 'phone' in data and 'name' in data:
+            phone = data['phone']
+            username = data['name']
+            if 'mediaid' in data:
+                mediaid = data['mediaid']
+            else:
+                mediaid = None
+            if 'email' in data:
+                email = data['email']
+            else:
+                email = None
+            if 'password' in data:
+                password = data['password']
+            else:
+                password = None
 
-            new_entity = EntityUser(username, e_mail, password, access)
+            new_entity = EntityAccount(username, phone, mediaid, email, password)
             vdvid = new_entity.add()
 
-        if 'prop' in data:
-            try:
-                with DBConnection() as session:
-                    for prop_name, prop_val in data['prop'].items():
-                        if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                            PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, vdvid)
-                        else:
-                            EntityUser.delete(vdvid)
-                            raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
-                                            (prop_name, str(PROPNAME_MAPPING)))
+        #if 'prop' in data:
+        try:
+            with DBConnection() as session:
+                # for prop_name, prop_val in data['prop'].items():
+                #     if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
+                #         PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, vdvid)
+                #     else:
+                #         EntityAccount.delete(vdvid)
+                #         raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
+                #                         (prop_name, str(PROPNAME_MAPPING)))
 
-                    session.db.commit()
-            except Exception as e:
-                EntityUser.delete(vdvid)
-                raise Exception('Internal error')
+                session.db.commit()
+        except Exception as e:
+            EntityAccount.delete(vdvid)
+            raise Exception('Internal error')
 
         return vdvid
 
@@ -90,40 +102,47 @@ class EntityUser(EntityBase, Base):
             PropMedia.delete(_vdvid, _id, False)
             cls.process_media(s, 'image', _vdvid, _vdvid, _id, _val)
 
-        PROPNAME_MAPPING = EntityProp.map_name_id()
+        # PROPNAME_MAPPING = EntityProp.map_name_id()
 
         vdvid = None
 
-        PROP_MAPPING = {
-            'private':
-                lambda session, _vdvid, _id, _value:
-                PropBool(_vdvid, _id, _value).update(session=session)
-                if len(PropBool.get().filter_by(vdvid=_vdvid, propid=_id).all())
-                else PropBool(_vdvid, _id, _value).add(session=session),
-            'avatar':
-                lambda s, _vdvid, _id, _val:
-                process_avatar(s, _vdvid, _id, _val)
-
-        }
+        # PROP_MAPPING = {
+        #     'private':
+        #         lambda session, _vdvid, _id, _value:
+        #         PropBool(_vdvid, _id, _value).update(session=session)
+        #         if len(PropBool.get().filter_by(vdvid=_vdvid, propid=_id).all())
+        #         else PropBool(_vdvid, _id, _value).add(session=session),
+        #     'avatar':
+        #         lambda s, _vdvid, _id, _val:
+        #         process_avatar(s, _vdvid, _id, _val)
+        #
+        # }
 
         if 'id' in data:
             with DBConnection() as session:
                 vdvid = data['id']
-                entity = session.db.query(EntityUser).filter_by(vdvid=vdvid).all()
+                entity = session.db.query(EntityAccount).filter_by(vdvid=vdvid).all()
                 if len(entity) == 0:
                     vdvid = -1          # No user with givven id
                 if len(entity):
                     for _ in entity:
                         if 'name' in data:
-                            _.name = data['name']
+                            _.name = data['username']
 
-                        if 'e_mail' in data:
-                            _.e_mail = data['e_mail']
+                        if 'mediaid' in data:
+                            _.mediaid = data['mediaid']
 
-                        if 'prop' in data:
-                            for prop_name, prop_val in data['prop'].items():
-                                if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                                    PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
+                        if 'email' in data:
+                            _.email = data['email']
+
+                        if 'password' in data:
+                            _.password = data['password']
+
+
+                        # if 'prop' in data:
+                        #     for prop_name, prop_val in data['prop'].items():
+                        #         if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
+                        #             PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
 
                         session.db.commit()
 
@@ -176,16 +195,16 @@ class EntityUser(EntityBase, Base):
             return None
 
     @classmethod
-    def get_id_from_email(cls, e_mail):
+    def get_id_from_email(cls, email):
         try:
-            return cls.get().filter_by(e_mail=e_mail).all()[0].vdvid
+            return cls.get().filter_by(email=email).all()[0].vdvid
         except:
             return None
 
     @classmethod
-    def get_password_from_email(cls, e_mail):
+    def get_password_from_email(cls, email):
         try:
-            return cls.get().filter_by(e_mail=e_mail).all()[0].password
+            return cls.get().filter_by(email=email).all()[0].password
         except:
             return None
 

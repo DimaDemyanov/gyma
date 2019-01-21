@@ -47,14 +47,14 @@ class SpecServer():
 
 
     def process_inbound_request(self, req, resp):
+
         # This is the meat of the application and steps through everything when a request comes in.
 
         if self.handle_preflight_request(req, resp): return # it would be good if we could just force a response return
 
         matched_operation, uri_fields = self.match_request_url_to_operation(req, resp)
-
-        #self.parse_form_data()
-
+        # self.parse_form_data()
+        #
         self.dispatch_matched_operation_to_request_handlers(req, resp, matched_operation, uri_fields)
 
 
