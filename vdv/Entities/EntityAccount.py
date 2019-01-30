@@ -195,6 +195,13 @@ class EntityAccount(EntityBase, Base):
             return None
 
     @classmethod
+    def get_id_from_phone(cls, phone):
+        try:
+            return cls.get().filter_by(phone=phone).all()[0].vdvid
+        except:
+            return None
+
+    @classmethod
     def get_id_from_email(cls, email):
         try:
             return cls.get().filter_by(email=email).all()[0].vdvid

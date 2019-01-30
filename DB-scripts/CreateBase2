@@ -46,12 +46,13 @@ DROP TABLE IF EXISTS "vdv_account" CASCADE;
 CREATE TABLE "vdv_account" (
 	"vdvid" BIGSERIAL NOT NULL,
 	"name" varchar(256),
-	"phone" varchar(30) NOT NULL UNIQUE,
+	"phone" varchar(30) NOT NULL,
 	"created" timestamp with time zone,
 	"updated" timestamp with time zone,
 	"mediaid" int8,
 	"email" varchar(256),
 	"password" varchar(256),
+	"account_type" varchar(30),
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_account_to_vdv_media" FOREIGN KEY ("mediaid")
 		REFERENCES "vdv_media"("vdvid")
@@ -229,3 +230,6 @@ CREATE TABLE "vdv_prop_equipment" (
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE
 );
+
+INSERT INTO vdv_account (vdvid, name, phone, account_type) VALUES (1000, 'tester', '9110001122', 'landlord');
+INSERT INTO vdv_validation (vdvid, accountid, code) VALUES (NEXTVAL('vdv_seq'), 1000, 10000);

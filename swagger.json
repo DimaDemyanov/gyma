@@ -446,9 +446,9 @@
           "user",
           "user API"
         ],
-        "summary": "Create a new user",
+        "summary": "Create a new account",
         "description": "",
-        "operationId": "createUser",
+        "operationId": "createAccount",
         "consumes": [
           "application/json"
         ],
@@ -700,7 +700,7 @@
             "description": "Validation exception"
           },
           "412": {
-            "description": "Phone already exists"
+            "description": "Account with given id already has spacial user"
           }
         },
         "security": [
@@ -2025,7 +2025,7 @@
         },
         "phone": {
           "type": "string",
-          "example": "+79315839083"
+          "example": "9315839083"
         },
         "mediaid": {
           "type": "integer",
@@ -2046,6 +2046,10 @@
         "password": {
           "type": "string",
           "example": "12345678"
+        },
+        "account_type": {
+          "type": "string",
+          "example": "landlord/admin/coach/simpleuser"
         }
       }
     },

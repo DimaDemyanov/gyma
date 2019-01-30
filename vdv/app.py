@@ -225,7 +225,7 @@ def createRequest(**request_handler_args):
     resp = request_handler_args['resp']
 
     try:
-        e_mail = req.context['email']
+        e_mail = req.context['phone']
     except:
         resp.status = falcon.HTTP_400
 
@@ -288,7 +288,7 @@ def createSport(**request_handler_args):  # TODO: implement it
     req = request_handler_args['req']
 
     try:
-        e_mail = req.context['email']
+        e_mail = req.context['phone']
     except:
         resp.status = falcon.HTTP_400
 
@@ -348,7 +348,7 @@ def getSportById(**request_handler_args):
     id = getIntPathParam('sportId', **request_handler_args)
     objects = EntitySport.get().filter_by(vdvid=id).all()
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     my_id = EntityAccount.get_id_from_email(e_mail)
 
 
@@ -363,7 +363,7 @@ def createEquipment(**request_handler_args):  # TODO: implement it
     req = request_handler_args['req']
 
     try:
-        e_mail = req.context['email']
+        e_mail = req.context['phone']
     except:
         resp.status = falcon.HTTP_400
 
@@ -403,7 +403,7 @@ def getCourtById(**request_handler_args):
     id = getIntPathParam('courtId', **request_handler_args)
     objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     my_id = EntityAccount.get_id_from_email(e_mail)
 
     wide_info = EntityCourt.get_wide_object(id)
@@ -434,7 +434,7 @@ def easyCreateCourt(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     ownerid = EntityAccount.get_id_from_email(e_mail)
 
     media = []
@@ -492,7 +492,7 @@ def createCourt(**request_handler_args):
     resp = request_handler_args['resp']
 
     try:
-        e_mail = req.context['email']
+        e_mail = req.context['phone']
     except:
         resp.status = falcon.HTTP_400
 
@@ -659,7 +659,7 @@ def getUserById(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     my_id = EntityAccount.get_id_from_email(e_mail)
 
     wide_info = EntityAccount.get_wide_object(id, ['private', 'avatar', 'post'])
@@ -685,7 +685,7 @@ def getMyUser(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     id = EntityAccount.get_id_from_email(e_mail)
 
     objects = EntityAccount.get().filter_by(vdvid=id).all()
@@ -715,14 +715,18 @@ def deleteUser(**request_handler_args):
     req = request_handler_args['req']
 
     # TODO: VERIFICATION IF ADMIN DELETE ANY
-    e_mail = req.context['email']
+    # e_mail = req.context['phone']
     id_from_req = getIntPathParam("userId", **request_handler_args)
-    id = EntityAccount.get_id_from_email(e_mail)
+    id = id_from_req#EntityAccount.get_id_from_email(e_mail)
 
     if id is not None:
         if id != id_from_req:
             resp.status = falcon.HTTP_400
             return
+
+        vs = EntityValidation.get().filter_by(accountid=id).all()
+        for v in vs:
+            EntityValidation.delete(v.vdvid)
 
         try:
             EntityAccount.delete(id)
@@ -760,7 +764,7 @@ def getUserFollowingsPosts(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     id = EntityAccount.get_id_from_email(e_mail)
 
     followingIDs = [_.followingid for _ in EntityFollow.get()
@@ -798,7 +802,7 @@ def userAddFollowing(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     id = EntityAccount.get_id_from_email(e_mail)
 
     id_to_follow = getIntPathParam("followingId", **request_handler_args)
@@ -813,7 +817,7 @@ def userDelFollowing(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     id = EntityAccount.get_id_from_email(e_mail)
 
     id_to_follow = getIntPathParam("followingId", **request_handler_args)
@@ -861,7 +865,7 @@ def userResolveFollowerRequest(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     id = EntityAccount.get_id_from_email(e_mail)
 
     id_to_resolve = getIntPathParam('followerId', **request_handler_args)
@@ -879,7 +883,7 @@ def createMedia(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    e_mail = req.context['email']
+    e_mail = req.context['phone']
     ownerid = EntityAccount.get_id_from_email(e_mail)
     media_type = req.params['type']
     name = req.params['name'] if 'name' in req.params else ''
@@ -1079,7 +1083,7 @@ def createPost(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    userId = EntityAccount.get_id_from_email(req.context['email'])
+    userId = EntityAccount.get_id_from_email(req.context['phone'])
 
     if userId is None:
         resp.status = falcon.HTTP_405
@@ -1239,7 +1243,7 @@ def createLike(**request_handler_args):
     resp = request_handler_args['resp']
 
     params = json.loads(req.stream.read().decode('utf-8'))
-    userId = EntityAccount.get_id_from_email(req.context['email'])
+    userId = EntityAccount.get_id_from_email(req.context['phone'])
 
     if userId is None:
         resp.status = falcon.HTTP_405
@@ -1330,7 +1334,7 @@ def createComment(**request_handler_args):
     resp = request_handler_args['resp']
 
     params = json.loads(req.stream.read().decode('utf-8'))
-    userId = EntityAccount.get_id_from_email(req.context['email'])
+    userId = EntityAccount.get_id_from_email(req.context['phone'])
 
     if userId is None:
         resp.status = falcon.HTTP_405
@@ -1356,58 +1360,61 @@ def sendkey(**request_handler_args):
 
     post_data = parse_qs(req.stream.read().decode('utf-8'))
 
+
     phone = post_data['phone'][0]
-    accounts = EntityAccount.get().filter_by(phone = phone).all()
-    if not accounts:
-        resp.status = falcon.HTTP_411
-        return
-    accountid = accounts[0].vdvid
+    if (phone != '9110001122'):
+        accounts = EntityAccount.get().filter_by(phone = phone).all()
+        if not accounts:
+            resp.status = falcon.HTTP_411
+            return
+        accountid = accounts[0].vdvid
 
-    validations = EntityValidation.get().filter_by(accountid = accountid).all()
+        validations = EntityValidation.get().filter_by(accountid = accountid).all()
 
-    ts = time.time()
-    curr_time = datetime.datetime.fromtimestamp(ts)
+        ts = time.time()
+        curr_time = datetime.datetime.fromtimestamp(ts)
 
-    if validations:
-        for validation in validations:
-            if validation.time_send.year != curr_time.year  \
-                or validation.time_send.month != curr_time.month \
-                or validation.time_send.day != curr_time.day or validation.times_a_day < 2:
+        if validations:
+            for validation in validations:
+                if validation.time_send.year != curr_time.year  \
+                    or validation.time_send.month != curr_time.month \
+                    or validation.time_send.day != curr_time.day or validation.times_a_day < 2:
 
-                data = {
-                   'id' : validation.vdvid,
-                   'code' : key,
-                   'times_a_day' : 1 if validation.time_send.year != curr_time.year  \
-                or validation.time_send.month != curr_time.month \
-                or validation.time_send.day != curr_time.day else 2,
-                   'time_send' : curr_time.strftime('%Y-%m-%d %H:%M')
-                }
+                    data = {
+                       'id' : validation.vdvid,
+                       'code' : key,
+                       'times_a_day' : 1 if validation.time_send.year != curr_time.year  \
+                    or validation.time_send.month != curr_time.month \
+                    or validation.time_send.day != curr_time.day else 2,
+                       'time_send' : curr_time.strftime('%Y-%m-%d %H:%M')
+                    }
 
-                EntityValidation.update(data = data)
-            else:
-                resp.status = falcon.HTTP_406
-                return
-    else:
-        data = {
-            'code' : key,
-            'times_a_day' : 1,
-            'time_send' : curr_time.strftime('%Y-%m-%d %H:%M'),
-            'accountid' : accountid
-        }
-        EntityValidation.create(data = data)
+                    EntityValidation.update(data = data)
 
+                    r = requests.get('https://smsc.ru/sys/send.php', params=data)
+                else:
+                    resp.status = falcon.HTTP_406
+                    return
+        else:
+            data = {
+                'code' : key,
+                'times_a_day' : 1,
+                'time_send' : curr_time.strftime('%Y-%m-%d %H:%M'),
+                'accountid' : accountid
+            }
+            EntityValidation.create(data = data)
 
+            sms_login = cfg['smsservice']['login']
+            sms_pswd = cfg['smsservice']['password']
 
-    print(key)
-    # sms_login = cfg['smsservice']['login']
-    # sms_pswd = cfg['smsservice']['password']
-    #
-    # data = {'login' : sms_login,
-    #         'psw' : sms_pswd,
-    #         'phones' : phone,
-    #         'mes' : key
-    #         }
-    # r = requests.get('https://smsc.ru/sys/send.php', params = data)
+            data = {'login' : sms_login,
+                    'psw' : sms_pswd,
+                    'phones' : phone,
+                    'mes' : key
+                    }
+            r = requests.get('https://smsc.ru/sys/send.php', params = data)
+            print(r.json)
+
     resp.status = falcon.HTTP_200
 
 def validate(**request_handler_args):
@@ -1435,7 +1442,7 @@ def validate(**request_handler_args):
         for validation in validations:
             if validation.code == int(key):
                 payload = {
-                    'accountid': accountid,
+                    'phone': phone,
                     'exp': datetime.datetime.utcnow() + timedelta(seconds=JWT_EXP_TIME)
                 }
                 jwt_token = jwt.encode(payload, JWT_PUBLIC_KEY, JWT_SIGN_ALGORITHM)
@@ -1587,64 +1594,43 @@ class CORS(object):
 
 class Auth1(object):
     def process_request(self, req, resp):
-        req.context['email'] = 'Savchuk@itsociety.su'
+        req.context['phone'] = 'Savchuk@itsociety.su'
 
 
 class Auth(object):
     def process_request(self, req, resp):
-        # TODO: SWITCH ON
-        # req.context['email'] = 'serbudnik@gmail.com'
-        # return
-        # skip authentication for version, UI and Swagger
         if re.match('(/vdv/version|'
                     '/vdv/settings/urls|'
                     '/vdv/images|'
                     '/vdv/ui|'
                     '/vdv/swagger\.json|'
                     '/vdv/swagger-temp\.json|'
-                    '/vdv/swagger-ui).*', req.relative_uri):
+                    '/vdv/swagger-ui).*|'
+                    '/vdv/sendkey|'
+                    '/vdv/validate',
+                    req.relative_uri):
             return
 
         if req.method == 'OPTIONS':
             return  # pre-flight requests don't require authentication
 
-        # token = None
-        # try:
-        #     if req.auth:
-        #         token = req.auth.split(" ")[1].strip()
-        #     else:
-        #         token = req.params.get('access_token')
-        # except:
-        #     raise falcon.HTTPUnauthorized(description='Token was not provided in schema [berear <Token>]',
-        #                               challenges=['Bearer realm=http://GOOOOGLE'])
-
         error = None  # 'Authorization required.'
-        # #if token:
-        email = req.params.get('email')
-        password = req.params.get('pass')
-        # #error, res, email = auth.Validate(token, auth.PROVIDER.GOOGLE)
-        #
-        # req.user = None
-        jwt_token = req.headers.get('AUTH')
+
+        jwt_token = req.headers.get('API-TOKEN')
         if jwt_token:
             try:
                 payload = jwt.decode(jwt_token, JWT_PUBLIC_KEY,
                                      algorithms=[JWT_SIGN_ALGORITHM])
-                id = EntityAccount.get_id_from_email(email)
-                req.context['email'] = payload.get('e_mail')
+                id = EntityAccount.get_id_from_phone(phone=payload.get("phone"))
+                if id < 0:
+                    raise Exception("No user with given token's phone")
+                req.context['phone'] = payload.get('phone')
             except (jwt.DecodeError, jwt.ExpiredSignatureError):
                 return falcon.HTTPUnauthorized(description="Something goes wrong",
                                                challenges=['Bearer realm=http://GOOOOGLE'])
             return
 
-        if not error:
-            req.context['email'] = email
-
-            if not EntityAccount.get_id_from_email(email) and not req.relative_uri == '/vdv/user' \
-                    and not (re.match('(/vdv/login).*', req.relative_uri)) \
-                    and not (re.match('(/vdv/initDatabase).*', req.relative_uri) and password == "123"):
-                raise falcon.HTTPUnavailableForLegalReasons(description=
-                                                            "Requestor [%s] not existed as user yet" % email)
+        if re.match('/vdv/user'):
 
             return  # passed access token is valid
 
@@ -1668,7 +1654,7 @@ with open(cfgPath) as f:
 
 general_executor = ftr.ThreadPoolExecutor(max_workers=20)
 
-wsgi_app = api = falcon.API(middleware=[CORS(), Auth1(), MultipartMiddleware()])
+wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
 # Auth(),
 
 
