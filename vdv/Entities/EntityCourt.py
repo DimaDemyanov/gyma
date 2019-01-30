@@ -8,12 +8,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
 
-from vdv.Prop.PropBool import PropBool
-from vdv.Prop.PropReal import PropReal
+from vdv.Prop.PropEquipment import PropEquipment
 from vdv.Prop.PropMedia import PropMedia
-from vdv.Prop.PropLike import PropLike
 from vdv.Prop.PropLocation import PropLocation
 from vdv.Prop.PropRequest import PropRequest
+from vdv.Prop.PropSport import PropSport
 from vdv.db import DBConnection
 
 Base = declarative_base()
@@ -56,29 +55,17 @@ class EntityCourt(EntityBase, Base):
         vdvid = None
 
         PROP_MAPPING = {
-            # 'private':
-            #     lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-            #         .add(session=session, no_commit=True),
-            # 'isopen':
-            #     lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-            #         .add(session=session, no_commit=True),
-            # 'isfree':
-            #     lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-            #         .add(session=session, no_commit=True),
-            # 'isonair':
-            #     lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-            #         .add(session=session, no_commit=True),
             'location':
                 lambda s, _vdvid, _id, _val, _uid: PropLocation(_vdvid, _id, _val)
                     .add(session=s, no_commit=True),
-            # 'request':
-            #     lambda s, _vdvid, _id, _val, _uid: [PropRequest(_vdvid, _id, _).add(session=s, no_commit=True)
-            #                                         for _ in _val],
             'media':
                 lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'image', _uid, _vdvid, _id, _)
                                                     for _ in _val],
             'equipment':
-                lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'equipment', _uid, _vdvid, _id, _)
+                lambda s, _vdvid, _id, _val, _uid:[PropEquipment(_vdvid, _id, _).add(session=s, no_commit=True)
+                                                    for _ in _val],
+            'sport':
+                lambda s, _vdvid, _id, _val, _uid: [PropSport(_vdvid, _id, _).add(session=s, no_commit=True)
                                                     for _ in _val]
         }
 
@@ -127,29 +114,17 @@ class EntityCourt(EntityBase, Base):
         vdvid = None
 
         PROP_MAPPING = {
-            'private':
-                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-                    .update(session=session, no_commit=True),
-            'isopen':
-                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-                    .update(session=session, no_commit=True),
-            'isfree':
-                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-                    .update(session=session, no_commit=True),
-            'isonair':
-                lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value)
-                    .update(session=session, no_commit=True),
             'location':
                 lambda s, _vdvid, _id, _val, _uid: PropLocation(_vdvid, _id, _val)
                     .update(session=s, no_commit=True),
-            'request':
-                lambda s, _vdvid, _id, _val, _uid: [PropRequest(_vdvid, _id, _).update(session=s, no_commit=True)
-                                                    for _ in _val],
             'media':
                 lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'image', _uid, _vdvid, _id, _)
                                                     for _ in _val],
             'equipment':
-                lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'equipment', _uid, _vdvid, _id, _)
+                lambda s, _vdvid, _id, _val, _uid: [PropEquipment(_vdvid, _id, _).update(session=s, no_commit=True)
+                                                    for _ in _val],
+            'sport':
+                lambda s, _vdvid, _id, _val, _uid: [PropSport(_vdvid, _id, _).update(session=s, no_commit=True)
                                                     for _ in _val]
         }
 
@@ -173,6 +148,12 @@ class EntityCourt(EntityBase, Base):
                         if 'price' in data:
                             _.price = data['price']
 
+                        if 'time_begin' in data:
+                            _.time_begin = data['time_begin']
+
+                        if 'time_end' in data:
+                            _.time_end = data['time_end']
+
                         if 'prop' in data:
                             for prop_name, prop_val in data['prop'].items():
                                 if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
@@ -187,16 +168,10 @@ class EntityCourt(EntityBase, Base):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         PROP_MAPPING = {
-            'private':   lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'isopen':    lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'isfree':    lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'isonair':   lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'price':     lambda _vdvid, _id: PropReal.get_object_property(_vdvid, _id),
             'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
-            'request': lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
             'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
-            'equipment': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
-            'like':      lambda _vdvid, _id: PropLike.get_object_property(_vdvid, _id)
+            'equipment': lambda _vdvid, _id: PropEquipment.get_object_property(_vdvid, _id),
+            'sport': lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id)
         }
 
         result = {
@@ -213,11 +188,6 @@ class EntityCourt(EntityBase, Base):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         PROP_MAPPING = {
-            'private':   lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'isopen':    lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'isfree':    lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'isonair':   lambda _vdvid, _id: PropBool.delete(_vdvid, _id, False),
-            'price':     lambda _vdvid, _id: PropReal.delete(_vdvid, _id, False),
             'location':  lambda _vdvid, _id: PropLocation.delete(_vdvid, _id, False),
             'request': lambda _vdvid, _id: PropRequest.delete(_vdvid, _id, False),
             'media':     lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False),

@@ -1,7 +1,7 @@
 
 
 DROP TYPE IF EXISTS vdv_prop_type CASCADE;
-CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request');
+CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request', 'equipment', 'sport');
 
 DROP TABLE IF EXISTS "vdv_prop";
 CREATE TABLE "vdv_prop" (
@@ -13,6 +13,8 @@ CREATE TABLE "vdv_prop" (
 );
 
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'location', 'location');
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'equipment', 'equipment');
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'sport', 'sport');
 
 DROP SEQUENCE IF EXISTS vdv_seq;
 CREATE SEQUENCE vdv_seq start with 1 increment by 1;
@@ -44,7 +46,7 @@ DROP TABLE IF EXISTS "vdv_account" CASCADE;
 CREATE TABLE "vdv_account" (
 	"vdvid" BIGSERIAL NOT NULL,
 	"name" varchar(256),
-	"phone" varchar(30) NOT NULL,
+	"phone" varchar(30) NOT NULL UNIQUE,
 	"created" timestamp with time zone,
 	"updated" timestamp with time zone,
 	"mediaid" int8,
@@ -168,3 +170,62 @@ WITH (
 );
 
 ALTER TABLE "vdv_prop_location" OWNER TO "postgres";
+
+DROP TABLE IF EXISTS "vdv_sport" CASCADE;
+
+CREATE TABLE "vdv_sport" (
+	"vdvid" int8 NOT NULL,
+	"name" varchar(40),
+	PRIMARY KEY("vdvid")
+);
+
+
+DROP TABLE IF EXISTS "vdv_prop_sport" CASCADE;
+
+CREATE TABLE "vdv_prop_sport" (
+	"value" int8,
+	"propid" int8 NOT NULL,
+	"vdvid" int8 NOT NULL,
+	PRIMARY KEY("propid"),
+	CONSTRAINT "Ref_vdv_prop_sport_to_vdv_sport" FOREIGN KEY ("value")
+		REFERENCES "vdv_sport"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE,
+	CONSTRAINT "Ref_vdv_prop_sport_to_vdv_court" FOREIGN KEY ("vdvid")
+		REFERENCES "vdv_court"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
+
+DROP TABLE IF EXISTS "vdv_equipment" CASCADE;
+
+CREATE TABLE "vdv_equipment" (
+	"vdvid" int8 NOT NULL,
+	"name" varchar(40),
+	PRIMARY KEY("vdvid")
+);
+
+DROP TABLE IF EXISTS "vdv_prop_equipment" CASCADE;
+
+CREATE TABLE "vdv_prop_equipment" (
+	"value" int8,
+	"propid" int8 NOT NULL,
+	"vdvid" int8 NOT NULL,
+	PRIMARY KEY("propid"),
+	CONSTRAINT "Ref_vdv_prop_equipment_to_vdv_court" FOREIGN KEY ("vdvid")
+		REFERENCES "vdv_court"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE,
+	CONSTRAINT "Ref_vdv_prop_equipment_to_vdv_equipment" FOREIGN KEY ("value")
+		REFERENCES "vdv_equipment"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
