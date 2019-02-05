@@ -381,6 +381,54 @@ def createEquipment(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
+def deleteEquipment(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('courtId', **request_handler_args)
+
+    if id is not None:
+        try:
+            EntityEquipment.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
+
+        try:
+            EntityEquipment.delete_wide_object(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_405
+            return
+
+        object = EntityEquipment.get().filter_by(vdvid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
+
+def getEquipments(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+
+    objects = EntityEquipment.get().all()
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+
+    resp.status = falcon.HTTP_200
+
+def getEquipmentById(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('equipmentId', **request_handler_args)
+    objects = EntityEquipment.get().filter_by(vdvid=id).all()
+
+    e_mail = req.context['phone']
+    my_id = EntityAccount.get_id_from_email(e_mail)
+
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.status = falcon.HTTP_200
+
 
 def deleteTime(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
@@ -691,7 +739,7 @@ def getMyUser(**request_handler_args):
     objects = EntityAccount.get().filter_by(vdvid=id).all()
 
     # TODO: LIMIT the posts output counts with a paging
-    wide_info = EntityAccount.get_wide_object(id)
+    #wide_info = EntityAccount.get_wide_object(id)
 
     # wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
     # followings = EntityFollow.get().filter_by(vdvid=id).all()
@@ -702,8 +750,8 @@ def getMyUser(**request_handler_args):
 
     res = []
     for _ in objects:
-        obj_dict = _.to_dict(['vdvid', 'name'])
-        obj_dict.update(wide_info)
+        obj_dict = _.to_dict(['vdvid', 'name', 'phone', 'mediaid'])
+        #obj_dict.update(wide_info)
         res.append(obj_dict)
 
     resp.body = obj_to_json(res)
@@ -1511,8 +1559,9 @@ operation_handlers = {
 
     #Equipment methods
     'createEquipment': [createEquipment],
-    #'deleteEquipment': [deleteEquipment],
-    #'getEquipments': [getEquipments],
+    'deleteEquipment': [deleteEquipment],
+    'getEquipments': [getEquipments],
+    'getEquipmentById': [getEquipmentById],
 
     # Court time methods
 #    'createTime': [createTime],

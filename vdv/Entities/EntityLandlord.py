@@ -28,7 +28,7 @@ class EntityLandlord(EntityBase, Base):
     company = Column(String)
     # Добавить поля password, is_admin, is_arendo
 
-    json_serialize_items_list = ['vdvid', 'accountid', 'money']
+    json_serialize_items_list = ['vdvid', 'accountid', 'money', 'isentity', 'company']
 
     def __init__(self, accountid, money, isentity, company):
         super().__init__()
@@ -89,17 +89,17 @@ class EntityLandlord(EntityBase, Base):
                     vdvid = -1          # No user with givven id
                 if len(entity):
                     for _ in entity:
-                        if 'name' in data:
-                            _.name = data['username']
+                        if 'accountid' in data:
+                            _.name = data['accountid']
 
-                        if 'mediaid' in data:
-                            _.mediaid = data['mediaid']
+                        if 'money' in data:
+                            _.mediaid = data['money']
 
-                        if 'email' in data:
-                            _.email = data['email']
+                        if 'isentity' in data:
+                            _.email = data['isentity']
 
-                        if 'password' in data:
-                            _.password = data['password']
+                        if 'company' in data:
+                            _.password = data['company']
 
 
                         # if 'prop' in data:

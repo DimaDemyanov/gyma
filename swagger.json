@@ -1905,6 +1905,113 @@
             "auth_env": []
           }
         ]
+      },
+      "get": {
+        "tags": [
+          "equipment"
+        ],
+        "summary": "Find all available equipments(ready)",
+        "description": "Returns a equipments data",
+        "operationId": "getEquipments",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/equipment/{equipmentId}": {
+      "get": {
+        "tags": [
+          "equipment"
+        ],
+        "summary": "Find equipment by ID(ready)",
+        "description": "Returns a equipment description",
+        "operationId": "getEquipmentById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "equipmentId",
+            "in": "path",
+            "description": "ID of sport to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Equipment"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Court not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "equipment"
+        ],
+        "summary": "Remove equipment(ready)",
+        "description": "",
+        "operationId": "deleteEquipment",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "equipmentId",
+            "in": "path",
+            "description": "Equipment id to unlink",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "hard",
+            "in": "query",
+            "description": "Hard-delete (no undo)",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Equipment not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
       }
     },
     "/sendkey": {
