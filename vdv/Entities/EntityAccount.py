@@ -9,7 +9,6 @@ from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
 from vdv.Entities.EntityCourt import EntityCourt
 
-from vdv.Prop.PropBool import PropBool
 from vdv.Prop.PropMedia import PropMedia
 from vdv.Prop.PropPost import PropPost
 
@@ -127,7 +126,7 @@ class EntityAccount(EntityBase, Base):
                 if len(entity):
                     for _ in entity:
                         if 'name' in data:
-                            _.name = data['username']
+                            _.name = data['name']
 
                         if 'mediaid' in data:
                             _.mediaid = data['mediaid']
@@ -162,6 +161,7 @@ class EntityAccount(EntityBase, Base):
             'vdvid': vdvid,
             'court': []
         }
+
         for key, propid in PROPNAME_MAPPING.items():
             if key in PROP_MAPPING and (not len(items) or key in items):
                 result.update({key: PROP_MAPPING[key](vdvid, propid)})

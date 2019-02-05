@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 class PropBool(PropBase, Base):
-    __tablename__ = 'vdv_prop_bool'
+    __tablename__ = 'vdv_prop_court_time'
     value = Column(Boolean)
 
     def __init__(self, vdvid, propid, value):

@@ -9,7 +9,7 @@ from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
 from vdv.Entities.EntityCourt import EntityCourt
 
-from vdv.Prop.PropBool import PropBool
+
 from vdv.Prop.PropMedia import PropMedia
 from vdv.Prop.PropPost import PropPost
 

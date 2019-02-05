@@ -7,6 +7,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
+from vdv.Entities.EntityTime import EntityTime
+from vdv.Prop.PropCourtTime import PropCourtTime
 
 from vdv.Prop.PropEquipment import PropEquipment
 from vdv.Prop.PropMedia import PropMedia
@@ -16,6 +18,16 @@ from vdv.Prop.PropSport import PropSport
 from vdv.db import DBConnection
 
 Base = declarative_base()
+
+
+def create_times(s, _vdvid, _id, _val, _uid):
+    for _ in _val:
+        times = EntityTime.get().filter_by(time=_).all()
+        if times:
+            id = times[0].vdvid
+        if not times:
+            id = EntityTime(_).add()
+        PropCourtTime(_vdvid, _id, id).add(session=s, no_commit=True)
 
 class EntityCourt(EntityBase, Base):
     __tablename__ = 'vdv_court'
@@ -48,6 +60,15 @@ class EntityCourt(EntityBase, Base):
         ts = time.time()
         self.request_time = self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
 
+    def create_times(s, _vdvid, _id, _val, _uid):
+        for _ in _val:
+            times = EntityTime.get().filter_by(time=_).all()
+            if times:
+                id = times[0].vdvid
+            if not times:
+                id = EntityTime(_).add()
+            PropCourtTime(_vdvid, _id, id).add(session=s, no_commit=True)
+
     @classmethod
     def add_from_json(cls, data):
         PROPNAME_MAPPING = EntityProp.map_name_id()
@@ -66,7 +87,10 @@ class EntityCourt(EntityBase, Base):
                                                     for _ in _val],
             'sport':
                 lambda s, _vdvid, _id, _val, _uid: [PropSport(_vdvid, _id, _).add(session=s, no_commit=True)
-                                                    for _ in _val]
+                                                    for _ in _val],
+            'court_time':
+                lambda s, _vdvid, _id, _val, _uid: cls.create_times(s, _vdvid, _id, _val, _uid)
+
         }
 
         if 'ownerid' in data and 'name' in data and 'time_begin' in data and 'time_end':
@@ -103,6 +127,13 @@ class EntityCourt(EntityBase, Base):
 
         return vdvid
 
+    def update_times(s, _vdvid, _id, _val, _uid):
+        times_court = PropCourtTime.get().filter_by(vdvid = _vdvid).all()
+        for _ in times_court:
+            PropCourtTime.delete_value(_.value)
+        create_times(s, _vdvid, _id, _val, _uid)
+
+
     @classmethod
     def update_from_json(cls, data):
         def process_avatar(s, _vdvid, _id, _val):
@@ -125,7 +156,9 @@ class EntityCourt(EntityBase, Base):
                                                     for _ in _val],
             'sport':
                 lambda s, _vdvid, _id, _val, _uid: [PropSport(_vdvid, _id, _).update(session=s, no_commit=True)
-                                                    for _ in _val]
+                                                    for _ in _val],
+            'court_time':
+                lambda s, _vdvid, _id, _val, _uid: cls.update_times(s, _vdvid, _id, _val, _uid)
         }
 
         if 'id' in data:
@@ -133,7 +166,7 @@ class EntityCourt(EntityBase, Base):
                 vdvid = data['id']
                 entity = session.db.query(EntityCourt).filter_by(vdvid=vdvid).all()
                 if len(entity) == 0:
-                    vdvid = -1  # No user with givven id
+                    vdvid = -1  # No user with given id
                 if len(entity):
                     for _ in entity:
                         if 'ownerid' in data:
@@ -157,7 +190,7 @@ class EntityCourt(EntityBase, Base):
                         if 'prop' in data:
                             for prop_name, prop_val in data['prop'].items():
                                 if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                                    PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
+                                    PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, 0)
 
                         session.db.commit()
 
@@ -171,7 +204,8 @@ class EntityCourt(EntityBase, Base):
             'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
             'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
             'equipment': lambda _vdvid, _id: PropEquipment.get_object_property(_vdvid, _id),
-            'sport': lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id)
+            'sport': lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id),
+            'court_time': lambda _vdvid, _id: [str(EntityTime.get().filter_by(vdvid = _).all()[0].time) for _ in PropCourtTime.get_object_property(_vdvid, _id)]
         }
 
         result = {

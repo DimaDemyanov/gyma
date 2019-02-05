@@ -12,7 +12,7 @@ from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityProp import EntityProp
 from vdv.Entities.EntityPost import EntityPost
 
-from vdv.Prop.PropBool import PropBool
+
 from vdv.Prop.PropLocation import PropLocation
 from vdv.Prop.PropReal import PropReal
 from vdv.Prop.PropPost import PropPost

@@ -246,7 +246,7 @@
           "court",
           "court API"
         ],
-        "summary": "Create a new court",
+        "summary": "Create a new court(ready)",
         "description": "",
         "operationId": "createCourt",
         "consumes": [
@@ -291,7 +291,7 @@
           "court",
           "court API"
         ],
-        "summary": "Update existing catalog info",
+        "summary": "Update existing catalog info(ready)",
         "description": "",
         "operationId": "updateCourt",
         "consumes": [
@@ -334,7 +334,7 @@
         "tags": [
           "court"
         ],
-        "summary": "Get all courts",
+        "summary": "Get all courts(ready)",
         "description": "Returns a list of courts descriptions",
         "operationId": "getAllCourts",
         "produces": [
@@ -361,7 +361,7 @@
           "court",
           "court API"
         ],
-        "summary": "Find court by ID",
+        "summary": "Find court by ID(ready)",
         "description": "Returns a court description",
         "operationId": "getCourtById",
         "produces": [
@@ -402,7 +402,7 @@
           "court",
           "court API"
         ],
-        "summary": "Remove court",
+        "summary": "Remove court(ready)",
         "description": "",
         "operationId": "deleteCourt",
         "produces": [
@@ -446,7 +446,7 @@
           "user",
           "user API"
         ],
-        "summary": "Create a new account",
+        "summary": "Create a new account(ready)",
         "description": "",
         "operationId": "createAccount",
         "consumes": [
@@ -491,7 +491,7 @@
           "user",
           "user API"
         ],
-        "summary": "Update existing catalog info !!  ID required",
+        "summary": "Update existing catalog info(ready)",
         "description": "",
         "operationId": "updateUser",
         "consumes": [
@@ -534,7 +534,7 @@
         "tags": [
           "user"
         ],
-        "summary": "Get all users",
+        "summary": "Get all users(ready)",
         "description": "Returns a list of courts descriptions",
         "operationId": "getAllUsers",
         "produces": [
@@ -561,7 +561,7 @@
           "user",
           "user API"
         ],
-        "summary": "Get my user info",
+        "summary": "Get my user info(ready)",
         "description": "Returns an info of currently authorized user",
         "operationId": "getMyUser",
         "produces": [
@@ -588,7 +588,7 @@
           "user",
           "user API"
         ],
-        "summary": "Find user by ID",
+        "summary": "Find user by ID(ready)",
         "description": "Returns a user description",
         "operationId": "getUser",
         "produces": [
@@ -629,7 +629,7 @@
           "user",
           "user API"
         ],
-        "summary": "Remove court",
+        "summary": "Remove court(ready)",
         "description": "deleteUser (can only be applied to authorized user)",
         "operationId": "deleteUser",
         "produces": [
@@ -673,7 +673,7 @@
           "special users API",
           "special users"
         ],
-        "description": "Create a landlord",
+        "description": "Create a landlord(ready)",
         "operationId": "createLandlord",
         "consumes": [
           "application/json"
@@ -956,7 +956,7 @@
         "tags": [
           "media"
         ],
-        "summary": "Create a new media item",
+        "summary": "Create a new media item(ready)",
         "description": "",
         "operationId": "createMedia",
         "consumes": [
@@ -1022,7 +1022,7 @@
         "tags": [
           "media"
         ],
-        "summary": "Get all courts",
+        "summary": "Get all courts(ready)",
         "description": "Returns a list of owners media descriptors",
         "operationId": "getAllOwnerMedias",
         "produces": [
@@ -1058,7 +1058,7 @@
         "tags": [
           "media"
         ],
-        "summary": "Get media by ID",
+        "summary": "Get media by ID(ready)",
         "description": "Returns a media item",
         "operationId": "getMedia",
         "produces": [
@@ -1135,7 +1135,7 @@
           "location",
           "location API"
         ],
-        "summary": "Create a new location",
+        "summary": "Create a new location(ready)",
         "description": "",
         "operationId": "createLocation",
         "consumes": [
@@ -1182,7 +1182,7 @@
           "location",
           "location API"
         ],
-        "summary": "Get all locations",
+        "summary": "Get all locations(ready)",
         "description": "Returns a list of locations descriptions",
         "operationId": "getAllLocations",
         "produces": [
@@ -1209,7 +1209,7 @@
           "location",
           "location API"
         ],
-        "summary": "Find location by ID",
+        "summary": "Find location by ID(ready)",
         "description": "Returns a location data",
         "operationId": "getLocationById",
         "produces": [
@@ -1249,7 +1249,7 @@
         "tags": [
           "location"
         ],
-        "summary": "Remove location",
+        "summary": "Remove location(ready)",
         "description": "",
         "operationId": "deleteLocation",
         "produces": [
@@ -1713,7 +1713,7 @@
         "tags": [
           "sport"
         ],
-        "summary": "Create a new sport",
+        "summary": "Create a new sport(ready)",
         "description": "",
         "operationId": "createSport",
         "consumes": [
@@ -1753,12 +1753,11 @@
           }
         ]
       },
-
       "get": {
         "tags": [
           "sport"
         ],
-        "summary": "Find all available sports",
+        "summary": "Find all available sports(ready)",
         "description": "Returns a sports data",
         "operationId": "getSports",
         "produces": [
@@ -1784,7 +1783,7 @@
         "tags": [
           "sport"
         ],
-        "summary": "Find sport by ID",
+        "summary": "Find sport by ID(ready)",
         "description": "Returns a sport description",
         "operationId": "getSportById",
         "produces": [
@@ -1824,7 +1823,7 @@
         "tags": [
           "sport"
         ],
-        "summary": "Remove sport",
+        "summary": "Remove sport(ready)",
         "description": "",
         "operationId": "deleteSport",
         "produces": [
@@ -1913,7 +1912,7 @@
         "tags": [
           "login"
         ],
-        "summary": "Send validation key on phone",
+        "summary": "Send validation key on phone(ready)",
         "description": "",
         "operationId": "sendkey",
         "consumes": [
@@ -1956,7 +1955,7 @@
         "tags": [
           "login"
         ],
-        "summary": "Check key and generate token",
+        "summary": "Check key and generate token(ready)",
         "operationId": "validate",
         "consumes": [
           "application/x-www-form-urlencoded"
@@ -2002,7 +2001,7 @@
   },
   "securityDefinitions": {
     "auth_env": {
-      "type" : "apiKey",
+      "type": "apiKey",
       "in": "header",
       "name": "API-Token"
     }
@@ -2025,7 +2024,7 @@
         },
         "phone": {
           "type": "string",
-          "example": "9315839083"
+          "example": "79315839083"
         },
         "mediaid": {
           "type": "integer",
@@ -2067,6 +2066,13 @@
         "money": {
           "type": "integer",
           "format": "int32"
+        },
+        "isentity": {
+          "type": "boolean"
+        },
+        "company": {
+          "type": "string",
+          "example": "Fitness house"
         }
       }
     },
@@ -2144,6 +2150,13 @@
             "location": {
               "type": "integer",
               "example": 0
+            },
+            "court_time": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "example": "2019-01-30 19:00:00+00"
+              }
             }
           }
         }
@@ -2400,7 +2413,7 @@
         },
         "name": {
           "type": "string",
-          "example": "Footboll // English only("
+          "example": "Footboll"
         }
       }
     },
@@ -2416,7 +2429,7 @@
         },
         "name": {
           "type": "string",
-          "example": "Ball // English only("
+          "example": "Ball"
         }
       }
     },

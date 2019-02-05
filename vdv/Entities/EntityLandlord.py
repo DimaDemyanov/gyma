@@ -2,14 +2,13 @@ from collections import OrderedDict
 import time
 import datetime
 
-from sqlalchemy import Column, String, Integer, Date, Sequence
+from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
 from vdv.Entities.EntityCourt import EntityCourt
 
-from vdv.Prop.PropBool import PropBool
 from vdv.Prop.PropMedia import PropMedia
 from vdv.Prop.PropPost import PropPost
 
@@ -25,24 +24,30 @@ class EntityLandlord(EntityBase, Base):
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     accountid = Column(Integer)
     money = Column(Integer)
+    isentity = Column(Boolean)
+    company = Column(String)
     # Добавить поля password, is_admin, is_arendo
 
     json_serialize_items_list = ['vdvid', 'accountid', 'money']
 
-    def __init__(self, accountid, money):
+    def __init__(self, accountid, money, isentity, company):
         super().__init__()
         self.accountid = accountid
         self.money = money
+        self.isentity = isentity
+        self.company = company
 
     @classmethod
     def add_from_json(cls, data):
 
         vdvid = None
-        if 'accountid' in data and 'money' in data:
+        if 'accountid' in data and 'money' and 'isentity' in data:
             accountid = data['accountid']
             money = data['money']
-
-            new_entity = EntityLandlord(accountid, money)
+            isentity = data['isentity']
+            if 'company' in data:
+                company = data['company']
+            new_entity = EntityLandlord(accountid, money, isentity, company)
             vdvid = new_entity.add()
 
         try:

@@ -685,20 +685,20 @@ def getMyUser(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    e_mail = req.context['phone']
-    id = EntityAccount.get_id_from_email(e_mail)
+    phone = req.context['phone']
+    id = EntityAccount.get_id_from_phone(phone)
 
     objects = EntityAccount.get().filter_by(vdvid=id).all()
 
     # TODO: LIMIT the posts output counts with a paging
-    wide_info = EntityAccount.get_wide_object(id, ['private', 'avatar', 'post'])
+    wide_info = EntityAccount.get_wide_object(id)
 
-    wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
-    followings = EntityFollow.get().filter_by(vdvid=id).all()
-    wide_info['is_me'] = True
-    wide_info['followed'] = False
-    wide_info['following_amount'] = len(followings)
-    wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
+    # wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
+    # followings = EntityFollow.get().filter_by(vdvid=id).all()
+    # wide_info['is_me'] = True
+    # wide_info['followed'] = False
+    # wide_info['following_amount'] = len(followings)
+    # wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
 
     res = []
     for _ in objects:
@@ -1362,7 +1362,7 @@ def sendkey(**request_handler_args):
 
 
     phone = post_data['phone'][0]
-    if (phone != '9110001122'):
+    if (phone != '79110001122'):
         accounts = EntityAccount.get().filter_by(phone = phone).all()
         if not accounts:
             resp.status = falcon.HTTP_411
@@ -1389,7 +1389,18 @@ def sendkey(**request_handler_args):
                        'time_send' : curr_time.strftime('%Y-%m-%d %H:%M')
                     }
 
+
+
                     EntityValidation.update(data = data)
+
+                    data = {
+                        'code': key,
+                        'times_a_day': 1 if validation.time_send.year != curr_time.year  \
+                    or validation.time_send.month != curr_time.month \
+                    or validation.time_send.day != curr_time.day else 2,
+                        'time_send': curr_time.strftime('%Y-%m-%d %H:%M'),
+                        'accountid': accountid
+                    }
 
                     r = requests.get('https://smsc.ru/sys/send.php', params=data)
                 else:
@@ -1410,7 +1421,7 @@ def sendkey(**request_handler_args):
             data = {'login' : sms_login,
                     'psw' : sms_pswd,
                     'phones' : phone,
-                    'mes' : key
+                    'mes' : 'GYMA key: ' + key
                     }
             r = requests.get('https://smsc.ru/sys/send.php', params = data)
             print(r.json)
@@ -1622,15 +1633,16 @@ class Auth(object):
                 payload = jwt.decode(jwt_token, JWT_PUBLIC_KEY,
                                      algorithms=[JWT_SIGN_ALGORITHM])
                 id = EntityAccount.get_id_from_phone(phone=payload.get("phone"))
-                if id < 0:
+                if not id:
                     raise Exception("No user with given token's phone")
                 req.context['phone'] = payload.get('phone')
             except (jwt.DecodeError, jwt.ExpiredSignatureError):
-                return falcon.HTTPUnauthorized(description="Something goes wrong",
+                return falcon.HTTPUnauthorized(description=error,
                                                challenges=['Bearer realm=http://GOOOOGLE'])
             return
 
-        if re.match('/vdv/user'):
+        if re.match('/vdv/user',
+                    req.relative_uri):
 
             return  # passed access token is valid
 

@@ -60,7 +60,7 @@
     },
     {
       "name": "dev",
-      "server_host": "vdv.itsociety.su:4201",
+      "server_host": "vdv.itsociety.su:4203",
       "swagger_port": "8081",
       "api_port": "4201",
       "vdv_db": {
@@ -83,6 +83,10 @@
           "user_info_url": "https://www.googleapis.com/plus/v1/people/me",
           "check_token_url": "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token="
         }
+      },
+      "smsservice": {
+        "login": "dm1024",
+        "password": "dm120397"
       }
     },
     {

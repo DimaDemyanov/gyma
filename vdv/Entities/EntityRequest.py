@@ -7,7 +7,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
 
-from vdv.Prop.PropBool import PropBool
 from vdv.Prop.PropMedia import PropMedia
 from vdv.Prop.PropPost import PropPost
 
@@ -21,7 +20,7 @@ class EntityRequest(EntityBase, Base):
     __tablename__ = 'vdv_request'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
-    userid = Column(Integer)
+    ownerid = Column(Integer)
     time_begin = Column(Date)
     time_end = Column(Date)
 

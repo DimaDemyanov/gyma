@@ -5,10 +5,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
 
-from vdv.Prop.PropSport import PropSport
-from vdv.Prop.PropBool import PropBool
-from vdv.Prop.PropMedia import PropMedia
-from vdv.Prop.PropPost import PropPost
 
 from vdv.db import DBConnection
 
