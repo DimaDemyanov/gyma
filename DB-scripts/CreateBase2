@@ -1,7 +1,7 @@
 
 
 DROP TYPE IF EXISTS vdv_prop_type CASCADE;
-CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request', 'equipment', 'sport');
+CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request', 'equipment', 'sport', 'court_time');
 
 DROP TABLE IF EXISTS "vdv_prop";
 CREATE TABLE "vdv_prop" (
@@ -15,6 +15,7 @@ CREATE TABLE "vdv_prop" (
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'location', 'location');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'equipment', 'equipment');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'sport', 'sport');
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'court_time', 'court_time');
 
 DROP SEQUENCE IF EXISTS vdv_seq;
 CREATE SEQUENCE vdv_seq start with 1 increment by 1;
@@ -40,6 +41,31 @@ WITH (
 );
 
 ALTER TABLE "vdv_media" OWNER TO "postgres";
+
+DROP TABLE IF EXISTS "vdv_prop_media" CASCADE;
+
+CREATE TABLE "vdv_prop_media" (
+	"vdvid" int8 NOT NULL,
+	"propid" int8 NOT NULL,
+	"value" int8 NOT NULL,
+	CONSTRAINT "Ref_vdv_prop_media_to_vdv_court" FOREIGN KEY ("vdvid")
+		REFERENCES "vdv_court"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE,
+	CONSTRAINT "Ref_vdv_prop_media_to_vdv_media" FOREIGN KEY ("value")
+		REFERENCES "vdv_media"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+)
+WITH (
+	OIDS = False
+);
+
+ALTER TABLE "vdv_prop_media" OWNER TO "postgres";
 
 DROP TABLE IF EXISTS "vdv_account" CASCADE;
 
@@ -86,6 +112,8 @@ CREATE TABLE "vdv_landlord" (
 	"vdvid" BIGSERIAL NOT NULL,
 	"accountid" int8,
 	"money" int4,
+	"is_entity" bool,
+	"company" varchar(256),
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_landlord_to_vdv_account" FOREIGN KEY ("accountid")
 		REFERENCES "vdv_account"("vdvid")
@@ -152,7 +180,7 @@ CREATE TABLE "vdv_prop_location" (
 	"vdvid" int8 NOT NULL,
 	"propid" int8 NOT NULL,
 	"value" int8 NOT NULL,
-	CONSTRAINT "vdv_prop_location_pkey" PRIMARY KEY("vdvid","propid","value"),
+	CONSTRAINT "vdv_prop_location_pkey" PRIMARY KEY("vdvid","value"),
 	CONSTRAINT "Ref_vdv_prop_location_to_vdv_location" FOREIGN KEY ("vdvid")
 		REFERENCES "vdv_location"("vdvid")
 	MATCH SIMPLE
@@ -185,9 +213,8 @@ DROP TABLE IF EXISTS "vdv_prop_sport" CASCADE;
 
 CREATE TABLE "vdv_prop_sport" (
 	"value" int8,
+	"vdvid" int8,
 	"propid" int8 NOT NULL,
-	"vdvid" int8 NOT NULL,
-	PRIMARY KEY("propid"),
 	CONSTRAINT "Ref_vdv_prop_sport_to_vdv_sport" FOREIGN KEY ("value")
 		REFERENCES "vdv_sport"("vdvid")
 	MATCH SIMPLE
@@ -201,7 +228,6 @@ CREATE TABLE "vdv_prop_sport" (
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE
 );
-
 DROP TABLE IF EXISTS "vdv_equipment" CASCADE;
 
 CREATE TABLE "vdv_equipment" (
@@ -216,7 +242,6 @@ CREATE TABLE "vdv_prop_equipment" (
 	"value" int8,
 	"propid" int8 NOT NULL,
 	"vdvid" int8 NOT NULL,
-	PRIMARY KEY("propid"),
 	CONSTRAINT "Ref_vdv_prop_equipment_to_vdv_court" FOREIGN KEY ("vdvid")
 		REFERENCES "vdv_court"("vdvid")
 	MATCH SIMPLE
@@ -230,6 +255,36 @@ CREATE TABLE "vdv_prop_equipment" (
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE
 );
+
+
+DROP TABLE IF EXISTS "vdv_time" CASCADE;
+
+CREATE TABLE "vdv_time" (
+	"vdvid" int8 NOT NULL,
+	"time" time with time zone,
+	PRIMARY KEY("vdvid")
+);
+
+DROP TABLE IF EXISTS "vdv_prop_court_time" CASCADE;
+
+CREATE TABLE "vdv_prop_court_time" (
+	"propid" int8 NOT NULL,
+	"value" int8,
+	"vdvid" int8,
+	CONSTRAINT "Ref_vdv_prop_court_time_to_vdv_court" FOREIGN KEY ("vdvid")
+		REFERENCES "vdv_court"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE,
+	CONSTRAINT "Ref_vdv_prop_court_time_to_vdv_time" FOREIGN KEY ("value")
+		REFERENCES "vdv_time"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
+
 
 INSERT INTO vdv_account (vdvid, name, phone, account_type) VALUES (1000, 'tester', '9110001122', 'landlord');
 INSERT INTO vdv_validation (vdvid, accountid, code) VALUES (NEXTVAL('vdv_seq'), 1000, 10000);
