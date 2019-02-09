@@ -51,7 +51,7 @@ from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
 JWT_SIGN_ALGORITHM = 'HS256'
 JWT_PUBLIC_KEY = 'secretterces123'
-JWT_EXP_TIME = 3600
+JWT_EXP_TIME = 24 * 3600
 
 
 def stringToBool(str):
@@ -224,20 +224,17 @@ def createRequest(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    try:
-        e_mail = req.context['phone']
-    except:
-        resp.status = falcon.HTTP_400
+    phone = req.context['phone']
 
     params = json.loads(req.stream.read().decode('utf-8'))
-    try:
-        id = EntityRequest.add_from_json(params)
-    except:
-        resp.status = falcon.HTTP_412
-        return
+    # try:
+    id = EntityRequest.add_from_json(params)
+    # except:
+    #     resp.status = falcon.HTTP_412
+    #     return
     if id:
-        objects = EntityRequest.get().filter_by(vdvid=id).all()
-        resp.body = obj_to_json(objects[0].to_dict())
+        objects = EntityRequest.get().filter_by(requestid=id).all()
+        resp.body = obj_to_json([object.to_dict() for object in objects])
         resp.status = falcon.HTTP_200
 
 
@@ -477,6 +474,26 @@ def getCourtById(**request_handler_args):
     resp.body = obj_to_json(res)
     resp.status = falcon.HTTP_200
 
+def getCourtByLandlordId(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('landlordId', **request_handler_args)
+    objects = EntityCourt.get().filter_by(ownerid=id).all()
+
+    phone = req.context['phone']
+
+    wide_info = EntityCourt.get_wide_object(id)
+
+    res = []
+    for _ in objects:
+        obj_dict = _.to_dict()
+
+        obj_dict.update(wide_info)
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res)
+    resp.status = falcon.HTTP_200
 
 def easyCreateCourt(**request_handler_args):
     req = request_handler_args['req']
@@ -542,21 +559,22 @@ def createCourt(**request_handler_args):
     try:
         e_mail = req.context['phone']
     except:
-        resp.status = falcon.HTTP_400
-
-    params = json.loads(req.stream.read().decode('utf-8'))
-    params['ispublished'] = False
+        resp.status = falcon.HTTP_401
     try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        params['ispublished'] = False
         id = EntityCourt.add_from_json(params)
     except Exception as e:
         logger.info(e)
-        resp.status = falcon.HTTP_412
+        resp.status = falcon.HTTP_405
         return
     if id:
         objects = EntityCourt.get().filter_by(vdvid=id).all()
 
         resp.body = obj_to_json([o.to_dict() for o in objects])
         resp.status = falcon.HTTP_200
+        return
+    resp.status = falcon.HTTP_406
 
 
 def updateCourt(**request_handler_args):
@@ -1441,14 +1459,14 @@ def sendkey(**request_handler_args):
 
                     EntityValidation.update(data = data)
 
-                    data = {
-                        'code': key,
-                        'times_a_day': 1 if validation.time_send.year != curr_time.year  \
-                    or validation.time_send.month != curr_time.month \
-                    or validation.time_send.day != curr_time.day else 2,
-                        'time_send': curr_time.strftime('%Y-%m-%d %H:%M'),
-                        'accountid': accountid
-                    }
+                    sms_login = cfg['smsservice']['login']
+                    sms_pswd = cfg['smsservice']['password']
+
+                    data = {'login': sms_login,
+                            'psw': sms_pswd,
+                            'phones': phone,
+                            'mes': str('GYMA:' + str(key))
+                            }
 
                     r = requests.get('https://smsc.ru/sys/send.php', params=data)
                 else:
@@ -1469,7 +1487,7 @@ def sendkey(**request_handler_args):
             data = {'login' : sms_login,
                     'psw' : sms_pswd,
                     'phones' : phone,
-                    'mes' : 'GYMA key: ' + key
+                    'mes' : 'GYMA key: ' + str(key)
                     }
             r = requests.get('https://smsc.ru/sys/send.php', params = data)
             print(r.json)
@@ -1570,6 +1588,7 @@ operation_handlers = {
     # Court methods
     'getAllCourts': [getAllCourts],
     'getCourtById': [getCourtById],
+    'getCourtByLandlordId': [getCourtByLandlordId],
     'createCourt': [createCourt],
     'updateCourt': [updateCourt],
     'deleteCourt': [deleteCourt],

@@ -2,66 +2,94 @@ from collections import OrderedDict
 import time
 import datetime
 
-from sqlalchemy import Column, String, Integer, Date, Sequence
+from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
+
 from vdv.Entities.EntityBase import EntityBase
+from vdv.Entities.EntityProp import EntityProp
+from vdv.Entities.EntityTime import EntityTime
+
+from vdv.Prop.PropCourtTime import PropCourtTime
 
 from vdv.Prop.PropMedia import PropMedia
 from vdv.Prop.PropPost import PropPost
+from vdv.Prop.PropRequestTime import PropRequestTime
 
 from vdv.db import DBConnection
 
 Base = declarative_base()
 
-
+def to_request_times(s, _vdvid, _id, _val, _uid):
+    for _ in _val:
+        times = EntityTime.get().filter_by(time=_).all()
+        if times:
+            id = times[0].vdvid
+        if not times:
+            raise Exception('No time for request')
+        pid = PropCourtTime.get().filter_by(vdvid = _vdvid).filter_by(value = id).all()
+        s.db.delete(_ for _ in pid)
+        PropRequestTime(_vdvid, _id, id).add(session=s, no_commit=True)
 
 class EntityRequest(EntityBase, Base):
     __tablename__ = 'vdv_request'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
-    ownerid = Column(Integer)
-    time_begin = Column(Date)
-    time_end = Column(Date)
+    accountid = Column(Integer)
+    courtid = Column(Integer)
+    isconfirmed = Column(Boolean)
+    ownertype = Column(String)
+    requestid = Column(Integer)
 
 
-    json_serialize_items_list = ['vdvid','userid', 'time_begin', 'time_end']
+    json_serialize_items_list = ['vdvid','accountid', 'courtid', 'isconfirmed', 'ownertype']
 
-    def __init__(self,userid, time_begin, time_end):
+    def __init__(self, accountid, courtid, ownertype, requestid):
         super().__init__()
-
-        self.userid =  userid
-        self.time_begin = time_begin
-        self.time_end = time_end
+        self.accountid = accountid
+        self.courtid = courtid
+        self.ownertype = ownertype
+        self.requestid = requestid
 
     @classmethod
-    def add_from_json(cls, data):
+    def add_from_json(cls, datas):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
         vdvid = None
 
-        if 'time_begin' in data and 'time_end' and 'userid' in data:
-            time_begin = data['time_begin']
-            time_end = data['time_end']
+        PROP_MAPPING = {
+            'court_time':
+                lambda s, _vdvid, _id, _val, _uid: to_request_times(s, _vdvid, _id, _val, _uid)
 
-            new_entity = EntityRequest(time_begin, time_end)
-            vdvid = new_entity.add()
+        }
 
-            try:
-                with DBConnection() as session:
-                    # for prop_name, prop_val in data['prop'].items():
-                    #     if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                    #         PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, vdvid)
-                    #     else:
-                    #         EntityAccount.delete(vdvid)
-                    #         raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
-                    #                         (prop_name, str(PROPNAME_MAPPING)))
+        with DBConnection() as session:
+            requestid = session.db.execute(Sequence('vdv_req'))
 
-                    session.db.commit()
-            except Exception as e:
-                EntityRequest.delete(vdvid)
-                raise Exception('Internal error')
-        else:
-            raise Exception('Validation exception')
-        return vdvid
+        for data in datas:
+
+            if 'accountid' in data and 'courtid' in data and 'ownertype' in data:
+                accountid = data['accountid']
+                courtid = data['courtid']
+                ownertype = data['ownertype']
+
+                new_entity = EntityRequest(accountid, courtid, ownertype, requestid)
+                vdvid = new_entity.add()
+
+                if 'prop' in data:
+                    with DBConnection() as session:
+                        for prop_name, prop_val in data['prop'].items():
+                            if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
+                                PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, accountid)
+                            else:
+                                new_entity.delete(vdvid)
+                                raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
+                                                (prop_name, str(PROPNAME_MAPPING)))
+
+                        session.db.commit()
+            else:
+                raise Exception('Validation exception')
+        return requestid
 
     @classmethod
     def update_from_json(cls, data):

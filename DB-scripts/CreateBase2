@@ -16,9 +16,13 @@ INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'location',
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'equipment', 'equipment');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'sport', 'sport');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'court_time', 'court_time');
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'media', 'media');
 
 DROP SEQUENCE IF EXISTS vdv_seq;
 CREATE SEQUENCE vdv_seq start with 1 increment by 1;
+
+DROP SEQUENCE IF EXISTS vdv_req;
+CREATE SEQUENCE vdv_req start with 1 increment by 1;
 
 DROP TYPE IF EXISTS vdv_media_type CASCADE;
 CREATE TYPE vdv_media_type AS ENUM ('image', 'equipment');
@@ -112,7 +116,7 @@ CREATE TABLE "vdv_landlord" (
 	"vdvid" BIGSERIAL NOT NULL,
 	"accountid" int8,
 	"money" int4,
-	"is_entity" bool,
+	"isentity" bool,
 	"company" varchar(256),
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_landlord_to_vdv_account" FOREIGN KEY ("accountid")
@@ -166,7 +170,6 @@ CREATE TABLE "vdv_location" (
 	"latitude" float4 NOT NULL,
 	"longitude" float4 NOT NULL,
 	CONSTRAINT "vdv_location_pkey" PRIMARY KEY("vdvid"),
-	CONSTRAINT "vdv_location_name_key" UNIQUE("name")
 )
 WITH (
 	OIDS = False
@@ -180,15 +183,15 @@ CREATE TABLE "vdv_prop_location" (
 	"vdvid" int8 NOT NULL,
 	"propid" int8 NOT NULL,
 	"value" int8 NOT NULL,
-	CONSTRAINT "vdv_prop_location_pkey" PRIMARY KEY("vdvid","value"),
-	CONSTRAINT "Ref_vdv_prop_location_to_vdv_location" FOREIGN KEY ("vdvid")
-		REFERENCES "vdv_location"("vdvid")
+	CONSTRAINT "vdv_prop_location_pkey" PRIMARY KEY("vdvid","propid","value"),
+	CONSTRAINT "Ref_vdv_prop_location_to_vdv_court" FOREIGN KEY ("vdvid")
+		REFERENCES "vdv_court"("vdvid")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE,
-	CONSTRAINT "Ref_vdv_prop_location_to_vdv_court" FOREIGN KEY ("value")
-		REFERENCES "vdv_court"("vdvid")
+	CONSTRAINT "Ref_vdv_prop_location_to_vdv_location" FOREIGN KEY ("value")
+		REFERENCES "vdv_location"("vdvid")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
@@ -199,7 +202,7 @@ WITH (
 );
 
 ALTER TABLE "vdv_prop_location" OWNER TO "postgres";
-
+    
 DROP TABLE IF EXISTS "vdv_sport" CASCADE;
 
 CREATE TABLE "vdv_sport" (
@@ -285,6 +288,50 @@ CREATE TABLE "vdv_prop_court_time" (
 	NOT DEFERRABLE
 );
 
+DROP TABLE IF EXISTS "vdv_request" CASCADE;
 
-INSERT INTO vdv_account (vdvid, name, phone, account_type) VALUES (1000, 'tester', '9110001122', 'landlord');
+CREATE TABLE "vdv_request" (
+	"vdvid" int8 NOT NULL,
+	"accountid" int8 NOT NULL,
+	"courtid" int8,
+	"isconfirmed" bool,
+	"ownertype" varchar(40),
+	"requestid" int8,
+	PRIMARY KEY("vdvid"),
+	CONSTRAINT "Ref_vdv_request_to_vdv_account" FOREIGN KEY ("accountid")
+		REFERENCES "vdv_account"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE,
+	CONSTRAINT "Ref_vdv_request_to_vdv_court" FOREIGN KEY ("courtid")
+		REFERENCES "vdv_court"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
+
+DROP TABLE IF EXISTS "vdv_prop_request_time" CASCADE;
+
+CREATE TABLE "vdv_prop_request_time" (
+	"propid" int8 NOT NULL,
+	"value" int8,
+	"vdvid" int8,
+	PRIMARY KEY("propid"),
+	CONSTRAINT "Ref_vdv_prop_request_time_to_vdv_request" FOREIGN KEY ("vdvid")
+		REFERENCES "vdv_request"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE,
+	CONSTRAINT "Ref_vdv_prop_request_time_to_vdv_time" FOREIGN KEY ("value")
+		REFERENCES "vdv_time"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
+
+INSERT INTO vdv_account (vdvid, name, phone, account_type) VALUES (1000, 'tester', '79110001122', 'landlord');
 INSERT INTO vdv_validation (vdvid, accountid, code) VALUES (NEXTVAL('vdv_seq'), 1000, 10000);

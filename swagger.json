@@ -56,30 +56,6 @@
       }
     },
     {
-      "name": "like API",
-      "description": "Unlocked like API functions",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
-      "name": "search API",
-      "description": "Unlocked search API functions",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
-      "name": "comment API",
-      "description": "Unlocked comment API functions",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
       "name": "court",
       "description": "Everything about court",
       "externalDocs": {
@@ -138,30 +114,6 @@
     {
       "name": "location",
       "description": "Everything about locations",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
-      "name": "search",
-      "description": "Everything about search",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
-      "name": "like",
-      "description": "Everything about like",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
-      "name": "comment",
-      "description": "Everything about comment",
       "externalDocs": {
         "description": "Find out more",
         "url": "http://swagger.io"
@@ -440,6 +392,51 @@
         ]
       }
     },
+    "/court/landlord/{landlordId}": {
+      "get": {
+        "tags": [
+          "court",
+          "court API"
+        ],
+        "summary": "Find court by landlord ID(ready)",
+        "description": "Returns a court description",
+        "operationId": "getCourtByLandlordId",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "landlordId",
+            "in": "path",
+            "description": "ID of landlord to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Court"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Landlord not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+
+
     "/user": {
       "post": {
         "tags": [
@@ -673,7 +670,8 @@
           "special users API",
           "special users"
         ],
-        "description": "Create a landlord(ready)",
+        "summary": "Create a landlord(ready)",
+        "description": "Create a landlord",
         "operationId": "createLandlord",
         "consumes": [
           "application/json"
@@ -787,7 +785,6 @@
     "/request": {
       "post": {
         "tags": [
-          "request",
           "request API"
         ],
         "summary": "Create a new request",
@@ -1280,434 +1277,6 @@
         ]
       }
     },
-    "/search": {
-      "post": {
-        "tags": [
-          "search",
-          "search API"
-        ],
-        "summary": "Request search",
-        "description": "",
-        "operationId": "search",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "json",
-            "in": "body",
-            "description": "Search encoded in JSON string",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Search"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/like": {
-      "post": {
-        "tags": [
-          "like",
-          "like API"
-        ],
-        "summary": "Create a new like",
-        "description": "",
-        "operationId": "createLike",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "new_like",
-            "in": "body",
-            "description": "Like encoded in JSON string",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Like"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          },
-          "405": {
-            "description": "Validation exception"
-          },
-          "422": {
-            "description": "Like already given"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "like",
-          "like API"
-        ],
-        "summary": "Update existing catalog info",
-        "description": "",
-        "operationId": "updateLike",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "new_like",
-            "in": "body",
-            "description": "Like encoded in JSON string",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Like"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Post not found"
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/like/all": {
-      "get": {
-        "tags": [
-          "like"
-        ],
-        "summary": "Get all likes",
-        "description": "Returns a list of likes descriptions",
-        "operationId": "getAllLikes",
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/like/{likeId}": {
-      "get": {
-        "tags": [
-          "like"
-        ],
-        "summary": "Find location by ID",
-        "description": "Returns a like data",
-        "operationId": "getLikeById",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "likeId",
-            "in": "path",
-            "description": "ID of like to return",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/Like"
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Like not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "like",
-          "like API"
-        ],
-        "summary": "Remove like",
-        "description": "",
-        "operationId": "deleteLike",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "likeId",
-            "in": "path",
-            "description": "Court id to unlink",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Like not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/comment": {
-      "post": {
-        "tags": [
-          "comment",
-          "comment API"
-        ],
-        "summary": "Create a new comment",
-        "description": "",
-        "operationId": "createComment",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "new_comment",
-            "in": "body",
-            "description": "Comment encoded in JSON string",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Comment"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          },
-          "405": {
-            "description": "Validation exception"
-          },
-          "412": {
-            "description": "Name already taken"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "comment",
-          "comment API"
-        ],
-        "summary": "Update existing catalog info",
-        "description": "",
-        "operationId": "updateComment",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "new_comment",
-            "in": "body",
-            "description": "Comment encoded in JSON string",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Comment"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Post not found"
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/comment/all": {
-      "get": {
-        "tags": [
-          "comment"
-        ],
-        "summary": "Get all comments",
-        "description": "Returns a list of comments descriptions",
-        "operationId": "getAllComments",
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/comment/{commentId}": {
-      "get": {
-        "tags": [
-          "comment"
-        ],
-        "summary": "Find comment by ID",
-        "description": "Returns a comment data",
-        "operationId": "getCommentById",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "commentId",
-            "in": "path",
-            "description": "ID of comment to return",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/Comment"
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Comment not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "comment",
-          "comment API"
-        ],
-        "summary": "Remove comment",
-        "description": "",
-        "operationId": "deleteComment",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "commentId",
-            "in": "path",
-            "description": "Comment id to unlink",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Comment not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
     "/sport": {
       "post": {
         "tags": [
@@ -1866,7 +1435,7 @@
         "tags": [
           "equipment"
         ],
-        "summary": "Create equipment",
+        "summary": "Create equipment(ready)",
         "description": "",
         "operationId": "createEquipment",
         "consumes": [
@@ -2290,60 +1859,51 @@
       }
     },
     "Request": {
-      "type": "object",
-      "required": [
-        "id",
-        "time_begin",
-        "time_end"
-      ],
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "userid": {
-          "type": "integer",
-          "example": "0"
-        },
-        "time_begin": {
-          "type": "string",
-          "example": "2018-03-28 20:00:00+00:00"
-        },
-        "time_end": {
-          "type": "string",
-          "example": "2018-03-28 21:30:00+00:00"
-        }
-      }
-    },
-    "Login": {
-      "type": "object",
-      "required": [
-        "id"
-      ],
-      "properties": {
-        "login": {
-          "type": "string",
-          "format": "string"
-        },
-        "password": {
-          "type": "string",
-          "example": "12345678"
-        }
-      }
-    },
-    "LoginResponse": {
-      "type": "object",
-      "required": [
-        "sig"
-      ],
-      "properties": {
-        "sig": {
-          "type": "string",
-          "format": "string"
-        },
-        "isAdmin": {
-          "type": "boolean",
-          "example": "false"
+      "type" : "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "accountid",
+          "courtid",
+          "ownertype"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "accountid": {
+            "type": "integer",
+            "example": "0"
+          },
+          "courtid": {
+            "type": "integer",
+            "example": "0"
+          },
+          "isconfirmed": {
+            "type": "boolean",
+            "example": "false"
+          },
+          "ownertype": {
+            "type": "string",
+            "example": "simpleuser/coach"
+          },
+          "requestid": {
+            "type": "integer",
+            "example": "0"
+          },
+          "prop": {
+            "type": "object",
+            "properties": {
+              "court_time": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "2019-01-30 19:00:00+00"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -2368,108 +1928,6 @@
         "url": {
           "type": "string",
           "example": "https://youtube.com/supervideo/542341"
-        },
-        "created": {
-          "type": "string",
-          "example": "2018-03-28 20:24:00+00:00"
-        },
-        "updated": {
-          "type": "string",
-          "example": "2018-03-28 20:24:00+00:00"
-        }
-      }
-    },
-    "Search": {
-      "type": "object",
-      "properties": {
-        "object": {
-          "type": "string",
-          "example": "(court|user|location)"
-        },
-        "prop": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string",
-              "example": "substring in [name]"
-            },
-            "location": {
-              "type": "integer",
-              "example": 0
-            },
-            "location_area": {
-              "type": "integer",
-              "example": "[cx, cy, R]"
-            },
-            "private": {
-              "type": "boolean",
-              "example": false
-            },
-            "isopen": {
-              "type": "boolean",
-              "example": false
-            },
-            "isfree": {
-              "type": "boolean",
-              "example": false
-            },
-            "isonair": {
-              "type": "boolean",
-              "example": false
-            },
-            "price": {
-              "type": "integer",
-              "example": "[min, max]"
-            }
-          }
-        }
-      }
-    },
-    "Like": {
-      "type": "object",
-      "required": [
-        "id"
-      ],
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "vdvid": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "weight": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "created": {
-          "type": "string",
-          "example": "2018-03-28 20:24:00+00:00"
-        },
-        "updated": {
-          "type": "string",
-          "example": "2018-03-28 20:24:00+00:00"
-        }
-      }
-    },
-    "Comment": {
-      "type": "object",
-      "required": [
-        "id"
-      ],
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "vdvid": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "text": {
-          "type": "string",
-          "example": "It's great place for sport!"
         },
         "created": {
           "type": "string",
