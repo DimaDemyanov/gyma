@@ -494,13 +494,13 @@ def getCourtByLandlordId(**request_handler_args):
 
     phone = req.context['phone']
 
-    wide_info = EntityCourt.get_wide_object(id)
+    #wide_info = EntityCourt.get_wide_object(id)
 
     res = []
     for _ in objects:
         obj_dict = _.to_dict()
 
-        obj_dict.update(wide_info)
+        obj_dict.update(EntityCourt.get_wide_object(_.vdvid))
         res.append(obj_dict)
 
     resp.body = obj_to_json(res)
