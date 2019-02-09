@@ -169,7 +169,7 @@ CREATE TABLE "vdv_location" (
 	"name" varchar(256) NOT NULL,
 	"latitude" float4 NOT NULL,
 	"longitude" float4 NOT NULL,
-	CONSTRAINT "vdv_location_pkey" PRIMARY KEY("vdvid"),
+	CONSTRAINT "vdv_location_pkey" PRIMARY KEY("vdvid")
 )
 WITH (
 	OIDS = False
@@ -202,7 +202,7 @@ WITH (
 );
 
 ALTER TABLE "vdv_prop_location" OWNER TO "postgres";
-    
+
 DROP TABLE IF EXISTS "vdv_sport" CASCADE;
 
 CREATE TABLE "vdv_sport" (

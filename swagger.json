@@ -708,86 +708,12 @@
         ]
       }
     },
-    "/request/allByUser/{userId}": {
-      "get": {
-        "tags": [
-          "request",
-          "request API"
-        ],
-        "summary": "Get all user requests",
-        "description": "Returns a requests of specified user",
-        "operationId": "getAllUserRequests",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ID of user",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/request/allByCourt/{courtId}": {
-      "get": {
-        "tags": [
-          "request",
-          "request API"
-        ],
-        "summary": "Get all requests on court",
-        "description": "Returns a requests of specified court",
-        "operationId": "getAllCourtRequests",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "courtId",
-            "in": "path",
-            "description": "ID of court",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
     "/request": {
       "post": {
         "tags": [
           "request API"
         ],
-        "summary": "Create a new request",
+        "summary": "Create a new request(ready)",
         "description": "",
         "operationId": "createRequest",
         "consumes": [
@@ -831,13 +757,87 @@
         ]
       }
     },
+    "/request/allByUser/{userId}": {
+      "get": {
+        "tags": [
+          "request",
+          "request API"
+        ],
+        "summary": "Get all user requests(ready)",
+        "description": "Returns a requests of specified user",
+        "operationId": "getAllUserRequests",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of user",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/request/allByCourt/{courtId}": {
+      "get": {
+        "tags": [
+          "request",
+          "request API"
+        ],
+        "summary": "Get all requests on court(ready)",
+        "description": "Returns a requests of specified court",
+        "operationId": "getAllCourtRequests",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "courtId",
+            "in": "path",
+            "description": "ID of court",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/request/{requestId}": {
       "delete": {
         "tags": [
           "request",
           "request API"
         ],
-        "summary": "Remove request item",
+        "summary": "Remove request item(ready)",
         "description": "",
         "operationId": "deleteRequest",
         "produces": [
@@ -848,6 +848,80 @@
             "name": "requestId",
             "in": "path",
             "description": "Court id to unlink",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Request not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/request/confirm/{requestid}": {
+      "post": {
+         "tags": [
+          "request",
+          "request API"
+        ],
+        "summary": "Confirm request item(ready)",
+        "description": "",
+        "operationId": "confirmRequest",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "requestid",
+            "in": "path",
+            "description": "Court id to confirm",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Request not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/request/decline/{requestid}": {
+      "post": {
+         "tags": [
+          "request",
+          "request API"
+        ],
+        "summary": "Confirm request item(ready)",
+        "description": "",
+        "operationId": "declineRequest",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "requestid",
+            "in": "path",
+            "description": "Court id to decline",
             "required": true,
             "type": "integer",
             "format": "int64"

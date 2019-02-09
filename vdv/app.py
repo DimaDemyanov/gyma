@@ -227,11 +227,11 @@ def createRequest(**request_handler_args):
     phone = req.context['phone']
 
     params = json.loads(req.stream.read().decode('utf-8'))
-    # try:
-    id = EntityRequest.add_from_json(params)
-    # except:
-    #     resp.status = falcon.HTTP_412
-    #     return
+    try:
+        id = EntityRequest.add_from_json(params)
+    except:
+        resp.status = falcon.HTTP_412
+        return
     if id:
         objects = EntityRequest.get().filter_by(requestid=id).all()
         resp.body = obj_to_json([object.to_dict() for object in objects])
@@ -243,7 +243,7 @@ def getAllUserRequests(**request_handler_args):
 
     id = getIntPathParam('userId', **request_handler_args)
 
-    objects = EntityRequest.get().filter_by(userid=id).all()
+    objects = EntityRequest.get().filter_by(accountid=id).all()
 
     resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
@@ -279,6 +279,17 @@ def deleteRequest(**request_handler_args):
 
     resp.status = falcon.HTTP_400
 
+def declineRequest(**request_handler_args):
+    resp = request_handler_args['resp']
+    id = getIntPathParam('requestid', **request_handler_args)
+    EntityRequest.decline(id)
+    resp.status = falcon.HTTP_200
+
+def confirmRequest(**request_handler_args):
+    resp = request_handler_args['resp']
+    id = getIntPathParam('requestid', **request_handler_args)
+    EntityRequest.confirm(id)
+    resp.status = falcon.HTTP_200
 
 def createSport(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
@@ -437,7 +448,7 @@ def getAllCourts(**request_handler_args):
 
     objects = EntityCourt.get().all()
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json([EntityCourt.get_wide_object(o.vdvid) for o in objects])
     resp.status = falcon.HTTP_200
 
 
@@ -756,6 +767,7 @@ def getMyUser(**request_handler_args):
 
     objects = EntityAccount.get().filter_by(vdvid=id).all()
 
+
     # TODO: LIMIT the posts output counts with a paging
     #wide_info = EntityAccount.get_wide_object(id)
 
@@ -769,7 +781,12 @@ def getMyUser(**request_handler_args):
     res = []
     for _ in objects:
         obj_dict = _.to_dict(['vdvid', 'name', 'phone', 'mediaid'])
+
+        landlords = EntityLandlord.get().filter_by(accountid = _.vdvid)
+        if landlords:
+            obj_dict['landlord'] = EntityLandlord.get_wide_object(landlords[0].vdvid)
         #obj_dict.update(wide_info)
+
         res.append(obj_dict)
 
     resp.body = obj_to_json(res)
@@ -1568,6 +1585,8 @@ operation_handlers = {
     'getAllCourtRequests': [getAllCourtRequests],
     'getAllUserRequests': [getAllUserRequests],
     'deleteRequest': [deleteRequest],
+    'confirmRequest': [confirmRequest],
+    'declineRequest': [declineRequest],
 
     # Sport methods
     'createSport': [createSport],

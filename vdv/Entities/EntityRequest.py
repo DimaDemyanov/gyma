@@ -27,8 +27,12 @@ def to_request_times(s, _vdvid, _id, _val, _uid):
             id = times[0].vdvid
         if not times:
             raise Exception('No time for request')
-        pid = PropCourtTime.get().filter_by(vdvid = _vdvid).filter_by(value = id).all()
-        s.db.delete(_ for _ in pid)
+        courtid = EntityRequest.get().filter_by(vdvid=_vdvid).all()[0].courtid
+        pid = PropCourtTime.get().filter_by(vdvid = int(courtid)).filter_by(value = id).all()
+        if not pid:
+            raise Exception('No time for request')
+        for _ in pid:
+            PropCourtTime.delete(vdvid=_.vdvid, propid=_.propid)
         PropRequestTime(_vdvid, _id, id).add(session=s, no_commit=True)
 
 class EntityRequest(EntityBase, Base):
@@ -42,7 +46,7 @@ class EntityRequest(EntityBase, Base):
     requestid = Column(Integer)
 
 
-    json_serialize_items_list = ['vdvid','accountid', 'courtid', 'isconfirmed', 'ownertype']
+    json_serialize_items_list = ['vdvid','accountid', 'courtid', 'isconfirmed', 'ownertype', 'requestid']
 
     def __init__(self, accountid, courtid, ownertype, requestid):
         super().__init__()
@@ -50,6 +54,7 @@ class EntityRequest(EntityBase, Base):
         self.courtid = courtid
         self.ownertype = ownertype
         self.requestid = requestid
+        self.isconfirmed = None
 
     @classmethod
     def add_from_json(cls, datas):
@@ -137,6 +142,7 @@ class EntityRequest(EntityBase, Base):
         #
         # return vdvid
 
+
     # @classmethod
     # def get_wide_object(cls, vdvid, items=[]):
     #     PROPNAME_MAPPING = EntityProp.map_name_id()
@@ -163,8 +169,31 @@ class EntityRequest(EntityBase, Base):
     #     return result
 
     @classmethod
-    def delete_wide_object(cls, vdvid):
-        EntityRequest.delete(cls, vdvid)
+    def decline(cls, vdvid):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+        with DBConnection() as session:
+            entity = session.db.query(EntityRequest).filter_by(vdvid=vdvid).all()
+
+            if len(entity):
+                for _ in entity:
+                    _.isconfirmed = False
+                    pid = PropRequestTime.get().filter_by(vdvid=vdvid).all()
+                    for i in pid:
+                        PropCourtTime(_.courtid, PROPNAME_MAPPING['court_time'], pid.value).add(session=session, no_commit=True)
+
+                session.db.commit()
+
+    @classmethod
+    def confirm(cls, vdvid):
+        with DBConnection() as session:
+            entity = session.db.query(EntityRequest).filter_by(vdvid=vdvid).all()
+
+            if len(entity):
+                for _ in entity:
+                    _.isconfirmed = True
+
+                session.db.commit()
+
 
     # @classmethod
     # def get_id_from_username(cls, username):

@@ -1,7 +1,7 @@
+import json
 from collections import OrderedDict
 import time
 import datetime
-
 from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -113,28 +113,26 @@ class EntityLandlord(EntityBase, Base):
 
     @classmethod
     def get_wide_object(cls, vdvid, items=[]):
-        PROPNAME_MAPPING = EntityProp.map_name_id()
+        # PROPNAME_MAPPING = EntityProp.map_name_id()
+        #
+        # PROP_MAPPING = {
+        #     'private': lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
+        #     'post': lambda _vdvid, _id: PropPost.get_object_property(_vdvid, _id),
+        #     'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id, ['vdvid', 'url'])
+        # }
 
-        PROP_MAPPING = {
-            'private': lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-            'post': lambda _vdvid, _id: PropPost.get_object_property(_vdvid, _id),
-            'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id, ['vdvid', 'url'])
-        }
+        landlord = EntityLandlord.get().filter_by(vdvid=vdvid).all()[0]
 
-        result = {
-            'vdvid': vdvid,
-            'court': []
-        }
-        for key, propid in PROPNAME_MAPPING.items():
-            if key in PROP_MAPPING and (not len(items) or key in items):
-                result.update({key: PROP_MAPPING[key](vdvid, propid)})
+        # for key, propid in PROPNAME_MAPPING.items():
+        #     if key in PROP_MAPPING and (not len(items) or key in items):
+        #         result.update({key: PROP_MAPPING[key](vdvid, propid)})
 
-        courts = EntityCourt.get().filter_by(ownerid=vdvid).all()
+        # courts = EntityCourt.get().filter_by(ownerid=vdvid).all()
 
-        for _ in courts:
-            result['court'].append(EntityCourt.get_wide_object(_.vdvid))
+        # for _ in courts:
+        #     result['court'].append(EntityCourt.get_wide_object(_.vdvid))
 
-        return result
+        return landlord.to_dict()
 
     @classmethod
     def delete_wide_object(cls, vdvid):
