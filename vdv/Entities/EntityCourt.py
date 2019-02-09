@@ -208,9 +208,7 @@ class EntityCourt(EntityBase, Base):
             'court_time': lambda _vdvid, _id: [str(EntityTime.get().filter_by(vdvid = _).all()[0].time) for _ in PropCourtTime.get_object_property(_vdvid, _id)]
         }
 
-        result = {
-            'vdvid': vdvid
-        }
+        result = EntityCourt.get().filter_by(vdvid=vdvid).all()[0].to_dict()
 
         for key, propid in PROPNAME_MAPPING.items():
             if key in PROP_MAPPING and (not len(items) or key in items):
