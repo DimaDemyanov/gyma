@@ -80,14 +80,6 @@ class EntityAccount(EntityBase, Base):
         #if 'prop' in data:
         try:
             with DBConnection() as session:
-                # for prop_name, prop_val in data['prop'].items():
-                #     if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                #         PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, vdvid)
-                #     else:
-                #         EntityAccount.delete(vdvid)
-                #         raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
-                #                         (prop_name, str(PROPNAME_MAPPING)))
-
                 session.db.commit()
         except Exception as e:
             EntityAccount.delete(vdvid)

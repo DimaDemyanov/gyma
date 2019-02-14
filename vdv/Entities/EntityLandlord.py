@@ -61,51 +61,27 @@ class EntityLandlord(EntityBase, Base):
 
     @classmethod
     def update_from_json(cls, data):
-        def process_avatar(s, _vdvid, _id, _val):
-            PropMedia.delete(_vdvid, _id, False)
-            cls.process_media(s, 'image', _vdvid, _vdvid, _id, _val)
-
-        # PROPNAME_MAPPING = EntityProp.map_name_id()
-
         vdvid = None
-
-        # PROP_MAPPING = {
-        #     'private':
-        #         lambda session, _vdvid, _id, _value:
-        #         PropBool(_vdvid, _id, _value).update(session=session)
-        #         if len(PropBool.get().filter_by(vdvid=_vdvid, propid=_id).all())
-        #         else PropBool(_vdvid, _id, _value).add(session=session),
-        #     'avatar':
-        #         lambda s, _vdvid, _id, _val:
-        #         process_avatar(s, _vdvid, _id, _val)
-        #
-        # }
 
         if 'id' in data:
             with DBConnection() as session:
                 vdvid = data['id']
                 entity = session.db.query(EntityLandlord).filter_by(vdvid=vdvid).all()
                 if len(entity) == 0:
-                    vdvid = -1          # No user with givven id
+                    vdvid = -1          # No user with given id
                 if len(entity):
                     for _ in entity:
                         if 'accountid' in data:
-                            _.name = data['accountid']
+                            _.accountid = data['accountid']
 
                         if 'money' in data:
-                            _.mediaid = data['money']
+                            _.money = data['money']
 
                         if 'isentity' in data:
-                            _.email = data['isentity']
+                            _.isentity = data['isentity']
 
                         if 'company' in data:
-                            _.password = data['company']
-
-
-                        # if 'prop' in data:
-                        #     for prop_name, prop_val in data['prop'].items():
-                        #         if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                        #             PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
+                            _.company = data['company']
 
                         session.db.commit()
 
@@ -149,9 +125,9 @@ class EntityLandlord(EntityBase, Base):
                 PROP_MAPPING[key](vdvid, propid)
 
     @classmethod
-    def get_id_from_username(cls, username):
+    def get_id_from_accountid(cls, accountid):
         try:
-            return cls.get().filter_by(username=username).all()[0].vdvid
+            return cls.get().filter_by(accountid=accountid).all()[0].vdvid
         except:
             return None
 

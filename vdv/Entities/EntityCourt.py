@@ -38,15 +38,15 @@ class EntityCourt(EntityBase, Base):
     desc = Column(String)
     price = Column(Integer)
     time_begin = Column(Date)
-    time_end = Column(Date)
+    months = Column(Date)
     request_time = Column(Date)
     ispublished = Column(Boolean)
     created = Column(Date)
     updated = Column(Date)
 
-    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'time_end', 'request_time', 'ispublished', 'created', 'updated']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'months', 'request_time', 'ispublished', 'created', 'updated']
 
-    def __init__(self, ownerid, name, desc, price, time_begin, time_end, ispublished):
+    def __init__(self, ownerid, name, desc, price, time_begin, months, ispublished):
         super().__init__()
 
         self.ownerid = ownerid
@@ -54,7 +54,7 @@ class EntityCourt(EntityBase, Base):
         self.desc = desc
         self.price = price
         self.time_begin = time_begin
-        self.time_end = time_end
+        self.months = months
         self.ispublished = ispublished
 
         ts = time.time()
@@ -93,11 +93,11 @@ class EntityCourt(EntityBase, Base):
 
         }
 
-        if 'ownerid' in data and 'name' in data and 'time_begin' in data and 'time_end':
+        if 'ownerid' in data and 'name' in data and 'time_begin' in data and 'months':
             ownerid = data['ownerid']
             name = data['name']
             time_begin = data['time_begin']
-            time_end = data['time_end']
+            months = data['months']
             if 'ispublished' in data:
                 ispublished = data['ispublished']
             else:
@@ -110,7 +110,7 @@ class EntityCourt(EntityBase, Base):
                 desc = data['desc']
             else:
                 desc = ''
-            new_entity = EntityCourt(ownerid, name, desc, price, time_begin, time_end, ispublished)
+            new_entity = EntityCourt(ownerid, name, desc, price, time_begin, months, ispublished)
             vdvid = new_entity.add()
 
         if 'prop' in data:
@@ -184,8 +184,8 @@ class EntityCourt(EntityBase, Base):
                         if 'time_begin' in data:
                             _.time_begin = data['time_begin']
 
-                        if 'time_end' in data:
-                            _.time_end = data['time_end']
+                        if 'months' in data:
+                            _.months = data['months']
 
                         if 'prop' in data:
                             for prop_name, prop_val in data['prop'].items():

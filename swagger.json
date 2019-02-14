@@ -195,8 +195,7 @@
     "/court": {
       "post": {
         "tags": [
-          "court",
-          "court API"
+          "court"
         ],
         "summary": "Create a new court(ready)",
         "description": "",
@@ -240,8 +239,7 @@
       },
       "put": {
         "tags": [
-          "court",
-          "court API"
+          "court"
         ],
         "summary": "Update existing catalog info(ready)",
         "description": "",
@@ -281,20 +279,46 @@
         ]
       }
     },
-    "/court/all": {
+    "/court/filter": {
       "get": {
         "tags": [
           "court"
         ],
-        "summary": "Get all courts(ready)",
+        "summary": "Get all courts with filter(ready)",
         "description": "Returns a list of courts descriptions",
         "operationId": "getAllCourts",
         "produces": [
           "application/json"
         ],
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "filter by",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "all",
+              "my",
+              "notmy"
+            ]
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "407": {
+            "description": "problems to get landlordid",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "408": {
+            "description": "problems with filter",
             "schema": {
               "$ref": "#/definitions/ApiResponse"
             }
@@ -310,8 +334,7 @@
     "/court/{courtId}": {
       "get": {
         "tags": [
-          "court",
-          "court API"
+          "court"
         ],
         "summary": "Find court by ID(ready)",
         "description": "Returns a court description",
@@ -351,8 +374,7 @@
       },
       "delete": {
         "tags": [
-          "court",
-          "court API"
+          "court"
         ],
         "summary": "Remove court(ready)",
         "description": "",
@@ -395,8 +417,7 @@
     "/court/landlord/{landlordId}": {
       "get": {
         "tags": [
-          "court",
-          "court API"
+          "court"
         ],
         "summary": "Find court by landlord ID(ready)",
         "description": "Returns a court description",
@@ -667,8 +688,7 @@
     "/landlord": {
       "post": {
         "tags": [
-          "special users API",
-          "special users"
+          "special users API"
         ],
         "summary": "Create a landlord(ready)",
         "description": "Create a landlord",
@@ -699,6 +719,123 @@
           },
           "412": {
             "description": "Account with given id already has spacial user"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "special users API"
+        ],
+        "summary": "Update a landlord(ready)",
+        "description": "Update a landlord",
+        "operationId": "updateLandlord",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "landlord",
+            "in": "body",
+            "description": "User encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LandLord"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Account with given id already has spacial user"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/landlord/{landlordId}": {
+      "get": {
+        "tags": [
+          "special users API"
+        ],
+        "summary": "Get landlord by ID(ready)",
+        "description": "Returns a landlord item",
+        "operationId": "getLandlord",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "landlordId",
+            "in": "path",
+            "description": "ID of landlord to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Landlord"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Landlord not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "landlord"
+        ],
+        "summary": "Remove landlord item",
+        "description": "",
+        "operationId": "deleteLandlord",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "landlordId",
+            "in": "path",
+            "description": "Landlord id to unlink",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Landlord not found"
           }
         },
         "security": [
@@ -1149,7 +1286,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/Court"
+              "$ref": "#/definitions/Media"
             }
           },
           "400": {
@@ -1250,7 +1387,6 @@
     "/location/all": {
       "get": {
         "tags": [
-          "location",
           "location API"
         ],
         "summary": "Get all locations(ready)",
@@ -1274,10 +1410,61 @@
         ]
       }
     },
+     "/location/inarea": {
+      "get": {
+        "tags": [
+          "location API"
+        ],
+        "summary": "Get locations in area(ready)",
+        "description": "Returns a list of locations descriptions",
+        "operationId": "getLocationsInArea",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "area radius",
+            "required": false,
+            "type": "float"
+          },
+          {
+            "name": "x",
+            "in": "query",
+            "description": "center x",
+            "required": false,
+            "type": "float"
+          },
+          {
+            "name": "y",
+            "in": "query",
+            "description": "center y",
+            "required": false,
+            "type": "float"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "type": "array",
+            "items": {
+              "schema": {
+                "$ref": "#/definitions/ApiResponse"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/location/{locId}": {
       "get": {
         "tags": [
-          "location",
           "location API"
         ],
         "summary": "Find location by ID(ready)",
@@ -1299,6 +1486,7 @@
         "responses": {
           "200": {
             "description": "successful operation",
+            "type": "array",
             "schema": {
               "$ref": "#/definitions/Location"
             }
@@ -1687,10 +1875,10 @@
             "description": "Validation exception"
           },
           "411": {
-            "description": "There is no accounts with given phone"
+            "description": "There is no account with given phone"
           },
           "412": {
-            "description": "Key cannot be send"
+            "description": "Key can not be send"
           }
         },
         "security": [
@@ -1832,7 +2020,7 @@
         "ownerid",
         "price",
         "time_begin",
-        "time_end",
+        "months",
         "request_time"
       ],
       "properties": {
@@ -1860,9 +2048,9 @@
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
         },
-        "time_end": {
-          "type": "string",
-          "example": "2018-03-28 20:24:00+00:00"
+        "months": {
+          "type": "integer",
+          "example": "3/6/12"
         },
         "request_time": {
           "type": "string",
@@ -1885,11 +2073,9 @@
           "properties": {
             "media": {
               "type": "array",
-              "items": {
                 "type": "integer",
                 "example": "media_id"
-              }
-            },
+              },
             "equipment": {
               "type": "array",
               "items": {

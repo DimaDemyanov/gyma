@@ -364,8 +364,6 @@ def getSportById(**request_handler_args):
     resp.status = falcon.HTTP_200
 
 
-
-
 def createEquipment(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
@@ -444,10 +442,27 @@ def deleteTime(**request_handler_args):  # TODO: implement it
 
 
 def getAllCourts(**request_handler_args):
+    req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    objects = EntityCourt.get().all()
-
+    phone = req.context['phone']
+    my_id = EntityAccount.get_id_from_phone(phone)
+    try:
+        my_landlordid = EntityLandlord.get_id_from_accountid(my_id)
+    except:
+        resp.status = falcon.HTTP_407
+        return
+    # post_data = parse_qs(req.stream.read().decode('utf-8'))
+    filter = req.params['filter'] # post_data['filter']
+    if filter == 'all':
+        objects = EntityCourt.get().all()
+    if filter == 'my':
+        objects = EntityCourt.get().filter_by(ownerid = my_landlordid).all()
+    if filter == 'notmy':
+        objects = EntityCourt.get().filter(EntityCourt.ownerid != my_landlordid).all()
+    if not objects:
+        resp.status = falcon.HTTP_408
+        return
     resp.body = obj_to_json([EntityCourt.get_wide_object(o.vdvid) for o in objects])
     resp.status = falcon.HTTP_200
 
@@ -467,17 +482,6 @@ def getCourtById(**request_handler_args):
     res = []
     for _ in objects:
         obj_dict = _.to_dict()
-
-        # wide_info['is_mine'] = my_id == obj_dict['ownerid']
-        # wide_info['followed'] = EntityFollow.get().filter_by(vdvid=my_id, followingid=id).count() > 0
-        # wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
-        # my_like = [_ for _ in wide_info['like'] if int(_['userid']) == my_id]
-        # wide_info['liked'] = len(my_like) > 0
-        # wide_info['my_rate'] = my_like[0]['weight'] if wide_info['liked'] else 0.0
-        # wide_info['rate_count'] = len(wide_info['like'])
-        # wide_info['rate_avg'] = sum([int(_['weight']) for _ in wide_info['like']]) / float(wide_info['rate_count']) \
-        #     if wide_info['rate_count'] > 0 \
-        #     else 0.0
 
         obj_dict.update(wide_info)
         res.append(obj_dict)
@@ -647,11 +651,7 @@ def createAccount(**request_handler_args):
         if EntityAccount.get().filter_by(phone=params["phone"]).all():
             resp.status = falcon.HTTP_412
             return
-        # try:
         id = EntityAccount.add_from_json(params)
-        # except:
-        #     resp.status = falcon.HTTP_412
-        #     return
         if id:
             objects = EntityAccount.get().filter_by(vdvid=id).all()
 
@@ -674,11 +674,7 @@ def createLandlord(**request_handler_args):
         if EntityLandlord.get().filter_by(accountid=params["accountid"]).all():
             resp.status = falcon.HTTP_412
             return
-        # try:
         id = EntityLandlord.add_from_json(params)
-        # except:
-        #     resp.status = falcon.HTTP_412
-        #     return
         if id:
             objects = EntityLandlord.get().filter_by(vdvid=id).all()
 
@@ -691,6 +687,55 @@ def createLandlord(**request_handler_args):
 
     resp.status = falcon.HTTP_501
 
+def updateLandlord(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        id = EntityLandlord.update_from_json(params)
+        if id == -1:
+            resp.status = falcon.HTTP_404
+            return
+        if id:
+            objects = EntityLandlord.get().filter_by(vdvid=id).all()
+
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
+    resp.status = falcon.HTTP_501
+
+def getLandlord(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam("landlordId", **request_handler_args)
+    objects = EntityLandlord.get().filter_by(vdvid=id).all()
+
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.status = falcon.HTTP_200
+
+def deleteLandlord(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam("landlordId", **request_handler_args)
+    objects = EntityLandlord.get().filter_by(vdvid=id).all()
+
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
+    for o in objects:
+        EntityLandlord.delete(EntityLandlord, o.vdvid)
+    resp.status = falcon.HTTP_200
 
 def updateUser(**request_handler_args):
     req = request_handler_args['req']
@@ -1119,6 +1164,18 @@ def getAllLocations(**request_handler_args):
     resp.body = obj_to_json([o.to_dict() for o in objects])
     resp.status = falcon.HTTP_200
 
+def getLocationsInArea(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    x = req.params['x']
+    y = req.params['y']
+    radius = req.params['radius']
+
+    objects = EntityLocation.get().filter( (EntityLocation.latitude - x)**2 + (EntityLocation.longitude - y)**2 < radius ** 2).all()  # PropLike.get_object_property(0, 0)#
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.status = falcon.HTTP_200
 
 def getPostById(**request_handler_args):
     req = request_handler_args['req']
@@ -1630,6 +1687,9 @@ operation_handlers = {
 
     # Special users methods
     'createLandlord': [createLandlord],
+    'updateLandlord': [updateLandlord],
+    'getLandlord': [getLandlord],
+    'deleteLandlord': [deleteLandlord],
 
     # Media methods
     'createMedia': [createMedia],
@@ -1642,6 +1702,7 @@ operation_handlers = {
     'getLocationById': [getLocationById],
     'deleteLocation': [deleteLocation],
     'getAllLocations': [getAllLocations],
+    'getLocationsInArea': [getLocationsInArea],
 
     # Post methods
     'getPostById': [getPostById],
