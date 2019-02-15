@@ -147,12 +147,15 @@ CREATE TABLE "vdv_court" (
 	"desc" varchar(4000) NOT NULL DEFAULT ''::character varying,
 	"price" int4,
 	"time_begin" time with time zone,
-	"months" int4 NOT NULL,
+	"time_end" time with time zone,
 	"request_time" time with time zone,
 	"ispublished" bool,
 	"created" timestamp with time zone NOT NULL,
 	"updated" timestamp with time zone NOT NULL,
+	"vdv_prop_location_propid" int8 NOT NULL,
+	"isdraft" bool NOT NULL,
 	CONSTRAINT "vdv_court_pkey" PRIMARY KEY("vdvid"),
+	CONSTRAINT "vdv_court_name_key" UNIQUE("name"),
 	CONSTRAINT "Ref_vdv_court_to_vdv_landlord" FOREIGN KEY ("ownerid")
 		REFERENCES "vdv_landlord"("vdvid")
 	MATCH SIMPLE

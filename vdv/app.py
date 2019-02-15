@@ -663,13 +663,13 @@ def getTimesForDate(**request_handler_args):
     free = EntityTime.get().filter(EntityTime.vdvid.in_(joined), cast(EntityTime.time,Date) == date).all()
 
     for _ in free:
-        result.append((_.vdvid, 'free'))
+        result.append((_.time, 'free'))
     for _a in EntityRequest.get().filter_by(courtid = objects[0].vdvid).all():
         joined = PropRequestTime.get_object_property(_a.vdvid, PROPNAME_MAPPING['request_time'])
         free = EntityTime.get().filter(EntityTime.vdvid.in_(joined), cast(EntityTime.time,Date) == date).all()
 
         for _ in free:
-            result.append((_.vdvid, 'rented' if _a.isconfirmed else 'pending'))
+            result.append((_.time, 'rented' if _a.isconfirmed else 'pending'))
 
     resp.body = obj_to_json(result)
     resp.status =falcon.HTTP_200

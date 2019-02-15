@@ -8,6 +8,14 @@
   "basePath": "/vdv",
   "tags": [
     {
+      "name": "login API",
+      "description": "Unlocked user API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
       "name": "user API",
       "description": "Unlocked user API functions",
       "externalDocs": {
@@ -56,15 +64,7 @@
       }
     },
     {
-      "name": "court",
-      "description": "Everything about court",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
-      "name": "sport",
+      "name": "sport API",
       "description": "Everything about sport",
       "externalDocs": {
         "description": "Find out more",
@@ -72,7 +72,7 @@
       }
     },
     {
-      "name": "equipment",
+      "name": "equipment API",
       "description": "Everything about equipment",
       "externalDocs": {
         "description": "Find out more",
@@ -80,7 +80,7 @@
       }
     },
     {
-      "name": "user",
+      "name": "user API",
       "description": "Everything about users",
       "externalDocs": {
         "description": "Find out more",
@@ -88,7 +88,7 @@
       }
     },
     {
-      "name": "special users",
+      "name": "special users API",
       "description": "Everything about users",
       "externalDocs": {
         "description": "Find out more",
@@ -96,7 +96,7 @@
       }
     },
     {
-      "name": "request",
+      "name": "request API",
       "description": "Everything about users",
       "externalDocs": {
         "description": "Find out more",
@@ -104,7 +104,7 @@
       }
     },
     {
-      "name": "media",
+      "name": "media API",
       "description": "Everything about medias",
       "externalDocs": {
         "description": "Find out more",
@@ -112,7 +112,7 @@
       }
     },
     {
-      "name": "location",
+      "name": "location API",
       "description": "Everything about locations",
       "externalDocs": {
         "description": "Find out more",
@@ -195,7 +195,7 @@
     "/court": {
       "post": {
         "tags": [
-          "court"
+          "court API"
         ],
         "summary": "Create a new court(ready)",
         "description": "",
@@ -239,7 +239,7 @@
       },
       "put": {
         "tags": [
-          "court"
+          "court API"
         ],
         "summary": "Update existing catalog info(ready)",
         "description": "",
@@ -282,7 +282,7 @@
     "/court/filter": {
       "get": {
         "tags": [
-          "court"
+          "court API"
         ],
         "summary": "Get all courts with filter(ready)",
         "description": "Returns a list of courts descriptions",
@@ -334,7 +334,7 @@
     "/court/{courtId}": {
       "get": {
         "tags": [
-          "court"
+          "court API"
         ],
         "summary": "Find court by ID(ready)",
         "description": "Returns a court description",
@@ -374,7 +374,7 @@
       },
       "delete": {
         "tags": [
-          "court"
+          "court API"
         ],
         "summary": "Remove court(ready)",
         "description": "",
@@ -417,7 +417,7 @@
     "/court/landlord/{landlordId}": {
       "get": {
         "tags": [
-          "court"
+          "court API"
         ],
         "summary": "Find court by landlord ID(ready)",
         "description": "Returns a court description",
@@ -459,7 +459,7 @@
     "/courts/times": {
       "get": {
         "tags": [
-          "court"
+          "court API"
         ],
         "summary": "Get court times by landlord ID(ready)",
         "description": "Returns court times for date",
@@ -479,10 +479,9 @@
           {
             "name": "date",
             "in": "query",
-            "description": "ID of court",
+            "description": "date",
             "required": true,
-            "type": "string",
-            "example": "2018-03-28"
+            "type": "string"
           }
         ],
         "responses": {
@@ -493,10 +492,10 @@
             }
           },
           "400": {
-            "description": "Invalid court ID supplied"
+            "description": "Invalid ID supplied"
           },
           "404": {
-            "description": "Court not found"
+            "description": "Landlord not found"
           }
         },
         "security": [
@@ -506,11 +505,9 @@
         ]
       }
     },
-
     "/user": {
       "post": {
         "tags": [
-          "user",
           "user API"
         ],
         "summary": "Create a new account(ready)",
@@ -555,7 +552,6 @@
       },
       "put": {
         "tags": [
-          "user",
           "user API"
         ],
         "summary": "Update existing catalog info(ready)",
@@ -599,7 +595,7 @@
     "/user/all": {
       "get": {
         "tags": [
-          "user"
+          "user API"
         ],
         "summary": "Get all users(ready)",
         "description": "Returns a list of courts descriptions",
@@ -625,7 +621,6 @@
     "/user/me": {
       "get": {
         "tags": [
-          "user",
           "user API"
         ],
         "summary": "Get my user info(ready)",
@@ -652,7 +647,6 @@
     "/user/{userId}": {
       "get": {
         "tags": [
-          "user",
           "user API"
         ],
         "summary": "Find user by ID(ready)",
@@ -693,7 +687,6 @@
       },
       "delete": {
         "tags": [
-          "user",
           "user API"
         ],
         "summary": "Remove court(ready)",
@@ -861,7 +854,7 @@
       },
       "delete": {
         "tags": [
-          "landlord"
+          "special users API"
         ],
         "summary": "Remove landlord item",
         "description": "",
@@ -946,7 +939,6 @@
     "/request/allByUser/{userId}": {
       "get": {
         "tags": [
-          "request",
           "request API"
         ],
         "summary": "Get all user requests(ready)",
@@ -983,7 +975,6 @@
     "/request/allByCourt/{courtId}": {
       "get": {
         "tags": [
-          "request",
           "request API"
         ],
         "summary": "Get all requests on court(ready)",
@@ -1020,7 +1011,6 @@
     "/request/{requestId}": {
       "delete": {
         "tags": [
-          "request",
           "request API"
         ],
         "summary": "Remove request item(ready)",
@@ -1056,8 +1046,7 @@
     },
     "/request/confirm/{requestid}": {
       "post": {
-         "tags": [
-          "request",
+        "tags": [
           "request API"
         ],
         "summary": "Confirm request item(ready)",
@@ -1093,8 +1082,7 @@
     },
     "/request/decline/{requestid}": {
       "post": {
-         "tags": [
-          "request",
+        "tags": [
           "request API"
         ],
         "summary": "Confirm request item(ready)",
@@ -1211,7 +1199,7 @@
     "/media": {
       "post": {
         "tags": [
-          "media"
+          "media API"
         ],
         "summary": "Create a new media item(ready)",
         "description": "",
@@ -1277,7 +1265,7 @@
     "/media/{ownerId}/all": {
       "get": {
         "tags": [
-          "media"
+          "media API"
         ],
         "summary": "Get all courts(ready)",
         "description": "Returns a list of owners media descriptors",
@@ -1313,7 +1301,7 @@
     "/media/{mediaId}": {
       "get": {
         "tags": [
-          "media"
+          "media API"
         ],
         "summary": "Get media by ID(ready)",
         "description": "Returns a media item",
@@ -1353,7 +1341,7 @@
       },
       "delete": {
         "tags": [
-          "media"
+          "media API"
         ],
         "summary": "Remove media item",
         "description": "",
@@ -1389,7 +1377,6 @@
     "/location": {
       "post": {
         "tags": [
-          "location",
           "location API"
         ],
         "summary": "Create a new location(ready)",
@@ -1459,58 +1446,6 @@
         ]
       }
     },
-     "/location/inarea": {
-      "get": {
-        "tags": [
-          "location API"
-        ],
-        "summary": "Get locations in area(ready)",
-        "description": "Returns a list of locations descriptions",
-        "operationId": "getLocationsInArea",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "radius",
-            "in": "query",
-            "description": "area radius",
-            "required": false,
-            "type": "float"
-          },
-          {
-            "name": "x",
-            "in": "query",
-            "description": "center x",
-            "required": false,
-            "type": "float"
-          },
-          {
-            "name": "y",
-            "in": "query",
-            "description": "center y",
-            "required": false,
-            "type": "float"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "type": "array",
-            "items": {
-              "schema": {
-                "$ref": "#/definitions/ApiResponse"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
     "/location/{locId}": {
       "get": {
         "tags": [
@@ -1535,7 +1470,6 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "type": "array",
             "schema": {
               "$ref": "#/definitions/Location"
             }
@@ -1555,7 +1489,7 @@
       },
       "delete": {
         "tags": [
-          "location"
+          "location API"
         ],
         "summary": "Remove location(ready)",
         "description": "",
@@ -1588,10 +1522,62 @@
         ]
       }
     },
+    "/location/inarea": {
+      "get": {
+        "tags": [
+          "location API"
+        ],
+        "summary": "Get locations in area(ready)",
+        "description": "Returns a list of locations descriptions",
+        "operationId": "getLocationsInArea",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "radius",
+            "in": "query",
+            "description": "area radius",
+            "required": true,
+            "type": "number",
+            "format": "float"
+          },
+          {
+            "name": "x",
+            "in": "query",
+            "description": "center x",
+            "required": true,
+            "type": "number",
+            "format": "float"
+          },
+          {
+            "name": "y",
+            "in": "query",
+            "description": "center y",
+            "required": true,
+            "type": "number",
+            "format": "float"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Location not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/sport": {
       "post": {
         "tags": [
-          "sport"
+          "sport API"
         ],
         "summary": "Create a new sport(ready)",
         "description": "",
@@ -1635,7 +1621,7 @@
       },
       "get": {
         "tags": [
-          "sport"
+          "sport API"
         ],
         "summary": "Find all available sports(ready)",
         "description": "Returns a sports data",
@@ -1661,7 +1647,7 @@
     "/sport/{sportId}": {
       "get": {
         "tags": [
-          "sport"
+          "sport API"
         ],
         "summary": "Find sport by ID(ready)",
         "description": "Returns a sport description",
@@ -1701,7 +1687,7 @@
       },
       "delete": {
         "tags": [
-          "sport"
+          "sport API"
         ],
         "summary": "Remove sport(ready)",
         "description": "",
@@ -1744,7 +1730,7 @@
     "/equipment": {
       "post": {
         "tags": [
-          "equipment"
+          "equipment API"
         ],
         "summary": "Create equipment(ready)",
         "description": "",
@@ -1788,7 +1774,7 @@
       },
       "get": {
         "tags": [
-          "equipment"
+          "equipment API"
         ],
         "summary": "Find all available equipments(ready)",
         "description": "Returns a equipments data",
@@ -1814,7 +1800,7 @@
     "/equipment/{equipmentId}": {
       "get": {
         "tags": [
-          "equipment"
+          "equipment API"
         ],
         "summary": "Find equipment by ID(ready)",
         "description": "Returns a equipment description",
@@ -1854,7 +1840,7 @@
       },
       "delete": {
         "tags": [
-          "equipment"
+          "equipment API"
         ],
         "summary": "Remove equipment(ready)",
         "description": "",
@@ -1897,7 +1883,7 @@
     "/sendkey": {
       "post": {
         "tags": [
-          "login"
+          "login API"
         ],
         "summary": "Send validation key on phone(ready)",
         "description": "",
@@ -1940,7 +1926,7 @@
     "/validate": {
       "post": {
         "tags": [
-          "login"
+          "login API"
         ],
         "summary": "Check key and generate token(ready)",
         "operationId": "validate",
@@ -1997,8 +1983,8 @@
     "Account": {
       "type": "object",
       "required": [
-        "name",
-        "phone"
+        "phone",
+        "account_type"
       ],
       "properties": {
         "id": {
@@ -2067,10 +2053,8 @@
       "type": "object",
       "required": [
         "ownerid",
-        "price",
-        "time_begin",
-        "months",
-        "request_time"
+        "request_time",
+        "isdraft"
       ],
       "properties": {
         "id": {
@@ -2117,14 +2101,19 @@
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
         },
+        "isdraft": {
+          "type": "boolean"
+        },
         "prop": {
           "type": "object",
           "properties": {
             "media": {
               "type": "array",
+              "items": {
                 "type": "integer",
                 "example": "media_id"
-              },
+              }
+            },
             "equipment": {
               "type": "array",
               "items": {
@@ -2135,13 +2124,6 @@
             "location": {
               "type": "integer",
               "example": 0
-            },
-            "court_time": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "example": "2019-01-30 19:00:00+00"
-              }
             }
           }
         }
@@ -2165,7 +2147,7 @@
       }
     },
     "Request": {
-      "type" : "array",
+      "type": "array",
       "items": {
         "type": "object",
         "required": [
@@ -2318,10 +2300,10 @@
           "type": "string"
         }
       }
+    },
+    "externalDocs": {
+      "description": "Find out more about Swagger",
+      "url": "http://swagger.io"
     }
-  },
-  "externalDocs": {
-    "description": "Find out more about Swagger",
-    "url": "http://swagger.io"
   }
 }

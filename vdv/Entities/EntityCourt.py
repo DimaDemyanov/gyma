@@ -43,10 +43,11 @@ class EntityCourt(EntityBase, Base):
     ispublished = Column(Boolean)
     created = Column(Date)
     updated = Column(Date)
+    isdraft = Column(Boolean)
 
-    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'months', 'request_time', 'ispublished', 'created', 'updated']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'months', 'request_time', 'ispublished', 'created', 'updated', 'isdraft']
 
-    def __init__(self, ownerid, name, desc, price, time_begin, months, ispublished):
+    def __init__(self, ownerid, name, desc, price, time_begin, months, ispublished, isdraft):
         super().__init__()
 
         self.ownerid = ownerid
@@ -56,6 +57,7 @@ class EntityCourt(EntityBase, Base):
         self.time_begin = time_begin
         self.months = months
         self.ispublished = ispublished
+        self.isdraft = isdraft
 
         ts = time.time()
         self.request_time = self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
@@ -93,11 +95,12 @@ class EntityCourt(EntityBase, Base):
 
         }
 
-        if 'ownerid' in data and 'name' in data and 'time_begin' in data and 'months':
+        if 'ownerid' in data and 'name' in data and 'months' in data and 'isdraft' in data:
             ownerid = data['ownerid']
             name = data['name']
             time_begin = data['time_begin']
             months = data['months']
+            isdraft = data['isdraft']
             if 'ispublished' in data:
                 ispublished = data['ispublished']
             else:
@@ -110,7 +113,7 @@ class EntityCourt(EntityBase, Base):
                 desc = data['desc']
             else:
                 desc = ''
-            new_entity = EntityCourt(ownerid, name, desc, price, time_begin, months, ispublished)
+            new_entity = EntityCourt(ownerid, name, desc, price, time_begin, months, ispublished, isdraft)
             vdvid = new_entity.add()
 
         if 'prop' in data:
@@ -205,7 +208,7 @@ class EntityCourt(EntityBase, Base):
             'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
             'equipment': lambda _vdvid, _id: PropEquipment.get_object_property(_vdvid, _id),
             'sport': lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id),
-            'court_time': lambda _vdvid, _id: [str(EntityTime.get().filter_by(vdvid = _).all()[0].time) for _ in PropCourtTime.get_object_property(_vdvid, _id)]
+            #'court_time': lambda _vdvid, _id: [str(EntityTime.get().filter_by(vdvid = _).all()[0].time) for _ in PropCourtTime.get_object_property(_vdvid, _id)]
         }
 
         result = EntityCourt.get().filter_by(vdvid=vdvid).all()[0].to_dict()
