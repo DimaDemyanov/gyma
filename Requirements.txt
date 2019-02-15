@@ -9,4 +9,3 @@ scikit-image
 matplotlib
 falcon-multipart
 pyjwt
-func
