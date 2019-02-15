@@ -11,7 +11,7 @@ from urllib.parse import parse_qs
 
 import jwt
 import requests
-from sqlalchemy import and_
+from sqlalchemy import and_, cast
 from sqlalchemy import or_
 import time
 from collections import OrderedDict
@@ -25,7 +25,10 @@ from vdv.Entities.EntityEquipment import EntityEquipment
 from vdv.Entities.EntityLandlord import EntityLandlord
 from vdv.Entities.EntityRequest import EntityRequest
 from vdv.Entities.EntitySport import EntitySport
+from vdv.Entities.EntityTime import EntityTime
 from vdv.Entities.EntityValidation import EntityValidation
+from vdv.Prop.PropCourtTime import PropCourtTime
+from vdv.Prop.PropRequestTime import PropRequestTime
 from vdv.auth import auth
 # from vdv.auth import JWT_SIGN_ALGORITHM
 from vdv.db import DBConnection
@@ -227,11 +230,11 @@ def createRequest(**request_handler_args):
     phone = req.context['phone']
 
     params = json.loads(req.stream.read().decode('utf-8'))
-    try:
-        id = EntityRequest.add_from_json(params)
-    except:
-        resp.status = falcon.HTTP_412
-        return
+    # try:
+    id = EntityRequest.add_from_json(params)
+    # except:
+    #     resp.status = falcon.HTTP_412
+    #     return
     if id:
         objects = EntityRequest.get().filter_by(requestid=id).all()
         resp.body = obj_to_json([object.to_dict() for object in objects])
@@ -640,6 +643,36 @@ def deleteCourt(**request_handler_args):
 
     resp.status = falcon.HTTP_400
 
+def getTimesForDate(**request_handler_args):
+    PROPNAME_MAPPING = EntityProp.map_name_id()
+
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    courtid = req.params['courtid']
+    date = req.params['date']
+
+    objects = EntityCourt.get().filter_by(vdvid=courtid).all()
+    if not objects:
+        resp.status = falcon.HTTP_404
+        return
+    # with DBConnection() as session:
+    #     joined = session.db.query(PropCourtTime).all()
+    joined = PropCourtTime.get_object_property(objects[0].vdvid, PROPNAME_MAPPING['court_time'])
+    result = []
+    free = EntityTime.get().filter(EntityTime.vdvid.in_(joined), cast(EntityTime.time,Date) == date).all()
+
+    for _ in free:
+        result.append((_.vdvid, 'free'))
+    for _a in EntityRequest.get().filter_by(courtid = objects[0].vdvid).all():
+        joined = PropRequestTime.get_object_property(_a.vdvid, PROPNAME_MAPPING['request_time'])
+        free = EntityTime.get().filter(EntityTime.vdvid.in_(joined), cast(EntityTime.time,Date) == date).all()
+
+        for _ in free:
+            result.append((_.vdvid, 'rented' if _a.isconfirmed else 'pending'))
+
+    resp.body = obj_to_json(result)
+    resp.status =falcon.HTTP_200
 
 def createAccount(**request_handler_args):
     req = request_handler_args['req']
@@ -1669,6 +1702,7 @@ operation_handlers = {
     'updateCourt': [updateCourt],
     'deleteCourt': [deleteCourt],
     'easyCreateCourt': [easyCreateCourt],
+    'getTimesForDate': [getTimesForDate],
 
     # User methods
     'createAccount': [createAccount],

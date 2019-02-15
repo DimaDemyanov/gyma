@@ -1,12 +1,13 @@
 from collections import OrderedDict
 
-from sqlalchemy import Column, Boolean, Integer
+from sqlalchemy import Column, Boolean, Integer, Sequence
 
 from vdv.db import DBConnection
 
 class PropBase:
-    vdvid = Column(Integer, primary_key=True)
-    propid = Column(Integer, primary_key=True)
+    id = Column(Integer, Sequence('vdv_prop_seq'), primary_key=True)
+    vdvid = Column(Integer)
+    propid = Column(Integer)
     value = Column(Integer)
 
     def to_dict(self):
@@ -14,6 +15,7 @@ class PropBase:
         return res
 
     def __init__(self, vdvid, propid, value):
+
         self.vdvid = vdvid
         self.propid = propid
         self.value = value
@@ -60,6 +62,18 @@ class PropBase:
             else:
                 if raise_exception:
                     raise FileNotFoundError('(vdvid, propid)=(%i, %i) was not found' % (vdvid, propid))
+
+    @classmethod
+    def delete_one(cls, vdvid, value, raise_exception=True):
+        with DBConnection() as session:
+            res = session.db.query(cls).filter_by(vdvid=vdvid, value=value).all()
+
+            if len(res):
+                [session.db.delete(_) for _ in res]
+                session.db.commit()
+            else:
+                if raise_exception:
+                    raise FileNotFoundError('(vdvid, value)=(%i, %i) was not found' % (vdvid, value))
 
     @classmethod
     def delete_value(cls, value, raise_exception=True):

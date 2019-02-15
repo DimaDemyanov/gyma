@@ -1,7 +1,7 @@
 
 
 DROP TYPE IF EXISTS vdv_prop_type CASCADE;
-CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request', 'equipment', 'sport', 'court_time');
+CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request', 'equipment', 'sport', 'court_time', 'request_time');
 
 DROP TABLE IF EXISTS "vdv_prop";
 CREATE TABLE "vdv_prop" (
@@ -16,6 +16,7 @@ INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'location',
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'equipment', 'equipment');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'sport', 'sport');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'court_time', 'court_time');
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'request_time', 'request_time');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'media', 'media');
 
 DROP SEQUENCE IF EXISTS vdv_seq;
@@ -23,6 +24,9 @@ CREATE SEQUENCE vdv_seq start with 1 increment by 1;
 
 DROP SEQUENCE IF EXISTS vdv_req;
 CREATE SEQUENCE vdv_req start with 1 increment by 1;
+
+DROP SEQUENCE IF EXISTS vdv_prop_seq;
+CREATE SEQUENCE vdv_prop_seq start with 1 increment by 1;
 
 DROP TYPE IF EXISTS vdv_media_type CASCADE;
 CREATE TYPE vdv_media_type AS ENUM ('image', 'equipment');
@@ -52,6 +56,8 @@ CREATE TABLE "vdv_prop_media" (
 	"vdvid" int8 NOT NULL,
 	"propid" int8 NOT NULL,
 	"value" int8 NOT NULL,
+	"id" int8 NOT NULL,
+	CONSTRAINT "vdv_prop_media_pkey" PRIMARY KEY("id"),
 	CONSTRAINT "Ref_vdv_prop_media_to_vdv_court" FOREIGN KEY ("vdvid")
 		REFERENCES "vdv_court"("vdvid")
 	MATCH SIMPLE
@@ -146,7 +152,6 @@ CREATE TABLE "vdv_court" (
 	"ispublished" bool,
 	"created" timestamp with time zone NOT NULL,
 	"updated" timestamp with time zone NOT NULL,
-	"vdv_prop_location_propid" int8 NOT NULL,
 	CONSTRAINT "vdv_court_pkey" PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_court_to_vdv_landlord" FOREIGN KEY ("ownerid")
 		REFERENCES "vdv_landlord"("vdvid")
@@ -182,7 +187,8 @@ CREATE TABLE "vdv_prop_location" (
 	"vdvid" int8 NOT NULL,
 	"propid" int8 NOT NULL,
 	"value" int8 NOT NULL,
-	CONSTRAINT "vdv_prop_location_pkey" PRIMARY KEY("vdvid","propid","value"),
+	"id" int8 NOT NULL,
+	PRIMARY KEY("id"),
 	CONSTRAINT "Ref_vdv_prop_location_to_vdv_court" FOREIGN KEY ("vdvid")
 		REFERENCES "vdv_court"("vdvid")
 	MATCH SIMPLE
@@ -217,6 +223,8 @@ CREATE TABLE "vdv_prop_sport" (
 	"value" int8,
 	"vdvid" int8,
 	"propid" int8 NOT NULL,
+	"id" int8 NOT NULL,
+	PRIMARY KEY("id"),
 	CONSTRAINT "Ref_vdv_prop_sport_to_vdv_sport" FOREIGN KEY ("value")
 		REFERENCES "vdv_sport"("vdvid")
 	MATCH SIMPLE
@@ -230,6 +238,7 @@ CREATE TABLE "vdv_prop_sport" (
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE
 );
+
 DROP TABLE IF EXISTS "vdv_equipment" CASCADE;
 
 CREATE TABLE "vdv_equipment" (
@@ -244,6 +253,8 @@ CREATE TABLE "vdv_prop_equipment" (
 	"value" int8,
 	"propid" int8 NOT NULL,
 	"vdvid" int8 NOT NULL,
+	"id" int8 NOT NULL,
+	PRIMARY KEY("id"),
 	CONSTRAINT "Ref_vdv_prop_equipment_to_vdv_court" FOREIGN KEY ("vdvid")
 		REFERENCES "vdv_court"("vdvid")
 	MATCH SIMPLE
@@ -258,12 +269,11 @@ CREATE TABLE "vdv_prop_equipment" (
 	NOT DEFERRABLE
 );
 
-
 DROP TABLE IF EXISTS "vdv_time" CASCADE;
 
 CREATE TABLE "vdv_time" (
 	"vdvid" int8 NOT NULL,
-	"time" time with time zone,
+	"time" timestamp with time zone,
 	PRIMARY KEY("vdvid")
 );
 
@@ -273,6 +283,8 @@ CREATE TABLE "vdv_prop_court_time" (
 	"propid" int8 NOT NULL,
 	"value" int8,
 	"vdvid" int8,
+	"id" int8 NOT NULL,
+	PRIMARY KEY("id"),
 	CONSTRAINT "Ref_vdv_prop_court_time_to_vdv_court" FOREIGN KEY ("vdvid")
 		REFERENCES "vdv_court"("vdvid")
 	MATCH SIMPLE
@@ -314,10 +326,11 @@ CREATE TABLE "vdv_request" (
 DROP TABLE IF EXISTS "vdv_prop_request_time" CASCADE;
 
 CREATE TABLE "vdv_prop_request_time" (
-	"propid" int8 NOT NULL,
+	"propid" int8,
 	"value" int8,
 	"vdvid" int8,
-	PRIMARY KEY("propid"),
+	"id" int8 NOT NULL,
+	PRIMARY KEY("id"),
 	CONSTRAINT "Ref_vdv_prop_request_time_to_vdv_request" FOREIGN KEY ("vdvid")
 		REFERENCES "vdv_request"("vdvid")
 	MATCH SIMPLE
@@ -331,6 +344,5 @@ CREATE TABLE "vdv_prop_request_time" (
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE
 );
-
 INSERT INTO vdv_account (vdvid, name, phone, account_type) VALUES (1000, 'tester', '79110001122', 'landlord');
 INSERT INTO vdv_validation (vdvid, accountid, code) VALUES (NEXTVAL('vdv_seq'), 1000, 10000);

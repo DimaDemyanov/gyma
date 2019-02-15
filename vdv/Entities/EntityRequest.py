@@ -31,9 +31,10 @@ def to_request_times(s, _vdvid, _id, _val, _uid):
         pid = PropCourtTime.get().filter_by(vdvid = int(courtid)).filter_by(value = id).all()
         if not pid:
             raise Exception('No time for request')
+        PropRequestTime(_vdvid, _id, id).add(session=s)
         for _ in pid:
-            PropCourtTime.delete(vdvid=_.vdvid, propid=_.propid)
-        PropRequestTime(_vdvid, _id, id).add(session=s, no_commit=True)
+            PropCourtTime.delete_one(vdvid=_.vdvid, value=_.value)
+
 
 class EntityRequest(EntityBase, Base):
     __tablename__ = 'vdv_request'
@@ -63,7 +64,7 @@ class EntityRequest(EntityBase, Base):
         vdvid = None
 
         PROP_MAPPING = {
-            'court_time':
+            'request_time':
                 lambda s, _vdvid, _id, _val, _uid: to_request_times(s, _vdvid, _id, _val, _uid)
 
         }
@@ -179,8 +180,8 @@ class EntityRequest(EntityBase, Base):
                     _.isconfirmed = False
                     pid = PropRequestTime.get().filter_by(vdvid=vdvid).all()
                     for i in pid:
-                        PropCourtTime(_.courtid, PROPNAME_MAPPING['court_time'], pid.value).add(session=session, no_commit=True)
-
+                        PropCourtTime(_.courtid, PROPNAME_MAPPING['court_time'], i.value).add(session=session, no_commit=True)
+                        PropRequestTime.delete_one(i.vdvid, i.value)
                 session.db.commit()
 
     @classmethod
