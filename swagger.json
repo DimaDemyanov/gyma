@@ -503,6 +503,110 @@
             "auth_env": []
           }
         ]
+      },
+      "post": {
+        "tags": [
+          "court API"
+        ],
+        "summary": "Create court times(ready)",
+        "description": "Creates court times for date",
+        "operationId": "createCourtTimesOnDate",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "courtid",
+            "in": "query",
+            "description": "date",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "times",
+            "in": "query",
+            "description": "Court encoded in JSON string",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "2018-03-28 20:24:00+00:00"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Time"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Landlord not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "court API"
+        ],
+        "summary": "Update court times(ready)",
+        "description": "Update court times",
+        "operationId": "updateCourtTimesOnDate",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "courtid",
+            "in": "query",
+            "description": "ID of court",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "times",
+            "in": "query",
+            "description": "Court encoded in JSON string",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "2018-03-28 20:24:00+00:00"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Time"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Landlord not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
       }
     },
     "/user": {
@@ -955,6 +1059,14 @@
             "required": true,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "date",
+            "required": true,
+            "type": "string",
+            "format": "int64"
           }
         ],
         "responses": {
@@ -991,6 +1103,102 @@
             "required": true,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "date",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/request/allByDateLandlord/{landlordId}": {
+      "get": {
+        "tags": [
+          "request API"
+        ],
+        "summary": "Get all requests on landlord(ready)",
+        "description": "Returns a requests of specified court",
+        "operationId": "getAllLandlordRequests",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "landlordId",
+            "in": "path",
+            "description": "ID of landlord",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "date",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/request/allByFilterLandlord/{landlordId}": {
+      "get": {
+        "tags": [
+          "request API"
+        ],
+        "summary": "Get all requests on landlord with filter(ready)",
+        "description": "Returns a requests of specified court",
+        "operationId": "getAllLandlordRequestsWithFilter",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "landlordId",
+            "in": "path",
+            "description": "ID of landlord",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "filter",
+            "required": true,
+            "type": "string",
+            "enum": ["notconfirmed", "confirmed", "all"]
           }
         ],
         "responses": {

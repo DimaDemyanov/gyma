@@ -96,3 +96,8 @@ class PropBase:
     def get_object_property(cls, vdvid, propid):
         with DBConnection() as session:
             return [_.value for _ in session.db.query(cls).filter_by(vdvid=vdvid, propid=propid).all()]
+
+    @classmethod
+    def get_objects(cls, value, propid):
+        with DBConnection() as session:
+            return [_.vdvid for _ in session.db.query(cls).filter_by(value=value, propid=propid).all()]

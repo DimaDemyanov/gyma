@@ -195,7 +195,10 @@ class EntityRequest(EntityBase, Base):
 
                 session.db.commit()
 
-
+    @classmethod
+    def get_request_by_requestid(cls, requestid):
+        objects = EntityRequest.get().filter_by(requestid=requestid).all()
+        return objects
     # @classmethod
     # def get_id_from_username(cls, username):
     #     try:

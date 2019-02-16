@@ -2,7 +2,7 @@ from collections import OrderedDict
 import datetime
 import time
 
-from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
+from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean, cast
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
@@ -28,6 +28,15 @@ def create_times(s, _vdvid, _id, _val, _uid):
         if not times:
             id = EntityTime(_).add()
         PropCourtTime(_vdvid, _id, id).add(session=s, no_commit=True)
+    s.db.commit()
+
+def update_times(s, _vdvid, _id, _val, _uid):
+    ids = [_.vdvid for _ in EntityTime.get().filter(cast(EntityTime.time,Date) == cast(_val[0],Date)).all()]
+    times_court = PropCourtTime.get().filter_by(vdvid = _vdvid).filter(PropCourtTime.value.in_(ids)).all()
+    for _ in times_court:
+        PropCourtTime.delete_one(_.vdvid, _.value)
+    create_times(s, _vdvid, _id, _val, _uid)
+    s.db.commit()
 
 class EntityCourt(EntityBase, Base):
     __tablename__ = 'vdv_court'
@@ -98,7 +107,10 @@ class EntityCourt(EntityBase, Base):
         if 'ownerid' in data and 'name' in data and 'months' in data and 'isdraft' in data:
             ownerid = data['ownerid']
             name = data['name']
-            time_begin = data['time_begin']
+            if 'time_begin' in data:
+                time_begin = data['time_begin']
+            else:
+                time_begin = None
             months = data['months']
             isdraft = data['isdraft']
             if 'ispublished' in data:

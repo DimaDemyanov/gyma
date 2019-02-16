@@ -6,12 +6,11 @@ import os
 import posixpath
 import random
 import re
-from datetime import datetime, timedelta
 from urllib.parse import parse_qs
 
 import jwt
 import requests
-from sqlalchemy import and_, cast
+from sqlalchemy import and_, cast, DateTime
 from sqlalchemy import or_
 import time
 from collections import OrderedDict
@@ -35,7 +34,7 @@ from vdv.db import DBConnection
 from vdv.serve_swagger import SpecServer
 
 from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityCourt import EntityCourt
+from vdv.Entities.EntityCourt import EntityCourt, create_times, update_times
 from vdv.Entities.EntityAccount import EntityAccount
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityMedia import EntityMedia
@@ -242,26 +241,93 @@ def createRequest(**request_handler_args):
 
 
 def getAllUserRequests(**request_handler_args):
+    PROPNAME_MAPPING = EntityProp.map_name_id()
+
+    req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('userId', **request_handler_args)
+    date = req.params['date']
 
-    objects = EntityRequest.get().filter_by(accountid=id).all()
-
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    ondate = EntityTime.get().filter(cast(EntityTime.time, Date) == date).all()
+    res = []
+    for _ in ondate:
+        reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['request_time'])
+        for i in EntityRequest.get().filter_by(accountid=id).filter(EntityRequest.vdvid.in_(reqs)).all():
+            for j in EntityRequest.get_request_by_requestid(i.requestid):
+                res.append(j)
+    resp.body = obj_to_json([o.to_dict() for o in res])
     resp.status = falcon.HTTP_200
 
 
 def getAllCourtRequests(**request_handler_args):
+    PROPNAME_MAPPING = EntityProp.map_name_id()
+
+    req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('courtId', **request_handler_args)
+    date = req.params['date']
 
-    objects = EntityRequest.get().filter_by(courtid=id).all()
-
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    ondate = EntityTime.get().filter(cast(EntityTime.time, Date) == date).all()
+    res = []
+    for _ in ondate:
+        reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['request_time'])
+        for i in EntityRequest.get().filter_by(courtid=id).filter(EntityRequest.vdvid.in_(reqs)).all():
+            for j in EntityRequest.get_request_by_requestid(i.requestid):
+                res.append(j)
+    resp.body = obj_to_json([o.to_dict() for o in res])
     resp.status = falcon.HTTP_200
 
+def getAllLandlordRequests(**request_handler_args):
+    PROPNAME_MAPPING = EntityProp.map_name_id()
+
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('landlordId', **request_handler_args)
+    date = req.params['date']
+
+    courts = EntityCourt.get().filter_by(ownerid = id).all()
+
+    for c in courts:
+        ondate = EntityTime.get().filter(cast(EntityTime.time, Date) == date).all()
+        res = []
+        for _ in ondate:
+            reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['request_time'])
+            for i in EntityRequest.get().filter_by(courtid=c.vdvid).filter(EntityRequest.vdvid.in_(reqs)).all():
+                for j in EntityRequest.get_request_by_requestid(i.requestid):
+                    res.append(j)
+    resp.body = obj_to_json([o.to_dict() for o in res])
+    resp.status = falcon.HTTP_200
+
+def getAllLandlordRequestsWithFilter(**request_handler_args):
+    PROPNAME_MAPPING = EntityProp.map_name_id()
+
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('landlordId', **request_handler_args)
+    filter = req.params['filter']
+
+    courts = EntityCourt.get().filter_by(ownerid = id).all()
+
+    for c in courts:
+        ondate = EntityTime.get().filter(cast(EntityTime.time, DateTime) >= datetime.datetime.today()).all()
+        res = []
+        for _ in ondate:
+            reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['request_time'])
+            reqss = None
+            if filter == 'confirmed':
+                reqss = EntityRequest.get().filter_by(courtid=c.vdvid).filter(EntityRequest.vdvid.in_(reqs),EntityRequest.isconfirmed != None).all()
+            if filter == 'notconfirmed':
+                reqss = EntityRequest.get().filter_by(courtid=c.vdvid).filter(EntityRequest.vdvid.in_(reqs),EntityRequest.isconfirmed == None).all()
+            if filter == 'all':
+                reqss = EntityRequest.get().filter_by(courtid=c.vdvid).filter(EntityRequest.vdvid.in_(reqs)).all()
+            for i in reqss:
+                res.append(i)
+    resp.body = obj_to_json([o.to_dict() for o in res])
+    resp.status = falcon.HTTP_200
 
 def deleteRequest(**request_handler_args):
     resp = request_handler_args['resp']
@@ -673,6 +739,39 @@ def getTimesForDate(**request_handler_args):
 
     resp.body = obj_to_json(result)
     resp.status =falcon.HTTP_200
+
+def createCourtTimesOnDate(**request_handler_args):
+    PROPNAME_MAPPING = EntityProp.map_name_id()
+
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    courtid = req.params['courtid']
+    params = req.params['times']
+
+    if not isinstance(params, list):
+        params = [params]
+    with DBConnection() as session:
+        create_times(session, courtid, PROPNAME_MAPPING['court_time'], params, 0)
+
+    resp.status = falcon.HTTP_200
+
+def updateCourtTimesOnDate(**request_handler_args):
+    PROPNAME_MAPPING = EntityProp.map_name_id()
+
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    courtid = req.params['courtid']
+    params = req.params['times']
+
+    if not isinstance(params, list):
+        params = [params]
+
+    with DBConnection() as session:
+        update_times(session, courtid, PROPNAME_MAPPING['court_time'], params, 0)
+
+    resp.status = falcon.HTTP_200
 
 def createAccount(**request_handler_args):
     req = request_handler_args['req']
@@ -1674,6 +1773,8 @@ operation_handlers = {
     'createRequest': [createRequest],
     'getAllCourtRequests': [getAllCourtRequests],
     'getAllUserRequests': [getAllUserRequests],
+    'getAllLandlordRequests': [getAllLandlordRequests],
+    'getAllLandlordRequestsWithFilter': [getAllLandlordRequestsWithFilter],
     'deleteRequest': [deleteRequest],
     'confirmRequest': [confirmRequest],
     'declineRequest': [declineRequest],
@@ -1703,6 +1804,8 @@ operation_handlers = {
     'deleteCourt': [deleteCourt],
     'easyCreateCourt': [easyCreateCourt],
     'getTimesForDate': [getTimesForDate],
+    'createCourtTimesOnDate': [createCourtTimesOnDate],
+    'updateCourtTimesOnDate': [updateCourtTimesOnDate],
 
     # User methods
     'createAccount': [createAccount],
