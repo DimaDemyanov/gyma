@@ -113,10 +113,7 @@ class EntityCourt(EntityBase, Base):
                 time_begin = None
             months = data['months']
             isdraft = data['isdraft']
-            if 'ispublished' in data:
-                ispublished = data['ispublished']
-            else:
-                ispublished = False
+            ispublished = False
             if 'price' in data:
                 price = data['price']
             else:
@@ -196,9 +193,6 @@ class EntityCourt(EntityBase, Base):
                         if 'price' in data:
                             _.price = data['price']
 
-                        if 'time_begin' in data:
-                            _.time_begin = data['time_begin']
-
                         if 'months' in data:
                             _.months = data['months']
 
@@ -206,6 +200,46 @@ class EntityCourt(EntityBase, Base):
                             for prop_name, prop_val in data['prop'].items():
                                 if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
                                     PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, 0)
+
+                        session.db.commit()
+
+        return vdvid
+
+    @classmethod
+    def confirm(cls, data, isconfirmed = True):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
+        vdvid = None
+
+        if 'id' in data:
+            with DBConnection() as session:
+                vdvid = data['id']
+                entity = session.db.query(EntityCourt).filter_by(vdvid=vdvid).all()
+                if len(entity) == 0:
+                    vdvid = -1  # No user with given id
+                if len(entity):
+                    for _ in entity:
+                        if 'ownerid' in data:
+                            _.ownerid = data['ownerid']
+
+                        if 'name' in data:
+                            _.name = data['name']
+
+                        if 'desc' in data:
+                            _.desc = data['desc']
+
+                        if 'price' in data:
+                            _.price = data['price']
+
+                        if 'months' in data:
+                            _.months = data['months']
+
+                        _.ispublished = isconfirmed
+
+                        ts = time.time()
+
+                        _.time_begin = datetime.datetime.fromtimestamp(ts).strftime(
+                            '%Y-%m-%d %H:%M')
 
                         session.db.commit()
 

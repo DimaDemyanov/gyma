@@ -45,9 +45,10 @@ class EntityRequest(EntityBase, Base):
     isconfirmed = Column(Boolean)
     ownertype = Column(String)
     requestid = Column(Integer)
+    come = Column(Boolean)
 
 
-    json_serialize_items_list = ['vdvid','accountid', 'courtid', 'isconfirmed', 'ownertype', 'requestid']
+    json_serialize_items_list = ['vdvid','accountid', 'courtid', 'isconfirmed', 'ownertype', 'requestid', 'come']
 
     def __init__(self, accountid, courtid, ownertype, requestid):
         super().__init__()
@@ -194,6 +195,13 @@ class EntityRequest(EntityBase, Base):
                     _.isconfirmed = True
 
                 session.db.commit()
+
+    @classmethod
+    def come(cls, id, hascome):
+        req = EntityRequest.get().filter_by(vdvid = id).all()[0]
+        req.come = hascome
+        with DBConnection() as session:
+            session.db.commit()
 
     @classmethod
     def get_request_by_requestid(cls, requestid):

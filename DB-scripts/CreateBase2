@@ -146,16 +146,14 @@ CREATE TABLE "vdv_court" (
 	"name" varchar(256) NOT NULL,
 	"desc" varchar(4000) NOT NULL DEFAULT ''::character varying,
 	"price" int4,
-	"time_begin" time with time zone,
-	"time_end" time with time zone,
-	"request_time" time with time zone,
+	"time_begin" timestamp with time zone,
+	"months" int8 NOT NULL,
+	"request_time" timestamp with time zone,
 	"ispublished" bool,
 	"created" timestamp with time zone NOT NULL,
 	"updated" timestamp with time zone NOT NULL,
-	"vdv_prop_location_propid" int8 NOT NULL,
 	"isdraft" bool NOT NULL,
 	CONSTRAINT "vdv_court_pkey" PRIMARY KEY("vdvid"),
-	CONSTRAINT "vdv_court_name_key" UNIQUE("name"),
 	CONSTRAINT "Ref_vdv_court_to_vdv_landlord" FOREIGN KEY ("ownerid")
 		REFERENCES "vdv_landlord"("vdvid")
 	MATCH SIMPLE
@@ -311,6 +309,7 @@ CREATE TABLE "vdv_request" (
 	"isconfirmed" bool,
 	"ownertype" varchar(40),
 	"requestid" int8,
+	"come" bool,
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_request_to_vdv_account" FOREIGN KEY ("accountid")
 		REFERENCES "vdv_account"("vdvid")
@@ -325,7 +324,6 @@ CREATE TABLE "vdv_request" (
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE
 );
-
 DROP TABLE IF EXISTS "vdv_prop_request_time" CASCADE;
 
 CREATE TABLE "vdv_prop_request_time" (

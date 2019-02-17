@@ -292,15 +292,27 @@
         ],
         "parameters": [
           {
-            "name": "filter",
+            "name": "filter1",
             "in": "query",
-            "description": "filter by",
+            "description": "filter by owner",
             "required": true,
             "type": "string",
             "enum": [
               "all",
               "my",
               "notmy"
+            ]
+          },
+          {
+            "name": "filter2",
+            "in": "query",
+            "description": "filter",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "drafts",
+              "published",
+              "all"
             ]
           }
         ],
@@ -414,6 +426,78 @@
         ]
       }
     },
+    "/court/confirm/{courtId}": {
+      "post": {
+        "tags": [
+          "court API"
+        ],
+        "summary": "Confirm court by ID(ready)",
+        "description": "Court confirmation",
+        "operationId": "confirmCourtById",
+        "parameters": [
+          {
+            "name": "courtId",
+            "in": "path",
+            "description": "ID of court to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Court not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/court/decline/{courtId}": {
+      "post": {
+        "tags": [
+          "court API"
+        ],
+        "summary": "decline court by ID(ready)",
+        "description": "Court declinetion",
+        "operationId": "declineCourtById",
+        "parameters": [
+          {
+            "name": "courtId",
+            "in": "path",
+            "description": "ID of court to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Court not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/court/landlord/{landlordId}": {
       "get": {
         "tags": [
@@ -447,6 +531,48 @@
           },
           "404": {
             "description": "Landlord not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/court/location/{locationId}": {
+      "get": {
+        "tags": [
+          "court API"
+        ],
+        "summary": "Find court by location ID(ready)",
+        "description": "Returns a court description",
+        "operationId": "getCourtByLocationId",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "locationId",
+            "in": "path",
+            "description": "ID of location to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Court"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Location not found"
           }
         },
         "security": [
@@ -645,7 +771,7 @@
             "description": "Validation exception"
           },
           "412": {
-            "description": "Phone already exists"
+            "description": "Phone already exists(return an id of existed account)"
           }
         },
         "security": [
@@ -1307,6 +1433,49 @@
             "required": true,
             "type": "integer",
             "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Request not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/request/come/{requestid}": {
+      "post": {
+        "tags": [
+          "request API"
+        ],
+        "summary": "Confirm request item(ready)",
+        "description": "",
+        "operationId": "comeRequest",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "requestid",
+            "in": "path",
+            "description": "Court id to confirm",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "hascome",
+            "in": "query",
+            "description": "Has user came?",
+            "required": true,
+            "type": "boolean"
           }
         ],
         "responses": {
@@ -2327,6 +2496,13 @@
               "items": {
                 "type": "integer",
                 "example": "equipment_id"
+              }
+            },
+            "sport": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "example": "sport_id"
               }
             },
             "location": {

@@ -360,6 +360,14 @@ def confirmRequest(**request_handler_args):
     EntityRequest.confirm(id)
     resp.status = falcon.HTTP_200
 
+def comeRequest(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+    id = getIntPathParam('requestid', **request_handler_args)
+    hascome = req.params('hascome')
+    EntityRequest.come(id, hascome)
+    resp.status = falcon.HTTP_200
+
 def createSport(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
@@ -522,17 +530,23 @@ def getAllCourts(**request_handler_args):
         resp.status = falcon.HTTP_407
         return
     # post_data = parse_qs(req.stream.read().decode('utf-8'))
-    filter = req.params['filter'] # post_data['filter']
+    filter = req.params['filter1'] # post_data['filter']
+    objects = None
     if filter == 'all':
-        objects = EntityCourt.get().all()
+        objects = EntityCourt.get()
     if filter == 'my':
-        objects = EntityCourt.get().filter_by(ownerid = my_landlordid).all()
+        objects = EntityCourt.get().filter_by(ownerid = my_landlordid)
     if filter == 'notmy':
-        objects = EntityCourt.get().filter(EntityCourt.ownerid != my_landlordid).all()
+        objects = EntityCourt.get().filter(EntityCourt.ownerid != my_landlordid)
+    filter = req.params['filter2']  # post_data['filter']
+    if filter == 'drafts':
+        objects = objects.filter_by(isdraft = True)
+    if filter == 'published':
+        objects = objects.filter_by(ispublished = True)
     if not objects:
         resp.status = falcon.HTTP_408
         return
-    resp.body = obj_to_json([EntityCourt.get_wide_object(o.vdvid) for o in objects])
+    resp.body = obj_to_json([EntityCourt.get_wide_object(o.vdvid) for o in objects.all()])
     resp.status = falcon.HTTP_200
 
 
@@ -568,6 +582,25 @@ def getCourtByLandlordId(**request_handler_args):
     phone = req.context['phone']
 
     #wide_info = EntityCourt.get_wide_object(id)
+
+    res = []
+    for _ in objects:
+        obj_dict = _.to_dict()
+
+        obj_dict.update(EntityCourt.get_wide_object(_.vdvid))
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res)
+    resp.status = falcon.HTTP_200
+
+def getCourtByLocationId(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('locationId', **request_handler_args)
+    objects = EntityCourt.get().filter_by(locationId=id).all()
+
+    phone = req.context['phone']
 
     res = []
     for _ in objects:
@@ -709,6 +742,50 @@ def deleteCourt(**request_handler_args):
 
     resp.status = falcon.HTTP_400
 
+def confirmCourtById(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        id = EntityCourt.confirm(params)
+        if id == -1:
+            resp.status = falcon.HTTP_404
+            return
+        if id:
+            objects = EntityCourt.get().filter_by(vdvid=id).all()
+
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
+    resp.status = falcon.HTTP_501
+
+def declineCourtById(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+        id = EntityCourt.confirm(params, isconfirmed=False)
+        if id == -1:
+            resp.status = falcon.HTTP_404
+            return
+        if id:
+            objects = EntityCourt.get().filter_by(vdvid=id).all()
+
+            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.status = falcon.HTTP_200
+            return
+    except ValueError:
+        resp.status = falcon.HTTP_405
+        return
+
+    resp.status = falcon.HTTP_501
+
 def getTimesForDate(**request_handler_args):
     PROPNAME_MAPPING = EntityProp.map_name_id()
 
@@ -729,13 +806,13 @@ def getTimesForDate(**request_handler_args):
     free = EntityTime.get().filter(EntityTime.vdvid.in_(joined), cast(EntityTime.time,Date) == date).all()
 
     for _ in free:
-        result.append((_.time, 'free'))
+        result.append((str(_.time), 'free'))
     for _a in EntityRequest.get().filter_by(courtid = objects[0].vdvid).all():
         joined = PropRequestTime.get_object_property(_a.vdvid, PROPNAME_MAPPING['request_time'])
         free = EntityTime.get().filter(EntityTime.vdvid.in_(joined), cast(EntityTime.time,Date) == date).all()
 
         for _ in free:
-            result.append((_.time, 'rented' if _a.isconfirmed else 'pending'))
+            result.append((str(_.time), 'rented' if _a.isconfirmed else 'pending'))
 
     resp.body = obj_to_json(result)
     resp.status =falcon.HTTP_200
@@ -780,8 +857,10 @@ def createAccount(**request_handler_args):
     try:
         data = req.stream.read().decode('utf-8')
         params = json.loads(data)
-        if EntityAccount.get().filter_by(phone=params["phone"]).all():
+        id = EntityAccount.get().filter_by(phone=params["phone"]).all()
+        if id:
             resp.status = falcon.HTTP_412
+            resp.body = obj_to_json(id[0].vdvid)
             return
         id = EntityAccount.add_from_json(params)
         if id:
@@ -1778,6 +1857,7 @@ operation_handlers = {
     'deleteRequest': [deleteRequest],
     'confirmRequest': [confirmRequest],
     'declineRequest': [declineRequest],
+    'comeRequest': [comeRequest],
 
     # Sport methods
     'createSport': [createSport],
@@ -1799,6 +1879,7 @@ operation_handlers = {
     'getAllCourts': [getAllCourts],
     'getCourtById': [getCourtById],
     'getCourtByLandlordId': [getCourtByLandlordId],
+    'getCourtByLocationId': [getCourtByLocationId],
     'createCourt': [createCourt],
     'updateCourt': [updateCourt],
     'deleteCourt': [deleteCourt],
@@ -1806,6 +1887,8 @@ operation_handlers = {
     'getTimesForDate': [getTimesForDate],
     'createCourtTimesOnDate': [createCourtTimesOnDate],
     'updateCourtTimesOnDate': [updateCourtTimesOnDate],
+    'confirmCourtById': [confirmCourtById],
+    'declineCourtById': [declineCourtById],
 
     # User methods
     'createAccount': [createAccount],
