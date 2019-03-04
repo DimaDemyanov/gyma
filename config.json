@@ -12,7 +12,7 @@
         "user": "postgres",
         "password": "123",
         "direct": null,
-        "pool_size": 2
+        "pool_size": 100
       },
       "oidc": {
         "google": {
@@ -70,7 +70,7 @@
         "user": "postgres",
         "password": "LaiukiKepta20002015",
         "direct": null,
-        "pool_size": 20
+        "pool_size": 100
       },
       "oidc": {
         "google": {

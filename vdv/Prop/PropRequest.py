@@ -9,6 +9,7 @@ from vdv.db import DBConnection
 
 class PropRequest(PropBase, Base):
     __tablename__ = 'vdv_prop_request'
+#    vdvid = relation_ship
 
     def __init__(self, vdvid, propid, value):
         super().__init__(vdvid, propid, value)

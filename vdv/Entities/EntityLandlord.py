@@ -2,15 +2,16 @@ import json
 from collections import OrderedDict
 import time
 import datetime
-from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
+from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean, cast, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
 from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityCourt import EntityCourt
+from vdv.Entities.EntityTime import EntityTime
 
 from vdv.Prop.PropMedia import PropMedia
 from vdv.Prop.PropPost import PropPost
+from vdv.Prop.PropRequestTime import PropRequestTime
 
 from vdv.db import DBConnection
 
@@ -26,16 +27,18 @@ class EntityLandlord(EntityBase, Base):
     money = Column(Integer)
     isentity = Column(Boolean)
     company = Column(String)
+    isAgreeRules = Column(Boolean)
     # Добавить поля password, is_admin, is_arendo
 
-    json_serialize_items_list = ['vdvid', 'accountid', 'money', 'isentity', 'company']
+    json_serialize_items_list = ['vdvid', 'accountid', 'money', 'isentity', 'company', 'isAgreeRules']
 
-    def __init__(self, accountid, money, isentity, company):
+    def __init__(self, accountid, money, isentity, company, isAgreeRules):
         super().__init__()
         self.accountid = accountid
         self.money = money
         self.isentity = isentity
         self.company = company
+        self.isAgreeRules = isAgreeRules
 
     @classmethod
     def add_from_json(cls, data):
@@ -45,9 +48,10 @@ class EntityLandlord(EntityBase, Base):
             accountid = data['accountid']
             money = data['money']
             isentity = data['isentity']
+            company = None
             if 'company' in data:
                 company = data['company']
-            new_entity = EntityLandlord(accountid, money, isentity, company)
+            new_entity = EntityLandlord(accountid, money, isentity, company, False)
             vdvid = new_entity.add()
 
         try:
@@ -88,27 +92,64 @@ class EntityLandlord(EntityBase, Base):
         return vdvid
 
     @classmethod
+    def confirm_rules(cls, vdvid):
+        with DBConnection() as session:
+            entity = session.db.query(EntityLandlord).filter_by(vdvid=vdvid).all()
+            if len(entity) == 0:
+                vdvid = -1  # No user with given id
+            if len(entity):
+                for _ in entity:
+                    _.isAgreeRules = True
+
+                session.db.commit()
+
+        return vdvid
+
+    @classmethod
     def get_wide_object(cls, vdvid, items=[]):
-        # PROPNAME_MAPPING = EntityProp.map_name_id()
-        #
-        # PROP_MAPPING = {
-        #     'private': lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-        #     'post': lambda _vdvid, _id: PropPost.get_object_property(_vdvid, _id),
-        #     'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id, ['vdvid', 'url'])
-        # }
 
         landlord = EntityLandlord.get().filter_by(vdvid=vdvid).all()[0]
 
-        # for key, propid in PROPNAME_MAPPING.items():
-        #     if key in PROP_MAPPING and (not len(items) or key in items):
-        #         result.update({key: PROP_MAPPING[key](vdvid, propid)})
+        PROPNAME_MAPPING = EntityProp.map_name_id()
 
-        # courts = EntityCourt.get().filter_by(ownerid=vdvid).all()
+        accountid = landlord.accountid
 
-        # for _ in courts:
-        #     result['court'].append(EntityCourt.get_wide_object(_.vdvid))
+        obj_dict = landlord.to_dict()
 
-        return landlord.to_dict()
+        count_come = 0
+        count_not_come = 0
+
+        from vdv.Entities.EntityCourt import EntityCourt
+        courts = EntityCourt.get().filter_by(ownerid=vdvid).all()
+
+        # for c in courts:
+        #     ondate = EntityTime.get().filter(cast(EntityTime.time, DateTime) < datetime.datetime.today()).all()
+        #     res = []
+        #     for _ in ondate:
+        #         reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['request_time'])
+        #         from vdv.Entities.EntityRequest import EntityRequest
+        #         reqs_on_acc = EntityRequest.get().filter_by(courtid=c.vdvid, isconfirmed = True).filter(EntityRequest.vdvid.in_(reqs))
+        #         count_come = count_come + len(reqs_on_acc.filter_by(come=True).all())
+        #         count_not_come = count_not_come + len(reqs_on_acc.filter_by(come=False).all())
+
+        for c in courts:
+            from vdv.Entities.EntityRequest import EntityRequest
+            reqs = EntityRequest.get().filter_by(courtid=c.vdvid, isconfirmed=True, come=True).all()
+            for _ in reqs:
+                times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['request_time'])
+                # count_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).filter(cast(EntityTime.time, DateTime) < datetime.datetime.today()).count() > 0 else 0
+                count_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).count() > 0 else 0
+
+            # reqs = EntityRequest.get().filter_by(courtid=c.vdvid, isconfirmed=True, come=False).all()
+            # for _ in reqs:
+            #     times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['request_time'])
+            #     # count_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).filter(cast(EntityTime.time, DateTime) < datetime.datetime.today()).count() > 0 else 0
+            #     count_not_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).count() > 0 else 0
+
+        obj_dict.update({'sucsess': count_come, 'notsucsess': count_not_come})
+
+        return obj_dict
+
 
     @classmethod
     def delete_wide_object(cls, vdvid):

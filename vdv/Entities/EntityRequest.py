@@ -1,12 +1,10 @@
-from collections import OrderedDict
-import time
-import datetime
 
-from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
+from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqlalchemy.orm import relationship
 
 from vdv.Entities.EntityBase import EntityBase
+from vdv.Entities.EntityLandlord import EntityLandlord
 from vdv.Entities.EntityProp import EntityProp
 from vdv.Entities.EntityTime import EntityTime
 
@@ -32,8 +30,8 @@ def to_request_times(s, _vdvid, _id, _val, _uid):
         if not pid:
             raise Exception('No time for request')
         PropRequestTime(_vdvid, _id, id).add(session=s)
-        for _ in pid:
-            PropCourtTime.delete_one(vdvid=_.vdvid, value=_.value)
+        # for _ in pid:
+        #     PropCourtTime.delete_one(vdvid=_.vdvid, value=_.value)
 
 
 class EntityRequest(EntityBase, Base):
@@ -41,14 +39,15 @@ class EntityRequest(EntityBase, Base):
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     accountid = Column(Integer)
-    courtid = Column(Integer)
+    courtid = Column(Integer, ForeignKey('vdv_court.vdvid'))
     isconfirmed = Column(Boolean)
     ownertype = Column(String)
     requestid = Column(Integer)
     come = Column(Boolean)
+    iscanceled = Column(Boolean)
+    #court = relationship('EntityCourt', back_populates="request")
 
-
-    json_serialize_items_list = ['vdvid','accountid', 'courtid', 'isconfirmed', 'ownertype', 'requestid', 'come']
+    json_serialize_items_list = ['vdvid','accountid', 'courtid', 'isconfirmed', 'ownertype', 'requestid', 'come', 'iscanceled']
 
     def __init__(self, accountid, courtid, ownertype, requestid):
         super().__init__()
@@ -57,6 +56,8 @@ class EntityRequest(EntityBase, Base):
         self.ownertype = ownertype
         self.requestid = requestid
         self.isconfirmed = None
+        self.come = False
+        self.iscanceled = False
 
     @classmethod
     def add_from_json(cls, datas):
@@ -74,28 +75,28 @@ class EntityRequest(EntityBase, Base):
             requestid = session.db.execute(Sequence('vdv_req'))
 
         for data in datas:
+            with DBConnection() as session:
+                if 'accountid' in data and 'courtid' in data and 'ownertype' in data:
+                    accountid = data['accountid']
+                    courtid = data['courtid']
+                    ownertype = data['ownertype']
 
-            if 'accountid' in data and 'courtid' in data and 'ownertype' in data:
-                accountid = data['accountid']
-                courtid = data['courtid']
-                ownertype = data['ownertype']
+                    new_entity = EntityRequest(accountid, courtid, ownertype, requestid)
+                    vdvid = new_entity.add()
 
-                new_entity = EntityRequest(accountid, courtid, ownertype, requestid)
-                vdvid = new_entity.add()
+                    if 'prop' in data:
 
-                if 'prop' in data:
-                    with DBConnection() as session:
-                        for prop_name, prop_val in data['prop'].items():
-                            if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                                PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, accountid)
-                            else:
-                                new_entity.delete(vdvid)
-                                raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
-                                                (prop_name, str(PROPNAME_MAPPING)))
+                            for prop_name, prop_val in data['prop'].items():
+                                if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
+                                    PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val, accountid)
+                                else:
+                                    new_entity.delete(vdvid)
+                                    raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
+                                                    (prop_name, str(PROPNAME_MAPPING)))
 
-                        session.db.commit()
-            else:
-                raise Exception('Validation exception')
+                    session.db.commit()
+                else:
+                    raise Exception('Validation exception')
         return requestid
 
     @classmethod
@@ -145,30 +146,21 @@ class EntityRequest(EntityBase, Base):
         # return vdvid
 
 
-    # @classmethod
-    # def get_wide_object(cls, vdvid, items=[]):
-    #     PROPNAME_MAPPING = EntityProp.map_name_id()
-    #
-    #     PROP_MAPPING = {
-    #         'private': lambda _vdvid, _id: PropBool.get_object_property(_vdvid, _id),
-    #         'post': lambda _vdvid, _id: PropPost.get_object_property(_vdvid, _id),
-    #         'avatar': lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id, ['vdvid', 'url'])
-    #     }
-    #
-    #     result = {
-    #         'vdvid': vdvid,
-    #         'court': []
-    #     }
-    #     for key, propid in PROPNAME_MAPPING.items():
-    #         if key in PROP_MAPPING and (not len(items) or key in items):
-    #             result.update({key: PROP_MAPPING[key](vdvid, propid)})
-    #
-    #     courts = EntityCourt.get().filter_by(ownerid=vdvid).all()
-    #
-    #     for _ in courts:
-    #         result['court'].append(EntityCourt.get_wide_object(_.vdvid))
-    #
-    #     return result
+    @classmethod
+    def get_wide_object(cls, vdvid, items=[]):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
+
+        requests = EntityRequest.get().filter_by(vdvid=vdvid).all()[0]
+        result = requests.to_dict()
+        if 'landlord' in items:
+            from vdv.Entities.EntityCourt import EntityCourt
+            result.update({'landlord': EntityLandlord.get_wide_object(EntityLandlord.get().filter_by(vdvid=EntityCourt.get().filter_by(vdvid = requests[0].courtid).all()[0].ownerid).all()[0].vdvid)})
+        if 'times' in items:
+            result.update({'times':
+                [time.time.strftime('%Y-%m-%d %H:%M') for time in EntityTime.get().filter(EntityTime.vdvid.in_(PropRequestTime.get_object_property(requests.vdvid, PROPNAME_MAPPING['request_time']))).all()]})
+
+        return result
 
     @classmethod
     def decline(cls, vdvid):
@@ -186,51 +178,47 @@ class EntityRequest(EntityBase, Base):
                 session.db.commit()
 
     @classmethod
+    def cancel(cls, vdvid):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+        with DBConnection() as session:
+            entity = session.db.query(EntityRequest).filter_by(vdvid=vdvid).all()
+
+            if len(entity):
+                for _ in entity:
+                    _.iscanceled = True
+            session.db.commit()
+
+    @classmethod
     def confirm(cls, vdvid):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
         with DBConnection() as session:
             entity = session.db.query(EntityRequest).filter_by(vdvid=vdvid).all()
 
             if len(entity):
                 for _ in entity:
                     _.isconfirmed = True
+                    times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['request_time'])
+                    for t in times:
+                        PropCourtTime.delete_one(_.courtid, t)
+                        for req in EntityRequest.get().filter(EntityRequest.vdvid.in_(PropRequestTime.get_objects(t, PROPNAME_MAPPING['request_time']))).all():
+                            req.isconfirmed = False
+
+
 
                 session.db.commit()
 
     @classmethod
-    def come(cls, id, hascome):
-        req = EntityRequest.get().filter_by(vdvid = id).all()[0]
-        req.come = hascome
+    def set_come(cls, id, hascome):
         with DBConnection() as session:
-            session.db.commit()
+            with DBConnection() as session:
+                entity = session.db.query(EntityRequest).filter_by(vdvid=id).all()
+
+                if len(entity):
+                    for _ in entity:
+                        _.come = hascome
+                session.db.commit()
 
     @classmethod
     def get_request_by_requestid(cls, requestid):
         objects = EntityRequest.get().filter_by(requestid=requestid).all()
         return objects
-    # @classmethod
-    # def get_id_from_username(cls, username):
-    #     try:
-    #         return cls.get().filter_by(username=username).all()[0].vdvid
-    #     except:
-    #         return None
-    #
-    # @classmethod
-    # def get_id_from_email(cls, e_mail):
-    #     try:
-    #         return cls.get().filter_by(e_mail=e_mail).all()[0].vdvid
-    #     except:
-    #         return None
-    #
-    # @classmethod
-    # def get_password_from_email(cls, e_mail):
-    #     try:
-    #         return cls.get().filter_by(e_mail=e_mail).all()[0].password
-    #     except:
-    #         return None
-
-    # @classmethod
-    # def is_private(cls, id):
-    #     PROPNAME_MAPPING = EntityProp.map_name_id()
-    #     res = PropBool.get_object_property(id, PROPNAME_MAPPING['private'])
-    #     return res[0] if len(res) else False
-

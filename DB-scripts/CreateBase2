@@ -50,6 +50,16 @@ WITH (
 
 ALTER TABLE "vdv_media" OWNER TO "postgres";
 
+DROP TABLE IF EXISTS "vdv_tariff" CASCADE;
+
+CREATE TABLE "vdv_tariff" (
+	"vdvid" int8 NOT NULL,
+	"months" int4 NOT NULL,
+	"price" int4 NOT NULL,
+	"sale" int4 NOT NULL,
+	PRIMARY KEY("vdvid")
+);
+
 DROP TABLE IF EXISTS "vdv_prop_media" CASCADE;
 
 CREATE TABLE "vdv_prop_media" (
@@ -124,6 +134,7 @@ CREATE TABLE "vdv_landlord" (
 	"money" int4,
 	"isentity" bool,
 	"company" varchar(256),
+	"isAgreeRules" bool NOT NULL,
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_landlord_to_vdv_account" FOREIGN KEY ("accountid")
 		REFERENCES "vdv_account"("vdvid")
@@ -136,7 +147,25 @@ WITH (
 	OIDS = False
 );
 
-ALTER TABLE "vdv_landlord" OWNER TO "postgres";
+DROP TABLE IF EXISTS "vdv_simple_user" CASCADE;
+
+CREATE TABLE "vdv_simple_user" (
+	"vdvid" BIGSERIAL NOT NULL,
+	"accountid" int8,
+	"isAgreeRules" bool NOT NULL,
+	CONSTRAINT "vdv_user_pkey" PRIMARY KEY("vdvid"),
+	CONSTRAINT "Ref_vdv_simple_user_to_vdv_account" FOREIGN KEY ("accountid")
+		REFERENCES "vdv_account"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+)
+WITH (
+	OIDS = False
+);
+
+ALTER TABLE "vdv_simple_user" OWNER TO "postgres";
 
 DROP TABLE IF EXISTS "vdv_court" CASCADE;
 
@@ -153,6 +182,7 @@ CREATE TABLE "vdv_court" (
 	"created" timestamp with time zone NOT NULL,
 	"updated" timestamp with time zone NOT NULL,
 	"isdraft" bool NOT NULL,
+	"mainmediaid" int8,
 	CONSTRAINT "vdv_court_pkey" PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_court_to_vdv_landlord" FOREIGN KEY ("ownerid")
 		REFERENCES "vdv_landlord"("vdvid")
@@ -310,6 +340,7 @@ CREATE TABLE "vdv_request" (
 	"ownertype" varchar(40),
 	"requestid" int8,
 	"come" bool,
+	"iscanceled" bool NOT NULL,
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_request_to_vdv_account" FOREIGN KEY ("accountid")
 		REFERENCES "vdv_account"("vdvid")
@@ -347,3 +378,61 @@ CREATE TABLE "vdv_prop_request_time" (
 );
 INSERT INTO vdv_account (vdvid, name, phone, account_type) VALUES (1000, 'tester', '79110001122', 'landlord');
 INSERT INTO vdv_validation (vdvid, accountid, code) VALUES (NEXTVAL('vdv_seq'), 1000, 10000);
+
+DROP TABLE IF EXISTS "vdv_help" CASCADE;
+
+CREATE TABLE "vdv_help" (
+	"vdvid" int8 NOT NULL,
+	"accountid" int8,
+	"message" varchar(3000) NOT NULL,
+	"created" timestamp with time zone NOT NULL,
+	"isDone" bool NOT NULL,
+	"done_time" timestamp with time zone,
+	PRIMARY KEY("vdvid"),
+	CONSTRAINT "Ref_vdv_help_to_vdv_account" FOREIGN KEY ("accountid")
+		REFERENCES "vdv_account"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
+
+DROP TABLE IF EXISTS "vdv_extension" CASCADE;
+
+CREATE TABLE "vdv_extension" (
+	"vdvid" int8 NOT NULL,
+	"courtid" int8 NOT NULL,
+	"months" int4 NOT NULL,
+	"created" timestamp with time zone,
+	"isconfirmed" bool NOT NULL,
+	"confirmed_time" timestamp with time zone,
+	"extension_price" int4,
+	"tarrifid" int8,
+	PRIMARY KEY("vdvid"),
+	CONSTRAINT "Ref_vdv_extension_to_vdv_court" FOREIGN KEY ("courtid")
+		REFERENCES "vdv_court"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE,
+	CONSTRAINT "Ref_vdv_extension_to_vdv_tariff" FOREIGN KEY ("tarrifid")
+		REFERENCES "vdv_tariff"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
+
+INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол');
+INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол S');
+INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол M');
+INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол L');
+INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Волейбол');
+INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Баскетбол');
+INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Танцы');
+INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Йога');
+
+INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Мяч');
+INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Пуфик');
+INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Диван');
+INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Телевизор');

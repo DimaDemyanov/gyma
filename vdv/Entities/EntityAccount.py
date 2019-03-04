@@ -47,16 +47,8 @@ class EntityAccount(EntityBase, Base):
 
     @classmethod
     def add_from_json(cls, data):
-        #PROPNAME_MAPPING = EntityProp.map_name_id()
 
         vdvid = None
-
-        # PROP_MAPPING = {
-        #     'private':
-        #         lambda session, _vdvid, _id, _value, _uid: PropBool(_vdvid, _id, _value).add(session=session, no_commit=True),
-        #     'avatar':
-        #         lambda s, _vdvid, _id, _val, _uid: cls.process_media(s, 'image', _uid, _vdvid, _id, _val)
-        # }
 
         if 'phone' in data and 'name' in data:
             phone = data['phone']
@@ -77,7 +69,6 @@ class EntityAccount(EntityBase, Base):
             new_entity = EntityAccount(username, phone, mediaid, email, password)
             vdvid = new_entity.add()
 
-        #if 'prop' in data:
         try:
             with DBConnection() as session:
                 session.db.commit()
@@ -93,28 +84,14 @@ class EntityAccount(EntityBase, Base):
             PropMedia.delete(_vdvid, _id, False)
             cls.process_media(s, 'image', _vdvid, _vdvid, _id, _val)
 
-        # PROPNAME_MAPPING = EntityProp.map_name_id()
-
         vdvid = None
-
-        # PROP_MAPPING = {
-        #     'private':
-        #         lambda session, _vdvid, _id, _value:
-        #         PropBool(_vdvid, _id, _value).update(session=session)
-        #         if len(PropBool.get().filter_by(vdvid=_vdvid, propid=_id).all())
-        #         else PropBool(_vdvid, _id, _value).add(session=session),
-        #     'avatar':
-        #         lambda s, _vdvid, _id, _val:
-        #         process_avatar(s, _vdvid, _id, _val)
-        #
-        # }
 
         if 'id' in data:
             with DBConnection() as session:
                 vdvid = data['id']
                 entity = session.db.query(EntityAccount).filter_by(vdvid=vdvid).all()
                 if len(entity) == 0:
-                    vdvid = -1          # No user with givven id
+                    vdvid = -1          # No user with given id
                 if len(entity):
                     for _ in entity:
                         if 'name' in data:
@@ -128,12 +105,6 @@ class EntityAccount(EntityBase, Base):
 
                         if 'password' in data:
                             _.password = data['password']
-
-
-                        # if 'prop' in data:
-                        #     for prop_name, prop_val in data['prop'].items():
-                        #         if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
-                        #             PROP_MAPPING[prop_name](session, vdvid, PROPNAME_MAPPING[prop_name], prop_val)
 
                         session.db.commit()
 

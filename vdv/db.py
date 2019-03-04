@@ -11,8 +11,8 @@ class DBConnection:
         'port': 5432,
         'sid': 'VDV',
         'user': 'vdv_admin',
-        'password': "asdfghjkl;'",
-        'pool_size': 2
+        'password': "",
+        'pool_size': 20
     }
 
     @classmethod

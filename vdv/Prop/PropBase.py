@@ -36,9 +36,24 @@ class PropBase:
 
         return None
 
+    # def update(self, session, no_commit=False):
+    #     def proseed(session):
+    #         entities = self.__class__.get().filter_by(vdvid=self.vdvid, propid=self.propid).all()
+    #         for _ in entities:
+    #             _.value = self.value
+    #
+    #         if not no_commit:
+    #             session.db.commit()
+    #
+    #     if session:
+    #         proseed(session)
+    #
+    #     with DBConnection() as session:
+    #         proseed(session)
+
     def update(self, session, no_commit=False):
         def proseed(session):
-            entities = self.__class__.get().filter_by(vdvid=self.vdvid, propid=self.propid).all()
+            entities = self.__class__.get().filter_by(vdvid=self.vdvid, propid=self.propid).delete()
             for _ in entities:
                 _.value = self.value
 
@@ -51,6 +66,7 @@ class PropBase:
         with DBConnection() as session:
             proseed(session)
 
+
     @classmethod
     def delete(cls, vdvid, propid, raise_exception=True):
         with DBConnection() as session:
@@ -59,9 +75,9 @@ class PropBase:
             if len(res):
                 [session.db.delete(_) for _ in res]
                 session.db.commit()
-            else:
-                if raise_exception:
-                    raise FileNotFoundError('(vdvid, propid)=(%i, %i) was not found' % (vdvid, propid))
+            # else:
+            #     if raise_exception:
+            #         raise FileNotFoundError('(vdvid, propid)=(%i, %i) was not found' % (vdvid, propid))
 
     @classmethod
     def delete_one(cls, vdvid, value, raise_exception=True):
@@ -71,9 +87,6 @@ class PropBase:
             if len(res):
                 [session.db.delete(_) for _ in res]
                 session.db.commit()
-            else:
-                if raise_exception:
-                    raise FileNotFoundError('(vdvid, value)=(%i, %i) was not found' % (vdvid, value))
 
     @classmethod
     def delete_value(cls, value, raise_exception=True):

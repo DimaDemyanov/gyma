@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "version": "2.0.1",
-    "title": "VDV"
+    "title": "GYMA"
   },
   "host": "127.0.0.1:4201",
   "basePath": "/vdv",
@@ -114,6 +114,30 @@
     {
       "name": "location API",
       "description": "Everything about locations",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "help API",
+      "description": "Unlocked help API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "special API",
+      "description": "Other API functions",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "tariffs API",
+      "description": "Other API functions",
       "externalDocs": {
         "description": "Find out more",
         "url": "http://swagger.io"
@@ -310,9 +334,21 @@
             "required": true,
             "type": "string",
             "enum": [
-              "drafts",
+              "all",
               "published",
-              "all"
+              "drafts"
+            ]
+          },
+          {
+            "name": "sortedby",
+            "in": "query",
+            "description": "sorting type",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "price",
+              "popularity",
+              "any"
             ]
           }
         ],
@@ -517,6 +553,18 @@
             "required": true,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "ispublished",
+            "in": "query",
+            "description": "desired type",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "published",
+              "notpublished",
+              "all"
+            ]
           }
         ],
         "responses": {
@@ -647,14 +695,14 @@
           {
             "name": "courtid",
             "in": "query",
-            "description": "date",
+            "description": "courtid",
             "required": true,
             "type": "string"
           },
           {
             "name": "times",
             "in": "query",
-            "description": "Court encoded in JSON string",
+            "description": "Free court times",
             "required": true,
             "type": "array",
             "items": {
@@ -773,12 +821,7 @@
           "412": {
             "description": "Phone already exists(return an id of existed account)"
           }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
+        }
       },
       "put": {
         "tags": [
@@ -1117,6 +1160,202 @@
         ]
       }
     },
+    "/simpleuser": {
+      "post": {
+        "tags": [
+          "special users API"
+        ],
+        "summary": "Create a simpleuser(ready)",
+        "description": "Create a simpleuser",
+        "operationId": "createSimpleuser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_simpleuser",
+            "in": "body",
+            "description": "User encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Simpleuser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Account with given id already has spacial user"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "special users API"
+        ],
+        "summary": "Update a simpleuser(ready)",
+        "description": "Update a simpleuser",
+        "operationId": "updateSimpleuser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "simpleuser",
+            "in": "body",
+            "description": "User encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Simpleuser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Account with given id already has spacial user"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/simpleuser/{simpleuserId}": {
+      "get": {
+        "tags": [
+          "special users API"
+        ],
+        "summary": "Get simpleuser by ID(ready)",
+        "description": "Returns a simpleuser item",
+        "operationId": "getSimpleuser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "simpleuserId",
+            "in": "path",
+            "description": "ID of simpleuser to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Simpleuser"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Simpleuser not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "special users API"
+        ],
+        "summary": "Remove simpleuser item",
+        "description": "",
+        "operationId": "deleteSimpleuser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "simpleuserId",
+            "in": "path",
+            "description": "Simpleuser id to unlink",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Simpleuser not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/confirmRules": {
+      "post": {
+        "tags": [
+          "special users API"
+        ],
+        "summary": "Confirm rules for relative special account on authorized user(ready)",
+        "description": "Returns a requests of specified court",
+        "operationId": "confirmRules",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "specialuser",
+            "in": "query",
+            "description": "specialuser",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "landlord",
+              "simpleuser"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/request": {
       "post": {
         "tags": [
@@ -1172,7 +1411,7 @@
           "request API"
         ],
         "summary": "Get all user requests(ready)",
-        "description": "Returns a requests of specified user",
+        "description": "Мои заказы. Пользователь. id владельца по залу.",
         "operationId": "getAllUserRequests",
         "produces": [
           "application/json"
@@ -1190,7 +1429,7 @@
             "name": "date",
             "in": "query",
             "description": "date",
-            "required": true,
+            "required": false,
             "type": "string",
             "format": "int64"
           }
@@ -1234,7 +1473,7 @@
             "name": "date",
             "in": "query",
             "description": "date",
-            "required": true,
+            "required": false,
             "type": "string",
             "format": "int64"
           }
@@ -1278,7 +1517,7 @@
             "name": "date",
             "in": "query",
             "description": "date",
-            "required": true,
+            "required": false,
             "type": "string",
             "format": "int64"
           }
@@ -1324,7 +1563,11 @@
             "description": "filter",
             "required": true,
             "type": "string",
-            "enum": ["notconfirmed", "confirmed", "all"]
+            "enum": [
+              "notconfirmed",
+              "confirmed",
+              "all"
+            ]
           }
         ],
         "responses": {
@@ -1364,6 +1607,48 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Request not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/cancel/request/{requestId}": {
+      "post": {
+        "tags": [
+          "request API"
+        ],
+        "summary": "Cancel request item(ready)",
+        "description": "",
+        "operationId": "cancelRequest",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "description": "Request id to cancel",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
           "400": {
             "description": "Invalid ID supplied"
           },
@@ -1400,6 +1685,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Ok"
+          },
           "400": {
             "description": "Invalid ID supplied"
           },
@@ -1823,6 +2111,87 @@
         ]
       }
     },
+    "/location/filter": {
+      "get": {
+        "tags": [
+          "location API"
+        ],
+        "summary": "Get all locations(ready)",
+        "description": "Returns a list of locations descriptions",
+        "operationId": "getLocationsWithFilter",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "sportid",
+            "in": "query",
+            "description": "Sport id",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "date",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "timeBegin",
+            "in": "query",
+            "description": "Start period time",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "timeEnd",
+            "in": "query",
+            "description": "End period time",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "description": "Min price",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "description": "Max price",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "equipmentid",
+            "in": "query",
+            "description": "Equipment id",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/location/{locId}": {
       "get": {
         "tags": [
@@ -1899,12 +2268,12 @@
         ]
       }
     },
-    "/location/inarea": {
+    "/inarea/location": {
       "get": {
         "tags": [
           "location API"
         ],
-        "summary": "Get locations in area(ready)",
+        "summary": "Get locations in area(not ready)",
         "description": "Returns a list of locations descriptions",
         "operationId": "getLocationsInArea",
         "produces": [
@@ -2292,12 +2661,7 @@
           "412": {
             "description": "Key can not be send"
           }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
+        }
       }
     },
     "/validate": {
@@ -2313,15 +2677,15 @@
         "parameters": [
           {
             "in": "formData",
-            "name": "key",
-            "type": "string",
-            "description": "A person's key."
-          },
-          {
-            "in": "formData",
             "name": "phone",
             "type": "string",
             "description": "A person's phone."
+          },
+          {
+            "in": "formData",
+            "name": "key",
+            "type": "string",
+            "description": "A person's key."
           }
         ],
         "responses": {
@@ -2340,6 +2704,40 @@
           "411": {
             "description": "There is no accounts with given phone"
           }
+        }
+      }
+    },
+    "/help": {
+      "post": {
+        "tags": [
+          "help API"
+        ],
+        "summary": "Send help message(ready)",
+        "operationId": "createHelp",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_help",
+            "in": "body",
+            "description": "Help encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Help"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
         },
         "security": [
           {
@@ -2347,6 +2745,155 @@
           }
         ]
       }
+    },
+    "/help/done/{helpId}": {
+      "post": {
+        "tags": [
+          "help API"
+        ],
+        "summary": "Mark help as done(ready)",
+        "operationId": "setDoneHelp",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Help id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    }
+  },
+  "/tariff": {
+    "post": {
+      "tags": [
+        "tarrifs API"
+      ],
+      "summary": "Create new tariff(ready)",
+      "operationId": "createTariff",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "name": "new_tariff",
+          "in": "body",
+          "description": "Tariff encoded in JSON string",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/Tariff"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "successful operation",
+          "schema": {
+            "$ref": "#/definitions/ApiResponse"
+          }
+        },
+        "405": {
+          "description": "Validation exception"
+        },
+        "412": {
+          "description": "Name already taken"
+        }
+      },
+      "security": [
+        {
+          "auth_env": []
+        }
+      ]
+    },
+    "get": {
+      "tags": [
+        "tarrifs API"
+      ],
+      "summary": "Get all tariffs(ready)",
+      "operationId": "getAllTariffs",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "successful operation",
+          "schema": {
+            "$ref": "#/definitions/ApiResponse"
+          }
+        }
+      },
+      "security": [
+        {
+          "auth_env": []
+        }
+      ]
+    }
+  },
+  "/tariff/{tariffId}": {
+    "delete": {
+      "tags": [
+        "tarrifs API"
+      ],
+      "summary": "Delete tariff(ready)",
+      "operationId": "deleteTariff",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "name": "tariffId",
+          "in": "path",
+          "description": "ID of tariff to return",
+          "required": true,
+          "type": "integer",
+          "format": "int64"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "successful operation",
+          "schema": {
+            "$ref": "#/definitions/Court"
+          }
+        },
+        "400": {
+          "description": "Invalid ID supplied"
+        },
+        "404": {
+          "description": "Tariff not found"
+        }
+      },
+      "security": [
+        {
+          "auth_env": []
+        }
+      ]
     }
   },
   "securityDefinitions": {
@@ -2423,6 +2970,25 @@
         "company": {
           "type": "string",
           "example": "Fitness house"
+        },
+        "isAgreeRules": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Simpleuser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "accountid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "isAgreeRules": {
+          "type": "boolean"
         }
       }
     },
@@ -2468,7 +3034,7 @@
         },
         "ispublished": {
           "type": "boolean",
-          "example": true
+          "example": false
         },
         "created": {
           "type": "string",
@@ -2480,6 +3046,9 @@
         },
         "isdraft": {
           "type": "boolean"
+        },
+        "mainmediaid": {
+          "type": "integer"
         },
         "prop": {
           "type": "object",
@@ -2667,6 +3236,53 @@
         "name": {
           "type": "string",
           "example": "Ball"
+        }
+      }
+    },
+    "Help": {
+      "type": "object",
+      "required": [
+        "accountid",
+        "message"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "accountid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "2018-03-28 20:24:00+00:00"
+        },
+        "isDone": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Tariff": {
+      "type": "object",
+      "required": [
+        "months",
+        "price",
+        "sale"
+      ],
+      "properties": {
+        "months": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "integer"
+        },
+        "sale": {
+          "type": "integer",
+          "description": "In percents"
         }
       }
     },

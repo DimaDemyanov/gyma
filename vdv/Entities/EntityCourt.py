@@ -4,6 +4,7 @@ import time
 
 from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean, cast
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
@@ -53,10 +54,12 @@ class EntityCourt(EntityBase, Base):
     created = Column(Date)
     updated = Column(Date)
     isdraft = Column(Boolean)
+    mainmediaid = Column(Integer)
+    # request = relationship("EntityRequest", back_populates="court")
 
-    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'months', 'request_time', 'ispublished', 'created', 'updated', 'isdraft']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'months', 'request_time', 'ispublished', 'created', 'updated', 'isdraft', 'mainmediaid']
 
-    def __init__(self, ownerid, name, desc, price, time_begin, months, ispublished, isdraft):
+    def __init__(self, ownerid, name, desc, price, time_begin, months, ispublished, isdraft, mainmediaid):
         super().__init__()
 
         self.ownerid = ownerid
@@ -67,6 +70,7 @@ class EntityCourt(EntityBase, Base):
         self.months = months
         self.ispublished = ispublished
         self.isdraft = isdraft
+        self.mainmediaid = mainmediaid
 
         ts = time.time()
         self.request_time = self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
@@ -122,7 +126,11 @@ class EntityCourt(EntityBase, Base):
                 desc = data['desc']
             else:
                 desc = ''
-            new_entity = EntityCourt(ownerid, name, desc, price, time_begin, months, ispublished, isdraft)
+            if 'mainmediaid' in data:
+                mainmediaid = data['mainmediaid']
+            else:
+                mainmediaid = -1
+            new_entity = EntityCourt(ownerid, name, desc, price, time_begin, months, ispublished, isdraft, mainmediaid)
             vdvid = new_entity.add()
 
         if 'prop' in data:
@@ -152,6 +160,16 @@ class EntityCourt(EntityBase, Base):
             PropMedia.delete(_vdvid, _id, False)
             cls.process_media(s, 'image', _vdvid, _vdvid, _id, _val)
 
+        def update_eq(s, _vdvid, _id, _val, _uid):
+            PropEquipment.delete(_vdvid, _id)
+            return [PropEquipment(_vdvid, _id, _).add(session=s, no_commit=True)
+             for _ in _val]
+
+        def update_sp(s, _vdvid, _id, _val, _uid):
+            PropSport.delete(_vdvid, _id)
+            return [PropSport(_vdvid, _id, _).add(session=s, no_commit=True)
+             for _ in _val]
+
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         vdvid = None
@@ -164,11 +182,9 @@ class EntityCourt(EntityBase, Base):
                 lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'image', _uid, _vdvid, _id, _)
                                                     for _ in _val],
             'equipment':
-                lambda s, _vdvid, _id, _val, _uid: [PropEquipment(_vdvid, _id, _).update(session=s, no_commit=True)
-                                                    for _ in _val],
+                update_eq,
             'sport':
-                lambda s, _vdvid, _id, _val, _uid: [PropSport(_vdvid, _id, _).update(session=s, no_commit=True)
-                                                    for _ in _val],
+                update_sp,
             'court_time':
                 lambda s, _vdvid, _id, _val, _uid: cls.update_times(s, _vdvid, _id, _val, _uid)
         }
@@ -206,42 +222,27 @@ class EntityCourt(EntityBase, Base):
         return vdvid
 
     @classmethod
-    def confirm(cls, data, isconfirmed = True):
+    def confirm(cls, id, isconfirmed = True):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         vdvid = None
 
-        if 'id' in data:
-            with DBConnection() as session:
-                vdvid = data['id']
-                entity = session.db.query(EntityCourt).filter_by(vdvid=vdvid).all()
-                if len(entity) == 0:
-                    vdvid = -1  # No user with given id
-                if len(entity):
-                    for _ in entity:
-                        if 'ownerid' in data:
-                            _.ownerid = data['ownerid']
+        with DBConnection() as session:
+            vdvid = id
+            entity = session.db.query(EntityCourt).filter_by(vdvid=vdvid).all()
+            if len(entity) == 0:
+                vdvid = -1  # No user with given id
+            if len(entity):
+                for _ in entity:
 
-                        if 'name' in data:
-                            _.name = data['name']
+                    _.ispublished = isconfirmed
 
-                        if 'desc' in data:
-                            _.desc = data['desc']
+                    ts = time.time()
 
-                        if 'price' in data:
-                            _.price = data['price']
+                    _.time_begin = datetime.datetime.fromtimestamp(ts).strftime(
+                        '%Y-%m-%d %H:%M')
 
-                        if 'months' in data:
-                            _.months = data['months']
-
-                        _.ispublished = isconfirmed
-
-                        ts = time.time()
-
-                        _.time_begin = datetime.datetime.fromtimestamp(ts).strftime(
-                            '%Y-%m-%d %H:%M')
-
-                        session.db.commit()
+                    session.db.commit()
 
         return vdvid
 
