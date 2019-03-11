@@ -29,6 +29,7 @@ class EntityAccount(EntityBase, Base):
     mediaid = Column(Integer)
     email = Column(String)
     password = Column(String)
+    account_type = Column(String)
     # Добавить поля password, is_admin, is_arendo
 
     json_serialize_items_list = ['vdvid', 'name', 'phone', 'created', 'updated', 'mediaid', 'email', 'password']
@@ -41,7 +42,7 @@ class EntityAccount(EntityBase, Base):
         self.mediaid = mediaid
         self.email = email
         self.password = password
-
+        self.account_type = ""
         ts = time.time()
         self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
 

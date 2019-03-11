@@ -48,32 +48,29 @@ class EntityCourt(EntityBase, Base):
     desc = Column(String)
     price = Column(Integer)
     time_begin = Column(Date)
-    months = Column(Date)
-    request_time = Column(Date)
+    time_end = Column(Date)
     ispublished = Column(Boolean)
     created = Column(Date)
     updated = Column(Date)
     isdraft = Column(Boolean)
     mainmediaid = Column(Integer)
-    # request = relationship("EntityRequest", back_populates="court")
+    #request = relationship("EntityRequest", back_populates="court")
 
-    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'months', 'request_time', 'ispublished', 'created', 'updated', 'isdraft', 'mainmediaid']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'time_end', 'ispublished', 'created', 'updated', 'isdraft', 'mainmediaid']
 
-    def __init__(self, ownerid, name, desc, price, time_begin, months, ispublished, isdraft, mainmediaid):
+    def __init__(self, ownerid, name, desc, price, ispublished, isdraft, mainmediaid):
         super().__init__()
 
         self.ownerid = ownerid
         self.name = name
         self.desc = desc
         self.price = price
-        self.time_begin = time_begin
-        self.months = months
         self.ispublished = ispublished
         self.isdraft = isdraft
         self.mainmediaid = mainmediaid
 
         ts = time.time()
-        self.request_time = self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
+        self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
 
     def create_times(s, _vdvid, _id, _val, _uid):
         for _ in _val:
@@ -108,14 +105,9 @@ class EntityCourt(EntityBase, Base):
 
         }
 
-        if 'ownerid' in data and 'name' in data and 'months' in data and 'isdraft' in data:
+        if 'ownerid' in data and 'name' in data and 'isdraft' in data:
             ownerid = data['ownerid']
             name = data['name']
-            if 'time_begin' in data:
-                time_begin = data['time_begin']
-            else:
-                time_begin = None
-            months = data['months']
             isdraft = data['isdraft']
             ispublished = False
             if 'price' in data:
@@ -130,7 +122,7 @@ class EntityCourt(EntityBase, Base):
                 mainmediaid = data['mainmediaid']
             else:
                 mainmediaid = -1
-            new_entity = EntityCourt(ownerid, name, desc, price, time_begin, months, ispublished, isdraft, mainmediaid)
+            new_entity = EntityCourt(ownerid, name, desc, price, ispublished, isdraft, mainmediaid)
             vdvid = new_entity.add()
 
         if 'prop' in data:
@@ -209,9 +201,6 @@ class EntityCourt(EntityBase, Base):
                         if 'price' in data:
                             _.price = data['price']
 
-                        if 'months' in data:
-                            _.months = data['months']
-
                         if 'prop' in data:
                             for prop_name, prop_val in data['prop'].items():
                                 if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:
@@ -274,7 +263,8 @@ class EntityCourt(EntityBase, Base):
             'location':  lambda _vdvid, _id: PropLocation.delete(_vdvid, _id, False),
             'request': lambda _vdvid, _id: PropRequest.delete(_vdvid, _id, False),
             'media':     lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False),
-            'equipment': lambda _vdvid, _id: PropMedia.delete(_vdvid, _id, False)
+            'equipment': lambda _vdvid, _id: PropEquipment.delete(_vdvid, _id, False),
+            'sport': lambda _vdvid, _id: PropSport.delete(_vdvid, _id, False)
         }
 
         for key, propid in PROPNAME_MAPPING.items():

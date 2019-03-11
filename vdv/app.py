@@ -21,11 +21,13 @@ from falcon_multipart.middleware import MultipartMiddleware
 from vdv.Entities.EntityCourt import EntityCourt, create_times, update_times
 from vdv import utils
 from vdv.Entities.EntityEquipment import EntityEquipment
+from vdv.Entities.EntityExtension import EntityExtention
 from vdv.Entities.EntityHelp import EntityHelp
 from vdv.Entities.EntityLandlord import EntityLandlord
 from vdv.Entities.EntityRequest import EntityRequest
 from vdv.Entities.EntitySimpleuser import EntitySimpleuser
 from vdv.Entities.EntitySport import EntitySport
+from vdv.Entities.EntityTariff import EntityTariff
 from vdv.Entities.EntityTime import EntityTime
 from vdv.Entities.EntityValidation import EntityValidation
 from vdv.Prop.PropCourtTime import PropCourtTime
@@ -35,6 +37,7 @@ from vdv.Prop.PropSport import PropSport
 from vdv.auth import auth
 # from vdv.auth import JWT_SIGN_ALGORITHM
 from vdv.db import DBConnection
+from vdv.o_utils.utils import get_curr_date
 from vdv.serve_swagger import SpecServer
 
 from vdv.Entities.EntityBase import EntityBase
@@ -280,7 +283,7 @@ def getAllUserRequests(**request_handler_args):
     resp.status = falcon.HTTP_200
 
 
-def getAllCourtRequests(**request_handler_args):
+def getAllCourtRequestsByDate(**request_handler_args):
     PROPNAME_MAPPING = EntityProp.map_name_id()
 
     req = request_handler_args['req']
@@ -292,6 +295,9 @@ def getAllCourtRequests(**request_handler_args):
     else:
         date = None
     res = []
+
+    # TODO: rewrite SQL theme
+
     if date:
         ondate = EntityTime.get().filter(cast(EntityTime.time, Date) == date).all()
         for _ in ondate:
@@ -304,6 +310,23 @@ def getAllCourtRequests(**request_handler_args):
             for j in EntityRequest.get_request_by_requestid(i.requestid):
                 res.append(j)
     resp.body = obj_to_json([o.to_dict() for o in res])
+    resp.status = falcon.HTTP_200
+
+def getAllCourtRequest(**request_handler_args):
+    PROPNAME_MAPPING = EntityProp.map_name_id()
+
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    res = []
+
+    id = getIntPathParam('courtId', **request_handler_args)
+    # extentions = EntityExtention.get().filter(EntityExtention.isconfirmed == False or (cast(EntityExtention.confirmed_time, DateTime) > get_curr_date() - timedelta(hours=24))).all()
+
+    with DBConnection() as session:
+        res = session.db.query(EntityRequest, EntityTime).filter(EntityRequest.vdvid==id).filter(cast(EntityTime.time, DateTime) > get_curr_date() - timedelta(hours=24)).distinct(EntityRequest.vdvid)
+
+    resp.body = obj_to_json([o[0].to_dict() for o in res])
     resp.status = falcon.HTTP_200
 
 
@@ -602,7 +625,8 @@ def getAllCourts(**request_handler_args):
     filter = req.params['filter1']  # post_data['filter']
 
     with DBConnection() as session:
-        objects = session.db.query(EntityCourt, EntityRequest, func.count(EntityRequest.vdvid).label('total'))
+        objects = session.db.query(EntityCourt, EntityRequest, func.count(EntityRequest.vdvid).label('total'))\
+            .filter(EntityRequest.courtid == EntityCourt.vdvid).group_by(EntityCourt.vdvid).group_by(EntityRequest.vdvid)
     if filter == 'all':
         objects = objects
 
@@ -620,6 +644,9 @@ def getAllCourts(**request_handler_args):
     if filter == 'published':
         objects = objects.filter_by(ispublished=True)
 
+    if filter == 'notpublished':
+        objects = objects.filter_by(ispublished=False)
+
     if not objects:
         resp.status = falcon.HTTP_408
         return
@@ -629,7 +656,7 @@ def getAllCourts(**request_handler_args):
     if sort_order == 'price':
         objects = objects.order_by(EntityCourt.price)
     if sort_order == 'popularity':
-        objects = objects.filter(EntityRequest.courtid == EntityCourt.vdvid).group_by(EntityCourt.vdvid).group_by(EntityRequest.vdvid).distinct(EntityCourt.vdvid, 'total').order_by('total', EntityCourt.vdvid)
+        objects = objects.distinct(EntityCourt.vdvid, 'total').order_by('total', EntityCourt.vdvid)
 
     a = objects.all()
     b = [EntityCourt.get_wide_object(d[0].vdvid) for d in a]
@@ -830,6 +857,7 @@ def deleteCourt(**request_handler_args):
 
     if id is not None:
         try:
+            EntityCourt.delete_wide_object(id)
             EntityCourt.delete(id)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
@@ -1077,7 +1105,7 @@ def deleteLandlord(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
     for o in objects:
-        EntityLandlord.delete(EntityLandlord, o.vdvid)
+        EntityLandlord.delete(o.vdvid)
     resp.status = falcon.HTTP_200
 
 
@@ -1225,14 +1253,37 @@ def getUserById(**request_handler_args):
     e_mail = req.context['phone']
     my_id = EntityAccount.get_id_from_email(e_mail)
 
-    # wide_info = EntityAccount.get_wide_object(id, ['private', 'avatar', 'post'])
-    #
-    # wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
-    #
-    # wide_info['is_me'] = my_id == id
-    # wide_info['followed'] = EntityFollow.get().filter_by(vdvid=my_id, followingid=id).count() > 0
-    # wide_info['following_amount'] = EntityFollow.get().filter_by(vdvid=id).count()
-    # wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
+    res = []
+    for _ in objects:
+        obj_dict = _.to_dict(['vdvid', 'name', 'phone', 'mediaid'])
+
+        landlords = EntityLandlord.get().filter_by(accountid=_.vdvid).all()
+        if len(landlords) > 0:
+            obj_dict['landlord'] = EntityLandlord.get_wide_object(landlords[0].vdvid)
+        simpleusers = EntitySimpleuser.get().filter_by(accountid=_.vdvid).all()
+        if len(simpleusers) > 0:
+            obj_dict['simpleuser'] = EntitySimpleuser.get_wide_object(simpleusers[0].vdvid)
+
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res)
+    resp.status = falcon.HTTP_200
+
+def getUserByPhone(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    if 'phone' in req.params:
+        phone = req.params['phone']
+    else:
+        resp.status = falcon.HTTP_407
+        return
+
+    objects = EntityAccount.get().filter_by(phone=phone).all()
+
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
 
     res = []
     for _ in objects:
@@ -1244,7 +1295,6 @@ def getUserById(**request_handler_args):
         simpleusers = EntitySimpleuser.get().filter_by(accountid=_.vdvid).all()
         if len(simpleusers) > 0:
             obj_dict['simpleuser'] = EntitySimpleuser.get_wide_object(simpleusers[0].vdvid)
-        # obj_dict.update(wide_info)
 
         res.append(obj_dict)
 
@@ -2023,6 +2073,56 @@ def createComment(**request_handler_args):
     resp.status = falcon.HTTP_500
 
 
+def createTariff(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    req = request_handler_args['req']
+
+    try:
+        e_mail = req.context['phone']
+    except:
+        resp.status = falcon.HTTP_400
+
+    params = json.loads(req.stream.read().decode('utf-8'))
+    try:
+        id = EntityTariff.add_from_json(params)
+    except Exception as e:
+        logger.info(e)
+        resp.status = falcon.HTTP_412
+        return
+    if id:
+        objects = EntityTariff.get().filter_by(vdvid=id).all()
+
+        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_200
+
+def deleteTariff(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('tariffId', **request_handler_args)
+
+    if id is not None:
+        try:
+            EntityTariff.delete(id)
+        except FileNotFoundError:
+            resp.status = falcon.HTTP_404
+            return
+        object = EntityTariff.get().filter_by(vdvid=id).all()
+        if not len(object):
+            resp.status = falcon.HTTP_200
+            return
+
+    resp.status = falcon.HTTP_400
+
+def getAllTariffs(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+
+    objects = EntityTariff.get().all()
+
+    resp.body = obj_to_json([o.to_dict() for o in objects])
+
+    resp.status = falcon.HTTP_200
+
 def sendkey(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
@@ -2157,11 +2257,101 @@ def createHelp(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
-
 def setDoneHelp(**request_handler_args):
     resp = request_handler_args['resp']
     id = getIntPathParam('helpId', **request_handler_args)
     EntityHelp.set_done(id)
+    resp.status = falcon.HTTP_200
+
+def createExtention(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    req = request_handler_args['req']
+
+    try:
+        phone = req.context['phone']
+    except:
+        resp.status = falcon.HTTP_400
+
+    params = json.loads(req.stream.read().decode('utf-8'))
+    try:
+        id = EntityExtention.add_from_json(params)
+    except Exception as e:
+        logger.info(e)
+        resp.status = falcon.HTTP_412
+        return
+    if id:
+        objects = EntityExtention.get().filter_by(vdvid=id).all()
+
+        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_200
+
+def updateExtention(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    req = request_handler_args['req']
+
+    try:
+        phone = req.context['phone']
+    except:
+        resp.status = falcon.HTTP_400
+
+    params = json.loads(req.stream.read().decode('utf-8'))
+    try:
+        id = EntityExtention.update_from_json(params)
+    except Exception as e:
+        logger.info(e)
+        resp.status = falcon.HTTP_412
+        return
+    if id:
+        objects = EntityExtention.get().filter_by(vdvid=id).all()
+        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.status = falcon.HTTP_200
+    resp.status = falcon.HTTP_200
+
+def confirmExtention(**request_handler_args):  # TODO: implement it
+    resp = request_handler_args['resp']
+    req = request_handler_args['req']
+    id = getIntPathParam('extentionid', **request_handler_args)
+    if('adminid' in req.params):
+        adminid = req.params['adminid']
+    else:
+        resp.status = falcon.HTTP_407
+        return
+    EntityExtention.confirm(id, adminid)
+    resp.status = falcon.HTTP_200
+
+def getAllExtentions(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    extentions = EntityExtention.get().filter(EntityExtention.isconfirmed == False
+                                              or (cast(EntityExtention.confirmed_time, DateTime)
+                                                  > get_curr_date() - timedelta(hours=24)))\
+        .order_by(EntityExtention.created)\
+        .all()
+
+    resp.body = obj_to_json([o.to_dict() for o in extentions])
+    resp.status = falcon.HTTP_200
+
+def getExtentionsByLandlordId(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('landlordId', **request_handler_args)
+    with DBConnection() as session:
+        objects = session.db.query(EntityExtention, EntityCourt).filter(EntityCourt.ownerid==id)
+    isconfirmed = req.params['isconfirmed']
+
+    # wide_info = EntityCourt.get_wide_object(id)
+
+    extentions = objects
+    if isconfirmed == 'confirmed':
+        extentions = extentions.filter(EntityExtention.isconfirmed==True)
+    if isconfirmed == 'notconfirmed':
+        extentions = extentions.filter(EntityExtention.isconfirmed==False)
+    extentions = extentions.all()
+
+    resp.body = obj_to_json([o[0].to_dict() for o in extentions])
     resp.status = falcon.HTTP_200
 
 
@@ -2200,7 +2390,8 @@ operation_handlers = {
 
     # Request methods
     'createRequest': [createRequest],
-    'getAllCourtRequests': [getAllCourtRequests],
+    'getAllCourtRequests': [getAllCourtRequestsByDate],
+    'getAllCourtRequest': [getAllCourtRequest],
     'getAllUserRequests': [getAllUserRequests],
     'getAllLandlordRequests': [getAllLandlordRequests],
     'getAllLandlordRequestsWithFilter': [getAllLandlordRequestsWithFilter],
@@ -2242,6 +2433,7 @@ operation_handlers = {
     'updateUser': [updateUser],
     'getAllUsers': [getAllUsers],
     'getUser': [getUserById],
+    'getUserByPhone': [getUserByPhone],
     'getMyUser': [getMyUser],
     'deleteUser': [deleteUser],
     'getUserFollowingsList': [getUserFollowingsList],
@@ -2308,7 +2500,14 @@ operation_handlers = {
     # Tariff methods
     'createTariff': [createTariff],
     'getAllTariffs': [getAllTariffs],
-    'deleteTariff': [deleteTariff]
+    'deleteTariff': [deleteTariff],
+
+    # Extention methods
+    'createExtention': [createExtention],
+    'updateExtention': [updateExtention],
+    'confirmExtention': [confirmExtention],
+    'getAllExtentions': [getAllExtentions],
+    'getExtentionsByLandlordId': [getExtentionsByLandlordId]
 }
 
 
@@ -2363,8 +2562,9 @@ class Auth(object):
             try:
                 payload = jwt.decode(jwt_token, JWT_PUBLIC_KEY,
                                      algorithms=[JWT_SIGN_ALGORITHM])
-                id = EntityAccount.get_id_from_phone(phone=payload.get("phone"))
+                id = EntityAccount.get_id_from_phone(phone=payload.get('phone'))
                 if not id:
+                    resp.status = falcon.HTTP_401
                     raise Exception("No user with given token's phone")
                 req.context['phone'] = payload.get('phone')
 

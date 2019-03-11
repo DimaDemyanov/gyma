@@ -336,6 +336,7 @@
             "enum": [
               "all",
               "published",
+              "notpublished",
               "drafts"
             ]
           },
@@ -917,6 +918,48 @@
         ]
       }
     },
+    "/user/getByPhone": {
+      "get": {
+        "tags": [
+          "user API"
+        ],
+        "summary": "Find user by phone(ready)",
+        "description": "Returns a user description",
+        "operationId": "getUserByPhone",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "phone",
+            "in": "query",
+            "description": "Phone of user to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Account"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
     "/user/{userId}": {
       "get": {
         "tags": [
@@ -1109,7 +1152,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/Landlord"
+              "$ref": "#/definitions/LandLord"
             }
           },
           "400": {
@@ -1449,14 +1492,14 @@
         ]
       }
     },
-    "/request/allByCourt/{courtId}": {
+    "/request/allByCourtAndDate/{courtId}": {
       "get": {
         "tags": [
           "request API"
         ],
         "summary": "Get all requests on court(ready)",
         "description": "Returns a requests of specified court",
-        "operationId": "getAllCourtRequests",
+        "operationId": "getAllCourtRequestsByDate",
         "produces": [
           "application/json"
         ],
@@ -1475,6 +1518,42 @@
             "description": "date",
             "required": false,
             "type": "string",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/request/allByCourt/{courtId}": {
+      "get": {
+        "tags": [
+          "request API"
+        ],
+        "summary": "Get all requests on court(ready)",
+        "description": "Returns a requests of specified court",
+        "operationId": "getAllCourtRequests",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "courtId",
+            "in": "path",
+            "description": "ID of court",
+            "required": true,
+            "type": "integer",
             "format": "int64"
           }
         ],
@@ -2761,7 +2840,7 @@
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "helpId",
             "in": "path",
             "description": "Help id",
             "required": true,
@@ -2779,121 +2858,330 @@
           }
         ]
       }
-    }
-  },
-  "/tariff": {
-    "post": {
-      "tags": [
-        "tarrifs API"
-      ],
-      "summary": "Create new tariff(ready)",
-      "operationId": "createTariff",
-      "consumes": [
-        "application/json"
-      ],
-      "produces": [
-        "application/json"
-      ],
-      "parameters": [
-        {
-          "name": "new_tariff",
-          "in": "body",
-          "description": "Tariff encoded in JSON string",
-          "required": true,
-          "schema": {
-            "$ref": "#/definitions/Tariff"
-          }
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "successful operation",
-          "schema": {
-            "$ref": "#/definitions/ApiResponse"
-          }
-        },
-        "405": {
-          "description": "Validation exception"
-        },
-        "412": {
-          "description": "Name already taken"
-        }
-      },
-      "security": [
-        {
-          "auth_env": []
-        }
-      ]
     },
-    "get": {
-      "tags": [
-        "tarrifs API"
-      ],
-      "summary": "Get all tariffs(ready)",
-      "operationId": "getAllTariffs",
-      "consumes": [
-        "application/json"
-      ],
-      "produces": [
-        "application/json"
-      ],
-      "responses": {
-        "200": {
-          "description": "successful operation",
-          "schema": {
-            "$ref": "#/definitions/ApiResponse"
+    "/extention": {
+      "post": {
+        "tags": [
+          "extention API"
+        ],
+        "summary": "Add new extention(ready)",
+        "operationId": "createExtention",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_extention",
+            "in": "body",
+            "description": "Extention encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Extention"
+            }
           }
-        }
-      },
-      "security": [
-        {
-          "auth_env": []
-        }
-      ]
-    }
-  },
-  "/tariff/{tariffId}": {
-    "delete": {
-      "tags": [
-        "tarrifs API"
-      ],
-      "summary": "Delete tariff(ready)",
-      "operationId": "deleteTariff",
-      "consumes": [
-        "application/json"
-      ],
-      "produces": [
-        "application/json"
-      ],
-      "parameters": [
-        {
-          "name": "tariffId",
-          "in": "path",
-          "description": "ID of tariff to return",
-          "required": true,
-          "type": "integer",
-          "format": "int64"
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "successful operation",
-          "schema": {
-            "$ref": "#/definitions/Court"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
           }
         },
-        "400": {
-          "description": "Invalid ID supplied"
-        },
-        "404": {
-          "description": "Tariff not found"
-        }
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
       },
-      "security": [
-        {
-          "auth_env": []
-        }
-      ]
+      "put": {
+        "tags": [
+          "extention API"
+        ],
+        "summary": "Update extention(ready)",
+        "operationId": "updateExtention",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_extention",
+            "in": "body",
+            "description": "Extention encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Extention"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "extention API"
+        ],
+        "summary": "Find all extentions(ready)",
+        "description": "Returns extentions description",
+        "operationId": "getAllExtentions",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Extention"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Extention not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/confirm/extention/{extentionid}": {
+      "post": {
+        "tags": [
+          "extention API"
+        ],
+        "summary": "Confirm extention(ready)",
+        "operationId": "confirmExtention",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "extentionid",
+            "in": "path",
+            "description": "ID of extention to confirm",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "adminid",
+            "in": "query",
+            "description": "ID of admin who confirm",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Extention not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+     "/extention/landlord/{landlordId}": {
+      "get": {
+        "tags": [
+          "extention API"
+        ],
+        "summary": "Find extentions by landlord ID(ready)",
+        "description": "Returns extentions description",
+        "operationId": "getExtentionsByLandlordId",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "landlordId",
+            "in": "path",
+            "description": "ID of landlord to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "isconfirmed",
+            "in": "query",
+            "description": "desired type",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "confirmed",
+              "notconfirmed",
+              "all"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Extention"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Landlord not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/tariff": {
+      "post": {
+        "tags": [
+          "tariffs API"
+        ],
+        "summary": "Create new tariff(ready)",
+        "operationId": "createTariff",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "new_tariff",
+            "in": "body",
+            "description": "Tariff encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Tariff"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Name already taken"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "tariffs API"
+        ],
+        "summary": "Get all tariffs(ready)",
+        "operationId": "getAllTariffs",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
+    },
+    "/tariff/{tariffId}": {
+      "delete": {
+        "tags": [
+          "tariffs API"
+        ],
+        "summary": "Delete tariff(ready)",
+        "operationId": "deleteTariff",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "tariffId",
+            "in": "path",
+            "description": "ID of tariff to return",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Court"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Tariff not found"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
     }
   },
   "securityDefinitions": {
@@ -2992,6 +3280,40 @@
         }
       }
     },
+    "Extention": {
+      "type": "object",
+      "required": [
+        "courtid",
+        "tariffid"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "courtid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "tariffid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "adminid": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "isconfirmed": {
+          "type": "boolean"
+        },
+        "confirmed_time": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string"
+        }
+      }
+    },
     "Court": {
       "type": "object",
       "required": [
@@ -3024,9 +3346,9 @@
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
         },
-        "months": {
-          "type": "integer",
-          "example": "3/6/12"
+        "time_end": {
+          "type": "string",
+          "example": "2018-03-28 20:24:00+00:00"
         },
         "request_time": {
           "type": "string",
@@ -3300,10 +3622,6 @@
           "type": "string"
         }
       }
-    },
-    "externalDocs": {
-      "description": "Find out more about Swagger",
-      "url": "http://swagger.io"
     }
   }
 }

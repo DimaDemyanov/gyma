@@ -167,6 +167,25 @@ WITH (
 
 ALTER TABLE "vdv_simple_user" OWNER TO "postgres";
 
+DROP TABLE IF EXISTS "vdv_admin" CASCADE;
+
+CREATE TABLE "vdv_admin" (
+	"vdvid" BIGSERIAL NOT NULL,
+	"accountid" int8,
+	PRIMARY KEY("vdvid"),
+	CONSTRAINT "Ref_vdv_admin_to_vdv_account" FOREIGN KEY ("accountid")
+		REFERENCES "vdv_account"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+)
+WITH (
+	OIDS = False
+);
+
+ALTER TABLE "vdv_admin" OWNER TO "postgres";
+
 DROP TABLE IF EXISTS "vdv_court" CASCADE;
 
 CREATE TABLE "vdv_court" (
@@ -176,8 +195,7 @@ CREATE TABLE "vdv_court" (
 	"desc" varchar(4000) NOT NULL DEFAULT ''::character varying,
 	"price" int4,
 	"time_begin" timestamp with time zone,
-	"months" int8 NOT NULL,
-	"request_time" timestamp with time zone,
+	"time_end" timestamp with time zone,
 	"ispublished" bool,
 	"created" timestamp with time zone NOT NULL,
 	"updated" timestamp with time zone NOT NULL,
@@ -397,17 +415,16 @@ CREATE TABLE "vdv_help" (
 	NOT DEFERRABLE
 );
 
-DROP TABLE IF EXISTS "vdv_extension" CASCADE;
+DROP TABLE IF EXISTS "vdv_extention" CASCADE;
 
-CREATE TABLE "vdv_extension" (
+CREATE TABLE "vdv_extention" (
 	"vdvid" int8 NOT NULL,
 	"courtid" int8 NOT NULL,
-	"months" int4 NOT NULL,
-	"created" timestamp with time zone,
+	"tariffid" int8,
 	"isconfirmed" bool NOT NULL,
 	"confirmed_time" timestamp with time zone,
-	"extension_price" int4,
-	"tarrifid" int8,
+	"created" timestamp with time zone,
+	"adminid" int8,
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_extension_to_vdv_court" FOREIGN KEY ("courtid")
 		REFERENCES "vdv_court"("vdvid")
@@ -415,8 +432,14 @@ CREATE TABLE "vdv_extension" (
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE,
-	CONSTRAINT "Ref_vdv_extension_to_vdv_tariff" FOREIGN KEY ("tarrifid")
+	CONSTRAINT "Ref_vdv_extension_to_vdv_tariff" FOREIGN KEY ("tariffid")
 		REFERENCES "vdv_tariff"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE,
+	CONSTRAINT "Ref_vdv_extension_to_vdv_admin" FOREIGN KEY ("adminid")
+		REFERENCES "vdv_admin"("vdvid")
 	MATCH SIMPLE
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
@@ -436,3 +459,9 @@ INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Мяч');
 INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Пуфик');
 INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Диван');
 INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Телевизор');
+
+INSERT INTO vdv_tariff (vdvid, months, price, sale) VALUES (NEXTVAL('vdv_seq'), '3', '1000', '0');
+INSERT INTO vdv_tariff (vdvid, months, price, sale) VALUES (NEXTVAL('vdv_seq'), '6', '2000', '10');
+INSERT INTO vdv_tariff (vdvid, months, price, sale) VALUES (NEXTVAL('vdv_seq'), '12', '4000', '20');
+
+INSERT INTO vdv_admin (vdvid, accountid) VALUES (NEXTVAL('vdv_seq'), '1000');

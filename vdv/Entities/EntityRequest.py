@@ -39,7 +39,7 @@ class EntityRequest(EntityBase, Base):
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     accountid = Column(Integer)
-    courtid = Column(Integer, ForeignKey('vdv_court.vdvid'))
+    courtid = Column(Integer)
     isconfirmed = Column(Boolean)
     ownertype = Column(String)
     requestid = Column(Integer)
