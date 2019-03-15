@@ -47,8 +47,8 @@ class EntityCourt(EntityBase, Base):
     name = Column(String)
     desc = Column(String)
     price = Column(Integer)
-    timeBegin = Column(Date)
-    timeEnd = Column(Date)
+    timebegin = Column(Date)
+    timeend = Column(Date)
     ispublished = Column(Boolean)
     created = Column(Date)
     updated = Column(Date)
@@ -56,7 +56,7 @@ class EntityCourt(EntityBase, Base):
     mainmediaid = Column(Integer)
     #request = relationship("EntityRequest", back_populates="court")
 
-    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'timeBegin', 'timeEnd', 'ispublished', 'created', 'updated', 'isdraft', 'mainmediaid']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'timebegin', 'timeend', 'ispublished', 'created', 'updated', 'isdraft', 'mainmediaid']
 
     def __init__(self, ownerid, name, desc, price, ispublished, isdraft, mainmediaid):
         super().__init__()
@@ -228,7 +228,7 @@ class EntityCourt(EntityBase, Base):
 
                     ts = time.time()
 
-                    _.timeBegin = datetime.datetime.fromtimestamp(ts).strftime(
+                    _.timebegin = datetime.datetime.fromtimestamp(ts).strftime(
                         '%Y-%m-%d %H:%M')
 
                     session.db.commit()

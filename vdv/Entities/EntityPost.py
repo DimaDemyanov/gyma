@@ -9,7 +9,6 @@ from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityProp import EntityProp
 
 from vdv.Prop.PropLocation import PropLocation
-from vdv.Prop.PropComment import PropComment
 from vdv.Prop.PropLike import PropLike
 from vdv.Prop.PropMedia import PropMedia
 

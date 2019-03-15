@@ -45,16 +45,10 @@ from vdv.Entities.EntityBase import EntityBase
 from vdv.Entities.EntityAccount import EntityAccount
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityMedia import EntityMedia
-from vdv.Entities.EntityPost import EntityPost
-from vdv.Entities.EntityFollow import EntityFollow
-from vdv.Entities.EntityLike import EntityLike
-from vdv.Entities.EntityComment import EntityComment
 
 from vdv.search import *
 
 from vdv.Prop.PropMedia import PropMedia
-from vdv.Prop.PropLike import PropLike
-from vdv.Prop.PropComment import PropComment
 
 from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
@@ -476,7 +470,7 @@ def createSport(**request_handler_args):  # TODO: implement it
     if id:
         objects = EntitySport.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
@@ -527,7 +521,7 @@ def getSportById(**request_handler_args):
     e_mail = req.context['phone']
     my_id = EntityAccount.get_id_from_email(e_mail)
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
 
@@ -550,7 +544,7 @@ def createEquipment(**request_handler_args):  # TODO: implement it
     if id:
         objects = EntityEquipment.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
@@ -586,7 +580,7 @@ def getEquipments(**request_handler_args):  # TODO: implement it
 
     objects = EntityEquipment.get().all()
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json(objects[0].to_dict())
 
     resp.status = falcon.HTTP_200
 
@@ -601,7 +595,7 @@ def getEquipmentById(**request_handler_args):
     e_mail = req.context['phone']
     my_id = EntityAccount.get_id_from_email(e_mail)
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
 
@@ -798,7 +792,7 @@ def easyCreateCourt(**request_handler_args):
     if id:
         objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
 
 
@@ -821,7 +815,7 @@ def createCourt(**request_handler_args):
     if id:
         objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
         return
     resp.status = falcon.HTTP_406
@@ -840,7 +834,7 @@ def updateCourt(**request_handler_args):
         if id:
             objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -891,7 +885,7 @@ def confirmCourtById(**request_handler_args):
         if id:
             objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -915,7 +909,7 @@ def declineCourtById(**request_handler_args):
         if id:
             objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1022,7 +1016,7 @@ def createAccount(**request_handler_args):
         if id:
             objects = EntityAccount.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1046,7 +1040,7 @@ def createLandlord(**request_handler_args):
         if id:
             objects = EntityLandlord.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1069,7 +1063,7 @@ def updateLandlord(**request_handler_args):
         if id:
             objects = EntityLandlord.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1090,7 +1084,7 @@ def getLandlord(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
 
@@ -1123,7 +1117,7 @@ def createSimpleuser(**request_handler_args):
         if id:
             objects = EntitySimpleuser.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1146,7 +1140,7 @@ def updateSimpleuser(**request_handler_args):
         if id:
             objects = EntitySimpleuser.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1167,7 +1161,7 @@ def getSimpleuser(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
 
@@ -1196,11 +1190,19 @@ def confirmRules(**request_handler_args):
     specialuser = req.params['specialuser']
 
     if specialuser == 'landlord':
-        object = EntityLandlord.get().filter_by(accountid=id).all()[0]
+        users = EntityLandlord.get().filter_by(accountid=id).all()
+        if len(users) == 0:
+            resp.status = falcon.HTTP_404
+            return
+        object = users[0]
         EntityLandlord.confirm_rules(object.vdvid)
 
     if specialuser == 'simpleuser':
-        object = EntitySimpleuser.get().filter_by(accountid=id).all()[0]
+        users =  EntitySimpleuser.get().filter_by(accountid=id).all()
+        if len(users) == 0:
+            resp.status = falcon.HTTP_404
+            return
+        object = users[0]
         EntitySimpleuser.confirm_rules(object.vdvid)
 
     resp.status = falcon.HTTP_200
@@ -1219,7 +1221,7 @@ def updateUser(**request_handler_args):
         if id:
             objects = EntityAccount.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1311,16 +1313,6 @@ def getMyUser(**request_handler_args):
 
     objects = EntityAccount.get().filter_by(vdvid=id).all()
 
-    # TODO: LIMIT the posts output counts with a paging
-    # wide_info = EntityAccount.get_wide_object(id)
-
-    # wide_info['post'].sort(key=lambda x: x['vdvid'], reverse=True)
-    # followings = EntityFollow.get().filter_by(vdvid=id).all()
-    # wide_info['is_me'] = True
-    # wide_info['followed'] = False
-    # wide_info['following_amount'] = len(followings)
-    # wide_info['followers_amount'] = EntityFollow.get().filter_by(followingid=id).count()
-
     res = []
     for _ in objects:
         obj_dict = _.to_dict(['vdvid', 'name', 'phone', 'mediaid'])
@@ -1331,11 +1323,10 @@ def getMyUser(**request_handler_args):
         simpleusers = EntitySimpleuser.get().filter_by(accountid=_.vdvid).all()
         if len(simpleusers) > 0:
             obj_dict['simpleuser'] = EntitySimpleuser.get_wide_object(simpleusers[0].vdvid)
-        # obj_dict.update(wide_info)
 
         res.append(obj_dict)
 
-    resp.body = obj_to_json(res)
+    resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
 
 
@@ -1534,7 +1525,7 @@ def createMedia(**request_handler_args):
             resp.body = obj_to_json("Media uploading error\nException::\n" + str(e))
             return
 
-    resp.body = obj_to_json(results)
+    resp.body = obj_to_json(results[0])
     resp.status = falcon.HTTP_200
 
 
@@ -1546,7 +1537,7 @@ def getAllOwnerMedias(**request_handler_args):
 
     if id is not None:
         objects = EntityMedia.get().filter_by(ownerid=id).all()
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
         return
 
@@ -1562,7 +1553,7 @@ def getMedia(**request_handler_args):
     if id is not None:
         objects = EntityMedia.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
         return
 
@@ -1612,7 +1603,7 @@ def createLocation(**request_handler_args):
     if id:
         objects = EntityLocation.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
         return
 
@@ -1628,7 +1619,7 @@ def getLocationById(**request_handler_args):
     if id is not None:
         objects = EntityLocation.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
         return
 
@@ -1676,8 +1667,8 @@ def getLocationsWithFilter(**request_handler_args):
     else:
         sportid = None
     # date = req.params['date']
-    timeBegin = req.params['timeBegin']
-    timeEnd = req.params['timeEnd']
+    # timeBegin = req.params['timeBegin']
+    # timeEnd = req.params['timeEnd']
     if 'timeBegin' in req.params and 'timeEnd' in req.params:
         timeBegin = req.params['timeBegin']
         timeEnd = req.params['timeEnd']
@@ -1796,7 +1787,7 @@ def getAllPosts(**request_handler_args):
 
     objects = EntityPost.get().all()
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
 
@@ -1816,7 +1807,7 @@ def createPost(**request_handler_args):
     if id:
         objects = EntityPost.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
         return
 
@@ -1834,7 +1825,7 @@ def updatePost(**request_handler_args):
         if id:
             objects = EntityPost.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1913,7 +1904,7 @@ def getAllLikes(**request_handler_args):
 
     objects = EntityLike.get().all()
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
 
@@ -1928,7 +1919,7 @@ def updateLike(**request_handler_args):
         if id:
             objects = EntityLike.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1975,7 +1966,7 @@ def createLike(**request_handler_args):
     if id:
         objects = EntityLike.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
         return
 
@@ -2004,7 +1995,7 @@ def getAllComments(**request_handler_args):
 
     objects = EntityComment.get().all()
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
 
@@ -2019,7 +2010,7 @@ def updateComment(**request_handler_args):
         if id:
             objects = EntityComment.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json([o.to_dict() for o in objects])
+            resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -2066,7 +2057,7 @@ def createComment(**request_handler_args):
     if id:
         objects = EntityComment.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
         return
 
@@ -2092,7 +2083,7 @@ def createTariff(**request_handler_args):  # TODO: implement it
     if id:
         objects = EntityTariff.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
@@ -2119,7 +2110,7 @@ def getAllTariffs(**request_handler_args):  # TODO: implement it
 
     objects = EntityTariff.get().all()
 
-    resp.body = obj_to_json([o.to_dict() for o in objects])
+    resp.body = obj_to_json(objects[0].to_dict())
 
     resp.status = falcon.HTTP_200
 
@@ -2153,10 +2144,10 @@ def sendkey(**request_handler_args):
                     data = {
                         'vdvid': validation.vdvid,
                         'code': key,
-                        'times_a_day': 1 if validation.time_send.year != curr_time.year \
+                        'timesADay': 1 if validation.time_send.year != curr_time.year \
                                             or validation.time_send.month != curr_time.month \
                                             or validation.time_send.day != curr_time.day else 2,
-                        'time_send': curr_time.strftime('%Y-%m-%d %H:%M')
+                        'timeSend': curr_time.strftime('%Y-%m-%d %H:%M')
                     }
 
                     EntityValidation.update(data=data)
@@ -2177,8 +2168,8 @@ def sendkey(**request_handler_args):
         else:
             data = {
                 'code': key,
-                'times_a_day': 1,
-                'time_send': curr_time.strftime('%Y-%m-%d %H:%M'),
+                'timesADay': 1,
+                'timeSend': curr_time.strftime('%Y-%m-%d %H:%M'),
                 'accountid': accountid
             }
             EntityValidation.create(data=data)
@@ -2253,7 +2244,7 @@ def createHelp(**request_handler_args):  # TODO: implement it
     if id:
         objects = EntityHelp.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
@@ -2282,7 +2273,7 @@ def createExtention(**request_handler_args):  # TODO: implement it
     if id:
         objects = EntityExtention.get().filter_by(vdvid=id).all()
 
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
@@ -2304,7 +2295,7 @@ def updateExtention(**request_handler_args):  # TODO: implement it
         return
     if id:
         objects = EntityExtention.get().filter_by(vdvid=id).all()
-        resp.body = obj_to_json([o.to_dict() for o in objects])
+        resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
@@ -2325,7 +2316,7 @@ def getAllExtentions(**request_handler_args):
     resp = request_handler_args['resp']
 
     extentions = EntityExtention.get().filter(EntityExtention.isconfirmed == False
-                                              or (cast(EntityExtention.confirmed_time, DateTime)
+                                              or (cast(EntityExtention.confirmedTime, DateTime)
                                                   > get_curr_date() - timedelta(hours=24)))\
         .order_by(EntityExtention.created)\
         .all()

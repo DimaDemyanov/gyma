@@ -25,26 +25,26 @@ class EntityValidation(EntityBase, Base):
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     accountid = Column(Integer)
     code = Column(Integer)
-    time_send = Column(Date)
-    times_a_day = Column(Integer)
+    timesend = Column(Date)
+    timesaday = Column(Integer)
 
     #json_serialize_items_list = ['vdvid', 'name', 'phone', 'created', 'updated', 'mediaid', 'e_mail', 'password']
 
-    def __init__(self, accountid, code, times_a_day):
+    def __init__(self, accountid, code, timesADay):
         super().__init__()
 
         self.accountid = accountid
         self.code = code
         ts = time.time()
-        self.time_send = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
-        self.times_a_day = times_a_day
+        self.timesend = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
+        self.timesaday = timesADay
 
     @classmethod
     def create(cls, data):
 
         vdvid = None
 
-        new_entity = EntityValidation(data['accountid'], data['code'], data['times_a_day'])
+        new_entity = EntityValidation(data['accountid'], data['code'], data['timesADay'])
         vdvid = new_entity.add()
 
         #if 'prop' in data:
@@ -73,11 +73,11 @@ class EntityValidation(EntityBase, Base):
                         if 'code' in data:
                             _.code = data['code']
 
-                        if 'times_a_day' in data:
-                            _.times_a_day = data['times_a_day']
+                        if 'timesADay' in data:
+                            _.timesADay = data['timesADay']
 
-                        if 'time_send' in data:
-                            _.data_send = data['time_send']
+                        if 'timesend' in data:
+                            _.data_send = data['timesend']
 
                         session.db.commit()
 

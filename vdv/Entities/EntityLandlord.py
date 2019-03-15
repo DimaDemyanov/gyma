@@ -27,10 +27,10 @@ class EntityLandlord(EntityBase, Base):
     money = Column(Integer)
     isentity = Column(Boolean)
     company = Column(String)
-    isAgreeRules = Column(Boolean)
+    isagreerules = Column(Boolean)
     # Добавить поля password, is_admin, is_arendo
 
-    json_serialize_items_list = ['vdvid', 'accountid', 'money', 'isentity', 'company', 'isAgreeRules']
+    json_serialize_items_list = ['vdvid', 'accountid', 'money', 'isentity', 'company', 'isagreerules']
 
     def __init__(self, accountid, money, isentity, company, isAgreeRules):
         super().__init__()
@@ -38,7 +38,7 @@ class EntityLandlord(EntityBase, Base):
         self.money = money
         self.isentity = isentity
         self.company = company
-        self.isAgreeRules = isAgreeRules
+        self.isagreerules = isAgreeRules
 
     @classmethod
     def add_from_json(cls, data):
@@ -55,7 +55,7 @@ class EntityLandlord(EntityBase, Base):
             vdvid = new_entity.add()
             from vdv.Entities.EntityAccount import EntityAccount
             account = EntityAccount.get().filter_by(vdvid=accountid).all()[0]
-            account.account_type = str(account.account_type) + "/landlord"
+            account.accounttype = str(account.accounttype) + "/landlord"
         try:
             with DBConnection() as session:
                 session.db.commit()
@@ -101,7 +101,7 @@ class EntityLandlord(EntityBase, Base):
                 vdvid = -1  # No user with given id
             if len(entity):
                 for _ in entity:
-                    _.isAgreeRules = True
+                    _.isagreerules = True
 
                 session.db.commit()
 

@@ -1,6 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityPost import EntityPost
 from vdv.Prop.PropBase import PropBase
 
 Base = declarative_base()

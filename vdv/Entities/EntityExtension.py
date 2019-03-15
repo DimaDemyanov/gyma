@@ -23,10 +23,10 @@ class EntityExtention(EntityBase, Base):
     tariffid = Column(Integer)
     adminid = Column(Integer)
     isconfirmed = Column(Boolean)
-    confirmedTime = Column(Date)
+    confirmedtime = Column(Date)
     created = Column(Date)
 
-    json_serialize_items_list = ['vdvid', 'courtid', 'tariffid', 'adminid', 'isconfirmed', 'confirmedTime', 'created']
+    json_serialize_items_list = ['vdvid', 'courtid', 'tariffid', 'adminid', 'isconfirmed', 'confirmedtime', 'created']
 
     def __init__(self, courtid, tariffid):
         super().__init__()
@@ -76,7 +76,7 @@ class EntityExtention(EntityBase, Base):
                         court.time_end = time_to_str(time_add(get_curr_date(), tariff.months))
                 court.ispublished = True
                 _.isconfirmed = True
-                _.confirmedTime = get_curr_date_str()
+                _.confirmedtime = get_curr_date_str()
                 _.adminid = adminid
                 session.db.commit()
 

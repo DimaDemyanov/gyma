@@ -10,7 +10,6 @@ from vdv.Entities.EntityAccount import EntityAccount
 from vdv.Entities.EntityCourt import EntityCourt
 from vdv.Entities.EntityLocation import EntityLocation
 from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityPost import EntityPost
 
 
 from vdv.Prop.PropLocation import PropLocation

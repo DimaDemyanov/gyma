@@ -98,7 +98,7 @@ CREATE TABLE "vdv_account" (
 	"mediaid" int8,
 	"email" varchar(256),
 	"password" varchar(256),
-	"account_type" varchar(30),
+	"accounttype" varchar(30),
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_account_to_vdv_media" FOREIGN KEY ("mediaid")
 		REFERENCES "vdv_media"("vdvid")
@@ -114,8 +114,8 @@ CREATE TABLE "vdv_validation" (
 	"vdvid" BIGSERIAL NOT NULL,
 	"accountid" int8,
 	"code" int8,
-	"time_send" timestamp with time zone,
-	"times_a_day" int4,
+	"timesend" timestamp with time zone,
+	"timesaday" int4,
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_validation_to_vdv_account" FOREIGN KEY ("accountid")
 		REFERENCES "vdv_account"("vdvid")
@@ -134,7 +134,7 @@ CREATE TABLE "vdv_landlord" (
 	"money" int4,
 	"isentity" bool,
 	"company" varchar(256),
-	"isAgreeRules" bool NOT NULL,
+	"isagreerules" bool NOT NULL,
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_landlord_to_vdv_account" FOREIGN KEY ("accountid")
 		REFERENCES "vdv_account"("vdvid")
@@ -152,7 +152,7 @@ DROP TABLE IF EXISTS "vdv_simple_user" CASCADE;
 CREATE TABLE "vdv_simple_user" (
 	"vdvid" BIGSERIAL NOT NULL,
 	"accountid" int8,
-	"isAgreeRules" bool NOT NULL,
+	"isagreerules" bool NOT NULL,
 	CONSTRAINT "vdv_user_pkey" PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_simple_user_to_vdv_account" FOREIGN KEY ("accountid")
 		REFERENCES "vdv_account"("vdvid")
@@ -194,8 +194,8 @@ CREATE TABLE "vdv_court" (
 	"name" varchar(256) NOT NULL,
 	"desc" varchar(4000) NOT NULL DEFAULT ''::character varying,
 	"price" int4,
-	"time_begin" timestamp with time zone,
-	"time_end" timestamp with time zone,
+	"timebegin" timestamp with time zone,
+	"timeend" timestamp with time zone,
 	"ispublished" bool,
 	"created" timestamp with time zone NOT NULL,
 	"updated" timestamp with time zone NOT NULL,
@@ -394,8 +394,6 @@ CREATE TABLE "vdv_prop_request_time" (
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE
 );
-INSERT INTO vdv_account (vdvid, name, phone, account_type) VALUES (1000, 'tester', '79110001122', 'landlord');
-INSERT INTO vdv_validation (vdvid, accountid, code) VALUES (NEXTVAL('vdv_seq'), 1000, 10000);
 
 DROP TABLE IF EXISTS "vdv_help" CASCADE;
 
@@ -404,8 +402,8 @@ CREATE TABLE "vdv_help" (
 	"accountid" int8,
 	"message" varchar(3000) NOT NULL,
 	"created" timestamp with time zone NOT NULL,
-	"isDone" bool NOT NULL,
-	"done_time" timestamp with time zone,
+	"isdone" bool NOT NULL,
+	"donetime" timestamp with time zone,
 	PRIMARY KEY("vdvid"),
 	CONSTRAINT "Ref_vdv_help_to_vdv_account" FOREIGN KEY ("accountid")
 		REFERENCES "vdv_account"("vdvid")
@@ -422,7 +420,7 @@ CREATE TABLE "vdv_extention" (
 	"courtid" int8 NOT NULL,
 	"tariffid" int8,
 	"isconfirmed" bool NOT NULL,
-	"confirmed_time" timestamp with time zone,
+	"confirmedTime" timestamp with time zone,
 	"created" timestamp with time zone,
 	"adminid" int8,
 	PRIMARY KEY("vdvid"),
@@ -445,6 +443,9 @@ CREATE TABLE "vdv_extention" (
 	ON UPDATE NO ACTION
 	NOT DEFERRABLE
 );
+
+INSERT INTO vdv_account (vdvid, name, phone, accounttype) VALUES (1000, 'tester', '79110001122', 'landlord');
+INSERT INTO vdv_validation (vdvid, accountid, code) VALUES (NEXTVAL('vdv_seq'), 1000, 10000);
 
 INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол');
 INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол S');

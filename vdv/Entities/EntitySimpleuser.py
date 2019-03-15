@@ -26,15 +26,14 @@ class EntitySimpleuser(EntityBase, Base):
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     accountid = Column(Integer)
-    isAgreeRules = Column(Boolean)
-    # Добавить поля password, is_admin, is_arendo
+    isagreerules = Column(Boolean)
 
-    json_serialize_items_list = ['vdvid', 'accountid', 'isAgreeRules']
+    json_serialize_items_list = ['vdvid', 'accountid', 'isagreerules']
 
-    def __init__(self, accountid, isAgreeRules):
+    def __init__(self, accountid, isagreerules):
         super().__init__()
         self.accountid = accountid
-        self.isAgreeRules = isAgreeRules
+        self.isagreerules = isagreerules
 
     @classmethod
     def add_from_json(cls, data):
@@ -70,7 +69,7 @@ class EntitySimpleuser(EntityBase, Base):
                             _.accountid = data['accountid']
 
                         if 'isAgreeRules' in data:
-                            _.isAgreeRules = data['isAgreeRules']
+                            _.isagreerules = data['isAgreeRules']
 
                         session.db.commit()
 
@@ -84,7 +83,7 @@ class EntitySimpleuser(EntityBase, Base):
                 vdvid = -1  # No user with given id
             if len(entity):
                 for _ in entity:
-                    _.isAgreeRules = True
+                    _.isagreerules = True
 
                 session.db.commit()
 
@@ -105,25 +104,15 @@ class EntitySimpleuser(EntityBase, Base):
         count_come = 0
         count_not_come = 0
 
-        # ondate = EntityTime.get(i).filter(cast(EntityTme.time, DateTime) < datetime.datetime.today()).all()
-        # ondate = EntityTime.get().all()
-        # res = []
-        # for _ in ondate:
-        #     reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['request_time'])
-        #     reqs_on_acc = EntityRequest.get().filter_by(accountid=accountid, isconfirmed = True).filter(EntityRequest.vdvid.in_(reqs))
-        #     count_come = count_come + len(reqs_on_acc.filter_by(come=True).all())
-        #     count_not_come = count_not_come + len(reqs_on_acc.filter_by(come=False).all())
 
         reqs = EntityRequest.get().filter_by(accountid=accountid, isconfirmed = True, come = True).all()
         for _ in reqs:
             times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['request_time'])
-            # count_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).filter(cast(EntityTime.time, DateTime) < datetime.datetime.today()).count() > 0 else 0
             count_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).count() > 0 else 0
 
         reqs = EntityRequest.get().filter_by(accountid=accountid, isconfirmed=True, come=False).all()
         for _ in reqs:
             times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['request_time'])
-            # count_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).filter(cast(EntityTime.time, DateTime) < datetime.datetime.today()).count() > 0 else 0
             count_not_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).count() > 0 else 0
 
         obj_dict.update({'sucsess': count_come, 'notsucsess': count_not_come})
