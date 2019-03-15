@@ -232,7 +232,7 @@
         ],
         "parameters": [
           {
-            "name": "new_court",
+            "name": "newCourt",
             "in": "body",
             "description": "Court encoded in JSON string",
             "required": true,
@@ -276,7 +276,7 @@
         ],
         "parameters": [
           {
-            "name": "new_court",
+            "name": "newCourt",
             "in": "body",
             "description": "Court encoded in JSON string",
             "required": true,
@@ -800,7 +800,7 @@
         ],
         "parameters": [
           {
-            "name": "new_user",
+            "name": "newUser",
             "in": "body",
             "description": "User encoded in JSON string",
             "required": true,
@@ -839,7 +839,7 @@
         ],
         "parameters": [
           {
-            "name": "new_user",
+            "name": "newUser",
             "in": "body",
             "description": "User encoded in JSON string",
             "required": true,
@@ -1059,7 +1059,7 @@
         ],
         "parameters": [
           {
-            "name": "new_landlord",
+            "name": "newLandlord",
             "in": "body",
             "description": "User encoded in JSON string",
             "required": true,
@@ -1219,7 +1219,7 @@
         ],
         "parameters": [
           {
-            "name": "new_simpleuser",
+            "name": "newSimpleuser",
             "in": "body",
             "description": "User encoded in JSON string",
             "required": true,
@@ -1415,7 +1415,7 @@
         ],
         "parameters": [
           {
-            "name": "new_request",
+            "name": "newRequest",
             "in": "body",
             "description": "Request encoded in JSON string",
             "required": true,
@@ -1876,7 +1876,7 @@
         ],
         "parameters": [
           {
-            "name": "new_request",
+            "name": "newRequest",
             "in": "body",
             "description": "Court time encoded in JSON string",
             "required": true,
@@ -2134,7 +2134,7 @@
         ],
         "parameters": [
           {
-            "name": "new_location",
+            "name": "newLocation",
             "in": "body",
             "description": "Court encoded in JSON string",
             "required": true,
@@ -2415,7 +2415,7 @@
         ],
         "parameters": [
           {
-            "name": "new_sport",
+            "name": "newSport",
             "in": "body",
             "description": "Comment encoded in JSON string",
             "required": true,
@@ -2568,7 +2568,7 @@
         ],
         "parameters": [
           {
-            "name": "new_equipment",
+            "name": "newEquipment",
             "in": "body",
             "description": "Comment encoded in JSON string",
             "required": true,
@@ -2801,7 +2801,7 @@
         ],
         "parameters": [
           {
-            "name": "new_help",
+            "name": "newHelp",
             "in": "body",
             "description": "Help encoded in JSON string",
             "required": true,
@@ -2874,7 +2874,7 @@
         ],
         "parameters": [
           {
-            "name": "new_extention",
+            "name": "newExtention",
             "in": "body",
             "description": "Extention encoded in JSON string",
             "required": true,
@@ -2911,7 +2911,7 @@
         ],
         "parameters": [
           {
-            "name": "new_extention",
+            "name": "newExtention",
             "in": "body",
             "description": "Extention encoded in JSON string",
             "required": true,
@@ -3083,7 +3083,7 @@
         ],
         "parameters": [
           {
-            "name": "new_tariff",
+            "name": "newTariff",
             "in": "body",
             "description": "Tariff encoded in JSON string",
             "required": true,
@@ -3196,10 +3196,10 @@
       "type": "object",
       "required": [
         "phone",
-        "account_type"
+        "accountType"
       ],
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -3223,7 +3223,7 @@
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
         },
-        "e_mail": {
+        "eMail": {
           "type": "string",
           "example": "maximov@itsociety.su"
         },
@@ -3231,7 +3231,7 @@
           "type": "string",
           "example": "12345678"
         },
-        "account_type": {
+        "accountType": {
           "type": "string",
           "example": "landlord/admin/coach/simpleuser"
         }
@@ -3240,7 +3240,7 @@
     "LandLord": {
       "type": "object",
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -3267,7 +3267,7 @@
     "Simpleuser": {
       "type": "object",
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -3287,7 +3287,7 @@
         "tariffid"
       ],
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -3306,7 +3306,7 @@
         "isconfirmed": {
           "type": "boolean"
         },
-        "confirmed_time": {
+        "confirmedTime": {
           "type": "string"
         },
         "created": {
@@ -3318,11 +3318,11 @@
       "type": "object",
       "required": [
         "ownerid",
-        "request_time",
+        "requestTime",
         "isdraft"
       ],
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -3342,15 +3342,15 @@
           "type": "integer",
           "format": "int64"
         },
-        "time_begin": {
+        "timeBegin": {
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
         },
-        "time_end": {
+        "timeEnd": {
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
         },
-        "request_time": {
+        "requestTime": {
           "type": "string",
           "example": "2018-03-28 20:24:00+00:00"
         },
@@ -3379,21 +3379,21 @@
               "type": "array",
               "items": {
                 "type": "integer",
-                "example": "media_id"
+                "example": "mediaId"
               }
             },
             "equipment": {
               "type": "array",
               "items": {
                 "type": "integer",
-                "example": "equipment_id"
+                "example": "equipmentId"
               }
             },
             "sport": {
               "type": "array",
               "items": {
                 "type": "integer",
-                "example": "sport_id"
+                "example": "sportId"
               }
             },
             "location": {
@@ -3431,7 +3431,7 @@
           "ownertype"
         ],
         "properties": {
-          "id": {
+          "vdvid": {
             "type": "integer",
             "format": "int64"
           },
@@ -3458,7 +3458,7 @@
           "prop": {
             "type": "object",
             "properties": {
-              "request_time": {
+              "requestTime": {
                 "type": "array",
                 "items": {
                   "type": "string",
@@ -3473,10 +3473,10 @@
     "Media": {
       "type": "object",
       "required": [
-        "id"
+        "vdvid"
       ],
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -3509,7 +3509,7 @@
         "longitude"
       ],
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -3532,10 +3532,10 @@
     "Sport": {
       "type": "object",
       "required": [
-        "id"
+        "vdvid"
       ],
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -3548,10 +3548,10 @@
     "Equipment": {
       "type": "object",
       "required": [
-        "id"
+        "vdvid"
       ],
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },
@@ -3568,7 +3568,7 @@
         "message"
       ],
       "properties": {
-        "id": {
+        "vdvid": {
           "type": "integer",
           "format": "int64"
         },

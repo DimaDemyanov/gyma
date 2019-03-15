@@ -2151,7 +2151,7 @@ def sendkey(**request_handler_args):
                         or validation.time_send.day != curr_time.day or validation.times_a_day < 2:
 
                     data = {
-                        'id': validation.vdvid,
+                        'vdvid': validation.vdvid,
                         'code': key,
                         'times_a_day': 1 if validation.time_send.year != curr_time.year \
                                             or validation.time_send.month != curr_time.month \

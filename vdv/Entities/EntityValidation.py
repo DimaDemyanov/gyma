@@ -62,9 +62,9 @@ class EntityValidation(EntityBase, Base):
 
         vdvid = None
 
-        if 'id' in data:
+        if 'vdvid' in data:
             with DBConnection() as session:
-                vdvid = data['id']
+                vdvid = data['vdvid']
                 entity = session.db.query(EntityValidation).filter_by(vdvid=vdvid).all()
                 if len(entity) == 0:
                     vdvid = -1          # No user with givven id

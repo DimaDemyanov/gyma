@@ -47,8 +47,8 @@ class EntityCourt(EntityBase, Base):
     name = Column(String)
     desc = Column(String)
     price = Column(Integer)
-    time_begin = Column(Date)
-    time_end = Column(Date)
+    timeBegin = Column(Date)
+    timeEnd = Column(Date)
     ispublished = Column(Boolean)
     created = Column(Date)
     updated = Column(Date)
@@ -56,7 +56,7 @@ class EntityCourt(EntityBase, Base):
     mainmediaid = Column(Integer)
     #request = relationship("EntityRequest", back_populates="court")
 
-    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'time_begin', 'time_end', 'ispublished', 'created', 'updated', 'isdraft', 'mainmediaid']
+    json_serialize_items_list = ['vdvid', 'ownerid', 'name', 'desc', 'price', 'timeBegin', 'timeEnd', 'ispublished', 'created', 'updated', 'isdraft', 'mainmediaid']
 
     def __init__(self, ownerid, name, desc, price, ispublished, isdraft, mainmediaid):
         super().__init__()
@@ -181,9 +181,9 @@ class EntityCourt(EntityBase, Base):
                 lambda s, _vdvid, _id, _val, _uid: cls.update_times(s, _vdvid, _id, _val, _uid)
         }
 
-        if 'id' in data:
+        if 'vdvid' in data:
             with DBConnection() as session:
-                vdvid = data['id']
+                vdvid = data['vdvid']
                 entity = session.db.query(EntityCourt).filter_by(vdvid=vdvid).all()
                 if len(entity) == 0:
                     vdvid = -1  # No user with given id
@@ -228,7 +228,7 @@ class EntityCourt(EntityBase, Base):
 
                     ts = time.time()
 
-                    _.time_begin = datetime.datetime.fromtimestamp(ts).strftime(
+                    _.timeBegin = datetime.datetime.fromtimestamp(ts).strftime(
                         '%Y-%m-%d %H:%M')
 
                     session.db.commit()

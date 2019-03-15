@@ -86,9 +86,9 @@ class EntityPost(EntityBase, Base):
     def update_from_json(cls, data):
         vdvid = None
 
-        if 'id' in data:
+        if 'vdvid' in data:
             with DBConnection() as session:
-                vdvid = data['id']
+                vdvid = data['vdvid']
                 entity = session.db.query(EntityPost).filter_by(vdvid=vdvid).all()
 
                 if len(entity):

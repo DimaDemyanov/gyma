@@ -29,7 +29,7 @@ class EntityAccount(EntityBase, Base):
     mediaid = Column(Integer)
     email = Column(String)
     password = Column(String)
-    account_type = Column(String)
+    accountType = Column(String)
     # Добавить поля password, is_admin, is_arendo
 
     json_serialize_items_list = ['vdvid', 'name', 'phone', 'created', 'updated', 'mediaid', 'email', 'password']
@@ -42,7 +42,7 @@ class EntityAccount(EntityBase, Base):
         self.mediaid = mediaid
         self.email = email
         self.password = password
-        self.account_type = ""
+        self.accountType = ""
         ts = time.time()
         self.created = self.updated = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M')
 
@@ -87,9 +87,9 @@ class EntityAccount(EntityBase, Base):
 
         vdvid = None
 
-        if 'id' in data:
+        if 'vdvid' in data:
             with DBConnection() as session:
-                vdvid = data['id']
+                vdvid = data['vdvid']
                 entity = session.db.query(EntityAccount).filter_by(vdvid=vdvid).all()
                 if len(entity) == 0:
                     vdvid = -1          # No user with given id

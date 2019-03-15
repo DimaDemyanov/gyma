@@ -58,9 +58,9 @@ class EntitySimpleuser(EntityBase, Base):
     def update_from_json(cls, data):
         vdvid = None
 
-        if 'id' in data:
+        if 'vdvid' in data:
             with DBConnection() as session:
-                vdvid = data['id']
+                vdvid = data['vdvid']
                 entity = session.db.query(EntitySimpleuser).filter_by(vdvid=vdvid).all()
                 if len(entity) == 0:
                     vdvid = -1          # No user with given id
