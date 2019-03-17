@@ -240,18 +240,20 @@ class EntityCourt(EntityBase, Base):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         PROP_MAPPING = {
-            'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id),
+            'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id)[0] if len(PropLocation.get_object_property(_vdvid, _id)) else -1,
             'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
             'equipment': lambda _vdvid, _id: PropEquipment.get_object_property(_vdvid, _id),
             'sport': lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id),
-            #'court_time': lambda _vdvid, _id: [str(EntityTime.get().filter_by(vdvid = _).all()[0].time) for _ in PropCourtTime.get_object_property(_vdvid, _id)]
         }
 
         result = EntityCourt.get().filter_by(vdvid=vdvid).all()[0].to_dict()
 
+        prop = {}
         for key, propid in PROPNAME_MAPPING.items():
             if key in PROP_MAPPING and (not len(items) or key in items):
-                result.update({key: PROP_MAPPING[key](vdvid, propid)})
+                prop.update({key: PROP_MAPPING[key](vdvid, propid)})
+
+        result.update({'prop': prop})
 
         return result
 

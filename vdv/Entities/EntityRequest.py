@@ -66,7 +66,7 @@ class EntityRequest(EntityBase, Base):
         vdvid = None
 
         PROP_MAPPING = {
-            'request_time':
+            'requestTime':
                 lambda s, _vdvid, _id, _val, _uid: to_request_times(s, _vdvid, _id, _val, _uid)
 
         }

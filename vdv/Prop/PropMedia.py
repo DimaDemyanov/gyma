@@ -13,10 +13,10 @@ class PropMedia(PropBase, Base):
     def __init__(self, vdvid, propid, value):
         super().__init__(vdvid, propid, value)
 
-    @classmethod
-    def get_object_property(cls, vdvid, propid, items=[]):
-        with DBConnection() as session:
-            return [_[1].to_dict(items) for _ in session.db.query(cls, EntityMedia).
-                filter(cls.vdvid == vdvid).
-                filter(cls.propid == propid).
-                filter(cls.value == EntityMedia.vdvid).all()]
+    # @classmethod
+    # def get_object_property(cls, vdvid, propid, items=[]):
+    #     with DBConnection() as session:
+    #         return [_[1].to_dict(items) for _ in session.db.query(cls, EntityMedia).
+    #             filter(cls.vdvid == vdvid).
+    #             filter(cls.propid == propid).
+    #             filter(cls.value == EntityMedia.vdvid).all()]

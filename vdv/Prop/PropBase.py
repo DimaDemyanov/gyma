@@ -53,7 +53,7 @@ class PropBase:
 
     def update(self, session, no_commit=False):
         def proseed(session):
-            entities = self.__class__.get().filter_by(vdvid=self.vdvid, propid=self.propid).delete()
+            entities = self.__class__.get().filter_by(vdvid=self.vdvid, propid=self.propid).all()
             for _ in entities:
                 _.value = self.value
 

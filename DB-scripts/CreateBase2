@@ -1,7 +1,7 @@
 
 
 DROP TYPE IF EXISTS vdv_prop_type CASCADE;
-CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request', 'equipment', 'sport', 'court_time', 'request_time');
+CREATE TYPE vdv_prop_type AS ENUM ('bool', 'int', 'real', 'media', 'comment', 'like', 'location', 'post', 'request', 'equipment', 'sport', 'courtTime', 'requestTime');
 
 DROP TABLE IF EXISTS "vdv_prop";
 CREATE TABLE "vdv_prop" (
@@ -15,8 +15,8 @@ CREATE TABLE "vdv_prop" (
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'location', 'location');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'equipment', 'equipment');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'sport', 'sport');
-INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'court_time', 'court_time');
-INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'request_time', 'request_time');
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'courtTime', 'courtTime');
+INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'requestTime', 'requestTime');
 INSERT INTO vdv_prop (vdvid, name, type) VALUES (NEXTVAL('vdv_seq'), 'media', 'media');
 
 DROP SEQUENCE IF EXISTS vdv_seq;
@@ -420,7 +420,7 @@ CREATE TABLE "vdv_extention" (
 	"courtid" int8 NOT NULL,
 	"tariffid" int8,
 	"isconfirmed" bool NOT NULL,
-	"confirmedTime" timestamp with time zone,
+	"confirmedtime" timestamp with time zone,
 	"created" timestamp with time zone,
 	"adminid" int8,
 	PRIMARY KEY("vdvid"),

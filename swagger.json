@@ -746,7 +746,7 @@
           {
             "name": "times",
             "in": "query",
-            "description": "Court encoded in JSON string",
+            "description": "Court times to update",
             "required": true,
             "type": "array",
             "items": {
@@ -812,7 +812,10 @@
             "description": "Validation exception"
           },
           "412": {
-            "description": "Phone already exists(return an id of existed account)"
+            "description": "Phone already exists(return an id of existed account)",
+            "schema": {
+              "type": "integer"
+            }
           }
         }
       },
@@ -873,7 +876,10 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/ApiResponse"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Account"
+              }
             }
           }
         },
@@ -1202,7 +1208,7 @@
         ],
         "summary": "Create a simpleuser(ready)",
         "description": "Create a simpleuser",
-        "operationId": "createSimpleuser",
+        "operationId": "createSimpleUser",
         "consumes": [
           "application/json"
         ],
@@ -1211,12 +1217,12 @@
         ],
         "parameters": [
           {
-            "name": "newSimpleuser",
+            "name": "newSimpleUser",
             "in": "body",
             "description": "User encoded in JSON string",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Simpleuser"
+              "$ref": "#/definitions/SimpleUser"
             }
           }
         ],
@@ -1243,7 +1249,7 @@
         ],
         "summary": "Update a simpleuser(ready)",
         "description": "Update a simpleuser",
-        "operationId": "updateSimpleuser",
+        "operationId": "updateSimpleUser",
         "consumes": [
           "application/json"
         ],
@@ -1257,7 +1263,7 @@
             "description": "User encoded in JSON string",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Simpleuser"
+              "$ref": "#/definitions/SimpleUser"
             }
           }
         ],
@@ -1286,7 +1292,7 @@
         ],
         "summary": "Get simpleuser by ID(ready)",
         "description": "Returns a simpleuser item",
-        "operationId": "getSimpleuser",
+        "operationId": "getSimpleUser",
         "produces": [
           "application/json"
         ],
@@ -1304,14 +1310,14 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/Simpleuser"
+              "$ref": "#/definitions/SimpleUser"
             }
           },
           "400": {
             "description": "Invalid ID supplied"
           },
           "404": {
-            "description": "Simpleuser not found"
+            "description": "SimpleUser not found"
           }
         },
         "security": [
@@ -1326,7 +1332,7 @@
         ],
         "summary": "Remove simpleuser item",
         "description": "",
-        "operationId": "deleteSimpleuser",
+        "operationId": "deleteSimpleUser",
         "produces": [
           "application/json"
         ],
@@ -1334,7 +1340,7 @@
           {
             "name": "simpleuserId",
             "in": "path",
-            "description": "Simpleuser id to unlink",
+            "description": "SimpleUser id to unlink",
             "required": true,
             "type": "integer",
             "format": "int64"
@@ -1345,7 +1351,7 @@
             "description": "Invalid ID supplied"
           },
           "404": {
-            "description": "Simpleuser not found"
+            "description": "SimpleUser not found"
           }
         },
         "security": [
@@ -1415,7 +1421,10 @@
             "description": "Request encoded in JSON string",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Request"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Request"
+              }
             }
           }
         ],
@@ -1423,7 +1432,10 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/ApiResponse"
+              "type" : "array",
+              "items": {
+                "$ref": "#/definitions/Request"
+              }
             }
           },
           "405": {
@@ -1476,8 +1488,14 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/ApiResponse"
+              "type" : "array",
+              "items": {
+                "$ref": "#/definitions/Request"
+              }
             }
+          },
+          "404": {
+            "description": "user not found"
           }
         },
         "security": [
@@ -1520,8 +1538,14 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/ApiResponse"
+              "type" : "array",
+              "items": {
+                "$ref": "#/definitions/Request"
+              }
             }
+          },
+          "404": {
+            "description": "court not found"
           }
         },
         "security": [
@@ -1556,8 +1580,14 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/ApiResponse"
+              "type" : "array",
+              "items": {
+                "$ref": "#/definitions/Request"
+              }
             }
+          },
+          "404": {
+            "description": "court not found"
           }
         },
         "security": [
@@ -1602,6 +1632,9 @@
             "schema": {
               "$ref": "#/definitions/ApiResponse"
             }
+          },
+          "404": {
+            "description": "landlord not found"
           }
         },
         "security": [
@@ -1650,6 +1683,9 @@
             "schema": {
               "$ref": "#/definitions/ApiResponse"
             }
+          },
+          "404": {
+            "description": "landlord not found"
           }
         },
         "security": [
@@ -2174,7 +2210,10 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/ApiResponse"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Location"
+              }
             }
           }
         },
@@ -3009,7 +3048,7 @@
         ]
       }
     },
-     "/extention/landlord/{landlordId}": {
+    "/extention/landlord/{landlordId}": {
       "get": {
         "tags": [
           "extention"
@@ -3161,7 +3200,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/Court"
+              "$ref": "#/definitions/Tariff"
             }
           },
           "400": {
@@ -3229,6 +3268,12 @@
         "accountType": {
           "type": "string",
           "example": "landlord/admin/coach/simpleuser"
+        },
+        "landlord": {
+          "$ref": "#/definitions/LandLord"
+        },
+        "simpleuser": {
+          "$ref": "#/definitions/SimpleUser"
         }
       }
     },
@@ -3259,7 +3304,7 @@
         }
       }
     },
-    "Simpleuser": {
+    "SimpleUser": {
       "type": "object",
       "properties": {
         "vdvid": {
@@ -3518,6 +3563,14 @@
           "type": "number",
           "format": "float",
           "example": -74.0059728
+        },
+        "minCost": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "maxCost": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },

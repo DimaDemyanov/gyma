@@ -43,7 +43,7 @@ from vdv.serve_swagger import SpecServer
 from vdv.Entities.EntityBase import EntityBase
 
 from vdv.Entities.EntityAccount import EntityAccount
-from vdv.Entities.EntityLocation import EntityLocation
+from vdv.Entities.EntityLocation import EntityLocation, distanceMath
 from vdv.Entities.EntityMedia import EntityMedia
 
 from vdv.search import *
@@ -261,7 +261,7 @@ def getAllUserRequests(**request_handler_args):
         ondate = EntityTime.get().all()
     res = []
     for _ in ondate:
-        reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['request_time'])
+        reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['requestTime'])
         for i in EntityRequest.get().filter_by(accountid=id).filter(EntityRequest.vdvid.in_(reqs)).all():
             for j in EntityRequest.get_request_by_requestid(i.requestid):
                 res.append(j)
@@ -295,7 +295,7 @@ def getAllCourtRequestsByDate(**request_handler_args):
     if date:
         ondate = EntityTime.get().filter(cast(EntityTime.time, Date) == date).all()
         for _ in ondate:
-            reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['request_time'])
+            reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['requestTime'])
             for i in EntityRequest.get().filter_by(courtid=id).filter(EntityRequest.vdvid.in_(reqs)).all():
                 for j in EntityRequest.get_request_by_requestid(i.requestid):
                     res.append(j)
@@ -685,7 +685,7 @@ def getCourtById(**request_handler_args):
         obj_dict.update(wide_info)
         res.append(obj_dict)
 
-    resp.body = obj_to_json(res)
+    resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
 
 
@@ -724,7 +724,11 @@ def getCourtByLocationId(**request_handler_args):
     PROPNAME_MAPPING = EntityProp.map_name_id()
 
     id = getIntPathParam('locationId', **request_handler_args)
-    objects = EntityCourt.get().filter_by(vdvid=PropLocation.get_objects(id, PROPNAME_MAPPING['location'])[0]).all()
+    locations = PropLocation.get_objects(id, PROPNAME_MAPPING['location'])
+    if len(locations) == 0:
+        resp.status = falcon.HTTP_404
+        return
+    objects = EntityCourt.get().filter_by(vdvid=locations[0]).all()
 
     phone = req.context['phone']
 
@@ -885,7 +889,7 @@ def confirmCourtById(**request_handler_args):
         if id:
             objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json(objects[0].to_dict())
+            #resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -909,7 +913,7 @@ def declineCourtById(**request_handler_args):
         if id:
             objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json(objects[0].to_dict())
+            #resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -1268,7 +1272,7 @@ def getUserById(**request_handler_args):
 
         res.append(obj_dict)
 
-    resp.body = obj_to_json(res)
+    resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
 
 def getUserByPhone(**request_handler_args):
@@ -1742,8 +1746,8 @@ def getLocationsInArea(**request_handler_args):
     y = req.params['y']
     radius = req.params['radius']
 
-    objects = EntityLocation.get().filter(haversine((EntityLocation.latitude, EntityLocation.longitude), (
-    float(x), float(y))) < radius).all()  # PropLike.get_object_property(0, 0)#
+    objects = EntityLocation.get().filter(distanceMath(EntityLocation.latitude, EntityLocation.longitude,
+    float(x), float(y), func) < (float(radius))).all()  # PropLike.get_object_property(0, 0)#
 
     resp.body = obj_to_json([EntityLocation.get_wide_info(o.vdvid) for o in objects])
     resp.status = falcon.HTTP_200
@@ -2316,7 +2320,7 @@ def getAllExtentions(**request_handler_args):
     resp = request_handler_args['resp']
 
     extentions = EntityExtention.get().filter(EntityExtention.isconfirmed == False
-                                              or (cast(EntityExtention.confirmedTime, DateTime)
+                                              or (cast(EntityExtention.confirmedtime, DateTime)
                                                   > get_curr_date() - timedelta(hours=24)))\
         .order_by(EntityExtention.created)\
         .all()
@@ -2381,7 +2385,7 @@ operation_handlers = {
 
     # Request methods
     'createRequest': [createRequest],
-    'getAllCourtRequests': [getAllCourtRequestsByDate],
+    'getAllCourtRequestsByDate': [getAllCourtRequestsByDate],
     'getAllCourtRequest': [getAllCourtRequest],
     'getAllUserRequests': [getAllUserRequests],
     'getAllLandlordRequests': [getAllLandlordRequests],
@@ -2441,10 +2445,10 @@ operation_handlers = {
     'updateLandlord': [updateLandlord],
     'getLandlord': [getLandlord],
     'deleteLandlord': [deleteLandlord],
-    'createSimpleuser': [createSimpleuser],
-    'updateSimpleuser': [updateSimpleuser],
-    'getSimpleuser': [getSimpleuser],
-    'deleteSimpleuser': [deleteSimpleuser],
+    'createSimpleUser': [createSimpleuser],
+    'updateSimpleUser': [updateSimpleuser],
+    'getSimpleUser': [getSimpleuser],
+    'deleteSimpleUser': [deleteSimpleuser],
 
     # Media methods
     'createMedia': [createMedia],
