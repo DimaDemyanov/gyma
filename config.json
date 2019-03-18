@@ -29,6 +29,9 @@
       "smsservice": {
         "login": "dm1024",
         "password": "dm120397"
+      },
+      "pushservice": {
+        "auth_key": "AAAAOyuVZzo:APA91bFIQjHD2_nSQq0MZU-VarNwgGi8hR1RhOY90LwZnitT0T2zJZVxyzCVyujSQHX87c7zI3msTMehT_Rha0HDkwB8p67frvepnwCHLDQV-FevwpSV9GYw_kJInorHBZbrRYdSNawz"
       }
     },
     {

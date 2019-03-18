@@ -1432,7 +1432,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "type" : "array",
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Request"
               }
@@ -1488,7 +1488,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "type" : "array",
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Request"
               }
@@ -1538,7 +1538,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "type" : "array",
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Request"
               }
@@ -1580,7 +1580,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "type" : "array",
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Request"
               }
@@ -2386,7 +2386,7 @@
         "tags": [
           "location"
         ],
-        "summary": "Get locations in area(not ready)",
+        "summary": "Get locations in area(ready)",
         "description": "Returns a list of locations descriptions",
         "operationId": "getLocationsInArea",
         "produces": [
@@ -3216,6 +3216,52 @@
           }
         ]
       }
+    },
+    "/subscribe": {
+      "post": {
+        "tags": [
+          "subscribe"
+        ],
+        "summary": "Create a new subscription on push notifications(not ready)",
+        "description": "",
+        "operationId": "createToken",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "newToken",
+            "in": "body",
+            "description": "Comment encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PushToken"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/PushToken"
+            }
+          },
+          "405": {
+            "description": "Validation exception"
+          },
+          "412": {
+            "description": "Name already taken"
+          }
+        },
+        "security": [
+          {
+            "auth_env": []
+          }
+        ]
+      }
     }
   },
   "securityDefinitions": {
@@ -3650,6 +3696,29 @@
         "sale": {
           "type": "integer",
           "description": "In percents"
+        }
+      }
+    },
+    "PushToken": {
+      "type": "object",
+      "required": [
+        "accountid",
+        "usertype",
+        "token"
+      ],
+      "properties": {
+        "vdvid": {
+          "type": "integer"
+        },
+        "accountid": {
+          "type": "integer"
+        },
+        "usertype": {
+          "type": "string",
+          "description": "admin/simpleuser/landlord (just one)"
+        },
+        "token": {
+          "type": "string"
         }
       }
     },

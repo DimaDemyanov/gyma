@@ -444,6 +444,22 @@ CREATE TABLE "vdv_extention" (
 	NOT DEFERRABLE
 );
 
+DROP TABLE IF EXISTS "vdv_app_token" CASCADE;
+
+CREATE TABLE "vdv_app_token" (
+	"vdvid" int8 NOT NULL,
+	"usertype" varchar(40),
+	"token" varchar(256),
+	"accountid" int8,
+	PRIMARY KEY("vdvid"),
+	CONSTRAINT "Ref_vdv_app_token_to_vdv_account" FOREIGN KEY ("accountid")
+		REFERENCES "vdv_account"("vdvid")
+	MATCH SIMPLE
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+	NOT DEFERRABLE
+);
+
 INSERT INTO vdv_account (vdvid, name, phone, accounttype) VALUES (1000, 'tester', '79110001122', 'landlord');
 INSERT INTO vdv_validation (vdvid, accountid, code) VALUES (NEXTVAL('vdv_seq'), 1000, 10000);
 

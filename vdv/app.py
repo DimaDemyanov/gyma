@@ -575,12 +575,12 @@ def deleteEquipment(**request_handler_args):  # TODO: implement it
     resp.status = falcon.HTTP_400
 
 
-def getEquipments(**request_handler_args):  # TODO: implement it
+def getEquipments(**request_handler_args):  
     resp = request_handler_args['resp']
 
     objects = EntityEquipment.get().all()
 
-    resp.body = obj_to_json(objects[0].to_dict())
+    resp.body = obj_to_json(obj_to_json([o.to_dict() for o in objects]))
 
     resp.status = falcon.HTTP_200
 
