@@ -158,7 +158,7 @@ class EntityRequest(EntityBase, Base):
             result.update({'landlord': EntityLandlord.get_wide_object(EntityLandlord.get().filter_by(vdvid=EntityCourt.get().filter_by(vdvid = requests[0].courtid).all()[0].ownerid).all()[0].vdvid)})
         if 'times' in items:
             result.update({'times':
-                [time.time.strftime('%Y-%m-%d %H:%M') for time in EntityTime.get().filter(EntityTime.vdvid.in_(PropRequestTime.get_object_property(requests.vdvid, PROPNAME_MAPPING['request_time']))).all()]})
+                [time.time.strftime('%Y-%m-%d %H:%M') for time in EntityTime.get().filter(EntityTime.vdvid.in_(PropRequestTime.get_object_property(requests.vdvid, PROPNAME_MAPPING['requestTime']))).all()]})
 
         return result
 
@@ -173,7 +173,7 @@ class EntityRequest(EntityBase, Base):
                     _.isconfirmed = False
                     pid = PropRequestTime.get().filter_by(vdvid=vdvid).all()
                     for i in pid:
-                        PropCourtTime(_.courtid, PROPNAME_MAPPING['court_time'], i.value).add(session=session, no_commit=True)
+                        PropCourtTime(_.courtid, PROPNAME_MAPPING['courtTime'], i.value).add(session=session, no_commit=True)
                         PropRequestTime.delete_one(i.vdvid, i.value)
                 session.db.commit()
 
@@ -197,10 +197,10 @@ class EntityRequest(EntityBase, Base):
             if len(entity):
                 for _ in entity:
                     _.isconfirmed = True
-                    times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['request_time'])
+                    times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['requestTime'])
                     for t in times:
                         PropCourtTime.delete_one(_.courtid, t)
-                        for req in EntityRequest.get().filter(EntityRequest.vdvid.in_(PropRequestTime.get_objects(t, PROPNAME_MAPPING['request_time']))).all():
+                        for req in EntityRequest.get().filter(EntityRequest.vdvid.in_(PropRequestTime.get_objects(t, PROPNAME_MAPPING['requestTime']))).all():
                             req.isconfirmed = False
 
 

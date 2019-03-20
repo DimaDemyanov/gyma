@@ -53,15 +53,18 @@ class PropBase:
 
     def update(self, session, no_commit=False):
         def proseed(session):
-            entities = self.__class__.get().filter_by(vdvid=self.vdvid, propid=self.propid).all()
-            for _ in entities:
-                _.value = self.value
+            entities = session.db.query(self.__class__).filter_by(vdvid=self.vdvid, propid=self.propid).all()
+            if len(entities) == 0:
+                self.add(session, no_commit=False)
+            else:
+                for _ in entities:
+                    _.value = self.value
 
             if not no_commit:
                 session.db.commit()
 
-        if session:
-            proseed(session)
+        # if session:
+        #     proseed(session)
 
         with DBConnection() as session:
             proseed(session)

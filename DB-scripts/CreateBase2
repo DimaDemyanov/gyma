@@ -462,21 +462,21 @@ CREATE TABLE "vdv_app_token" (
 
 INSERT INTO vdv_account (vdvid, name, phone, accounttype) VALUES (1000, 'tester', '79110001122', 'landlord');
 INSERT INTO vdv_validation (vdvid, accountid, code) VALUES (NEXTVAL('vdv_seq'), 1000, 10000);
-
-INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол');
-INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол S');
-INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол M');
-INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол L');
-INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Волейбол');
-INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Баскетбол');
-INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Танцы');
-INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Йога');
-
-INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Мяч');
-INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Пуфик');
-INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Диван');
-INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Телевизор');
-
+--
+--INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол');
+--INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол S');
+--INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол M');
+--INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Футбол L');
+--INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Волейбол');
+--INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Баскетбол');
+--INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Танцы');
+--INSERT INTO vdv_sport (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Йога');
+--
+--INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Мяч');
+--INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Пуфик');
+--INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Диван');
+--INSERT INTO vdv_equipment (vdvid, name) VALUES (NEXTVAL('vdv_seq'), 'Телевизор');
+--
 INSERT INTO vdv_tariff (vdvid, months, price, sale) VALUES (NEXTVAL('vdv_seq'), '3', '1000', '0');
 INSERT INTO vdv_tariff (vdvid, months, price, sale) VALUES (NEXTVAL('vdv_seq'), '6', '2000', '10');
 INSERT INTO vdv_tariff (vdvid, months, price, sale) VALUES (NEXTVAL('vdv_seq'), '12', '4000', '20');

@@ -128,7 +128,7 @@ class EntityLandlord(EntityBase, Base):
             from vdv.Entities.EntityRequest import EntityRequest
             reqs = EntityRequest.get().filter_by(courtid=c.vdvid, isconfirmed=True, come=True).all()
             for _ in reqs:
-                times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['request_time'])
+                times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['requestTime'])
                 count_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).count() > 0 else 0
 
         obj_dict.update({'sucsess': count_come, 'notsucsess': count_not_come})

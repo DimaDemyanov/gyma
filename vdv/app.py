@@ -369,7 +369,7 @@ def getAllLandlordRequestsWithFilter(**request_handler_args):
         ondate = EntityTime.get().filter(cast(EntityTime.time, DateTime) >= datetime.datetime.today()).all()
 
         for _ in ondate:
-            reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['request_time'])
+            reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['requestTime'])
             reqss = None
             if filter == 'confirmed':
                 reqss = EntityRequest.get().filter_by(courtid=c.vdvid).filter(EntityRequest.vdvid.in_(reqs),
@@ -478,19 +478,13 @@ def createSport(**request_handler_args):  # TODO: implement it
 def deleteSport(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
 
-    id = getIntPathParam('courtId', **request_handler_args)
+    id = getIntPathParam('sportId', **request_handler_args)
 
     if id is not None:
         try:
             EntitySport.delete(id)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
-            return
-
-        try:
-            EntitySport.delete_wide_object(id)
-        except FileNotFoundError:
-            resp.status = falcon.HTTP_405
             return
 
         object = EntitySport.get().filter_by(vdvid=id).all()
@@ -552,19 +546,13 @@ def createEquipment(**request_handler_args):  # TODO: implement it
 def deleteEquipment(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
 
-    id = getIntPathParam('courtId', **request_handler_args)
+    id = getIntPathParam('equipmentId', **request_handler_args)
 
     if id is not None:
         try:
             EntityEquipment.delete(id)
         except FileNotFoundError:
             resp.status = falcon.HTTP_404
-            return
-
-        try:
-            EntityEquipment.delete_wide_object(id)
-        except FileNotFoundError:
-            resp.status = falcon.HTTP_405
             return
 
         object = EntityEquipment.get().filter_by(vdvid=id).all()
@@ -575,12 +563,12 @@ def deleteEquipment(**request_handler_args):  # TODO: implement it
     resp.status = falcon.HTTP_400
 
 
-def getEquipments(**request_handler_args):  
+def getEquipments(**request_handler_args):
     resp = request_handler_args['resp']
 
     objects = EntityEquipment.get().all()
 
-    resp.body = obj_to_json(obj_to_json([o.to_dict() for o in objects]))
+    resp.body = obj_to_json([o.to_dict() for o in objects])
 
     resp.status = falcon.HTTP_200
 
@@ -838,7 +826,7 @@ def updateCourt(**request_handler_args):
         if id:
             objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-            resp.body = obj_to_json(objects[0].to_dict())
+            resp.body = obj_to_json(EntityCourt.get_wide_object(objects[0].vdvid))
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -938,7 +926,7 @@ def getTimesForDate(**request_handler_args):
         return
     # with DBConnection() as session:
     #     joined = session.db.query(PropCourtTime).all()
-    joined = PropCourtTime.get_object_property(courts[0].vdvid, PROPNAME_MAPPING['court_time'])
+    joined = PropCourtTime.get_object_property(courts[0].vdvid, PROPNAME_MAPPING['courtTime'])
     result = []
     court_times = EntityTime.get().filter(EntityTime.vdvid.in_(joined), cast(EntityTime.time, Date) == date)
 
@@ -955,7 +943,7 @@ def getTimesForDate(**request_handler_args):
         for _c in free_times:
             result.append((str(_c.time), 'free'))
     for _a in EntityRequest.get().filter_by(courtid=courts[0].vdvid).all():
-        joined = PropRequestTime.get_object_property(_a.vdvid, PROPNAME_MAPPING['request_time'])
+        joined = PropRequestTime.get_object_property(_a.vdvid, PROPNAME_MAPPING['requestTime'])
         free = EntityTime.get().filter(EntityTime.vdvid.in_(joined), cast(EntityTime.time, Date) == date).all()
 
         for _ in free:
@@ -981,7 +969,7 @@ def createCourtTimesOnDate(**request_handler_args):
     if not isinstance(params, list):
         params = [params]
     with DBConnection() as session:
-        create_times(session, courtid, PROPNAME_MAPPING['court_time'], params, 0)
+        create_times(session, courtid, PROPNAME_MAPPING['courtTime'], params, 0)
 
     resp.status = falcon.HTTP_200
 
@@ -1304,7 +1292,7 @@ def getUserByPhone(**request_handler_args):
 
         res.append(obj_dict)
 
-    resp.body = obj_to_json(res)
+    resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
 
 
@@ -1591,7 +1579,10 @@ def createLocation(**request_handler_args):
 
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-        name = params.get('name')
+        if 'name' in params:
+            name = params.get('name')
+        else:
+            name = "location default"
         latitude = params.get('latitude')
         longitude = params.get('longitude')
     except ValueError:
@@ -1721,7 +1712,7 @@ def getLocationsWithFilter(**request_handler_args):
         timesid = [_.vdvid for _ in EntityTime.get().filter(EntityTime.time.in_(times)).all()]
         # courts = courts.filter(PropCourtTime.get_object_property(EntityCourt.vdvid, PROPNAME_MAPPING['court_time']) in timesid)
         courts = courts.filter(all(
-            elem in PropCourtTime.get_object_property(EntityCourt.vdvid, PROPNAME_MAPPING['court_time']) for elem in
+            elem in PropCourtTime.get_object_property(EntityCourt.vdvid, PROPNAME_MAPPING['courtTime']) for elem in
             timesid))
     courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 

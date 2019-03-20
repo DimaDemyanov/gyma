@@ -107,12 +107,12 @@ class EntitySimpleuser(EntityBase, Base):
 
         reqs = EntityRequest.get().filter_by(accountid=accountid, isconfirmed = True, come = True).all()
         for _ in reqs:
-            times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['request_time'])
+            times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['requestTime'])
             count_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).count() > 0 else 0
 
         reqs = EntityRequest.get().filter_by(accountid=accountid, isconfirmed=True, come=False).all()
         for _ in reqs:
-            times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['request_time'])
+            times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['requestTime'])
             count_not_come += 1 if EntityTime.get().filter(EntityTime.vdvid.in_(times)).count() > 0 else 0
 
         obj_dict.update({'sucsess': count_come, 'notsucsess': count_not_come})

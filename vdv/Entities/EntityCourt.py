@@ -100,7 +100,7 @@ class EntityCourt(EntityBase, Base):
             'sport':
                 lambda s, _vdvid, _id, _val, _uid: [PropSport(_vdvid, _id, _).add(session=s, no_commit=True)
                                                     for _ in _val],
-            'court_time':
+            'courtTime':
                 lambda s, _vdvid, _id, _val, _uid: cls.create_times(s, _vdvid, _id, _val, _uid)
 
         }
@@ -162,6 +162,11 @@ class EntityCourt(EntityBase, Base):
             return [PropSport(_vdvid, _id, _).add(session=s, no_commit=True)
              for _ in _val]
 
+        def update_media(s, _vdvid, _id, _val, _uid):
+            PropMedia.delete(_vdvid, _id)
+            return [cls.process_media(s, 'image', _uid, _vdvid, _id, _)
+                                                    for _ in _val]
+
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
         vdvid = None
@@ -169,15 +174,14 @@ class EntityCourt(EntityBase, Base):
         PROP_MAPPING = {
             'location':
                 lambda s, _vdvid, _id, _val, _uid: PropLocation(_vdvid, _id, _val)
-                    .update(session=s, no_commit=True),
+                    .update(session=s, no_commit=False),
             'media':
-                lambda s, _vdvid, _id, _val, _uid: [cls.process_media(s, 'image', _uid, _vdvid, _id, _)
-                                                    for _ in _val],
+                update_media,
             'equipment':
                 update_eq,
             'sport':
                 update_sp,
-            'court_time':
+            'courtTime':
                 lambda s, _vdvid, _id, _val, _uid: cls.update_times(s, _vdvid, _id, _val, _uid)
         }
 
