@@ -914,6 +914,9 @@ def declineCourtById(**request_handler_args):
 def getTimesForDate(**request_handler_args):
     PROPNAME_MAPPING = EntityProp.map_name_id()
 
+    def create_time(o):
+        return {'time': o[0], 'state': o[1]}
+
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
@@ -953,7 +956,7 @@ def getTimesForDate(**request_handler_args):
                 if _a.isconfirmed:
                     result.append((str(_.time), 'rented'))
 
-    resp.body = obj_to_json(list(set(result)))
+    resp.body = obj_to_json([create_time(o) for o in list(set(result))])
     resp.status = falcon.HTTP_200
 
 
@@ -964,12 +967,11 @@ def createCourtTimesOnDate(**request_handler_args):
     resp = request_handler_args['resp']
 
     courtid = req.params['courtid']
-    params = req.params['times']
+    #params = req.params['times']
+    params = json.loads(req.stream.read().decode('utf-8'))
 
-    if not isinstance(params, list):
-        params = [params]
     with DBConnection() as session:
-        create_times(session, courtid, PROPNAME_MAPPING['courtTime'], params, 0)
+        create_times(session, courtid, PROPNAME_MAPPING['courtTime'], params['times'], 0)
 
     resp.status = falcon.HTTP_200
 
@@ -981,13 +983,10 @@ def updateCourtTimesOnDate(**request_handler_args):
     resp = request_handler_args['resp']
 
     courtid = req.params['courtid']
-    params = req.params['times']
-
-    if not isinstance(params, list):
-        params = [params]
+    params = json.loads(req.stream.read().decode('utf-8'))
 
     with DBConnection() as session:
-        update_times(session, courtid, PROPNAME_MAPPING['court_time'], params, 0)
+        update_times(session, courtid, PROPNAME_MAPPING['courtTime'], params['times'], 0)
 
     resp.status = falcon.HTTP_200
 
@@ -1303,6 +1302,7 @@ def getMyUser(**request_handler_args):
     phone = req.context['phone']
     id = EntityAccount.get_id_from_phone(phone)
 
+
     objects = EntityAccount.get().filter_by(vdvid=id).all()
 
     res = []
@@ -1321,6 +1321,31 @@ def getMyUser(**request_handler_args):
     resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
 
+def getUserByLandlord(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    phone = req.context['phone']
+    landlordid = getIntPathParam("landlordId", **request_handler_args)
+
+    objects = EntityLandlord.get().filter_by(vdvid = landlordid)
+
+    res = []
+    for _ in objects:
+        o = EntityAccount.get().filter_by(vdvid=_.accountid).all()[0]
+        obj_dict = o.to_dict(['vdvid', 'name', 'phone', 'mediaid'])
+
+        landlords = EntityLandlord.get().filter_by(accountid=_.accountid).all()
+        if len(landlords) > 0:
+            obj_dict['landlord'] = EntityLandlord.get_wide_object(landlords[0].vdvid)
+        simpleusers = EntitySimpleuser.get().filter_by(accountid=_.accountid).all()
+        if len(simpleusers) > 0:
+            obj_dict['simpleuser'] = EntitySimpleuser.get_wide_object(simpleusers[0].vdvid)
+
+        res.append(obj_dict)
+
+    resp.body = obj_to_json(res[0])
+    resp.status = falcon.HTTP_200
 
 def deleteUser(**request_handler_args):
     resp = request_handler_args['resp']
@@ -2100,12 +2125,12 @@ def deleteTariff(**request_handler_args):  # TODO: implement it
 
     resp.status = falcon.HTTP_400
 
-def getAllTariffs(**request_handler_args):  # TODO: implement it
+def getAllTariffs(**request_handler_args):
     resp = request_handler_args['resp']
 
     objects = EntityTariff.get().all()
 
-    resp.body = obj_to_json(objects[0].to_dict())
+    resp.body = obj_to_json([o.to_dict() for o in objects ])
 
     resp.status = falcon.HTTP_200
 
@@ -2421,6 +2446,7 @@ operation_handlers = {
     'getUser': [getUserById],
     'getUserByPhone': [getUserByPhone],
     'getMyUser': [getMyUser],
+    'getUserByLandlord': [getUserByLandlord],
     'deleteUser': [deleteUser],
     'getUserFollowingsList': [getUserFollowingsList],
     'getUserFollowingsPosts': [getUserFollowingsPosts],
