@@ -48,14 +48,6 @@
       }
     },
     {
-      "name": "court time",
-      "description": "Unlocked request functions",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "http://swagger.io"
-      }
-    },
-    {
       "name": "location",
       "description": "Unlocked location functions",
       "externalDocs": {
@@ -278,6 +270,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Ok"
+          },
           "400": {
             "description": "Invalid ID supplied"
           },
@@ -628,7 +623,7 @@
         "tags": [
           "court"
         ],
-        "summary": "Get court times by landlord ID(ready)",
+        "summary": "Get court times by court ID(ready)",
         "description": "Returns court times for date",
         "operationId": "getTimesForDate",
         "produces": [
@@ -1878,6 +1873,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Ok"
+          },
           "400": {
             "description": "Invalid ID supplied"
           },
@@ -1921,91 +1919,14 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Ok"
+          },
           "400": {
             "description": "Invalid ID supplied"
           },
           "404": {
             "description": "Request not found"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      }
-    },
-    "/time": {
-      "post": {
-        "tags": [
-          "court time"
-        ],
-        "summary": "Create a new court time",
-        "description": "",
-        "operationId": "createTime",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "newRequest",
-            "in": "body",
-            "description": "Court time encoded in JSON string",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Time"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          },
-          "405": {
-            "description": "Validation exception"
-          },
-          "412": {
-            "description": "Time already taken"
-          }
-        },
-        "security": [
-          {
-            "auth_env": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "court time"
-        ],
-        "summary": "Remove time item",
-        "description": "",
-        "operationId": "deleteTime",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "timeId",
-            "in": "path",
-            "description": "time id to unlink",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Time not found"
           }
         },
         "security": [
@@ -2426,14 +2347,14 @@
         ]
       }
     },
-    "/inarea/location": {
+    "/inarea/courts": {
       "get": {
         "tags": [
-          "location"
+          "court"
         ],
-        "summary": "Get locations in area(ready)",
-        "description": "Returns a list of locations descriptions",
-        "operationId": "getLocationsInArea",
+        "summary": "Get courts in area(ready, but POPOULARITY DOESN'T work)",
+        "description": "Returns a list of courts descriptions",
+        "operationId": "getCourtsInArea",
         "produces": [
           "application/json"
         ],
@@ -2444,7 +2365,8 @@
             "description": "area radius",
             "required": true,
             "type": "number",
-            "format": "float"
+            "format": "float",
+            "default": 30
           },
           {
             "name": "x",
@@ -2452,7 +2374,8 @@
             "description": "center x",
             "required": true,
             "type": "number",
-            "format": "float"
+            "format": "float",
+            "default": 59.95
           },
           {
             "name": "y",
@@ -2460,10 +2383,109 @@
             "description": "center y",
             "required": true,
             "type": "number",
-            "format": "float"
+            "format": "float",
+            "default": 30.34
+          },
+          {
+            "name": "filter1",
+            "in": "query",
+            "description": "filter by owner",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "all",
+              "my",
+              "notmy"
+            ]
+          },
+          {
+            "name": "filter2",
+            "in": "query",
+            "description": "filter",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "all",
+              "published",
+              "notpublished",
+              "drafts"
+            ]
+          },
+          {
+            "name": "sortedby",
+            "in": "query",
+            "description": "sorting type",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "price",
+              "popularity",
+              "any"
+            ]
+          },
+          {
+            "name": "sportid",
+            "in": "query",
+            "description": "Sport id",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "date",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "timeBegin",
+            "in": "query",
+            "description": "Start period time",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "timeEnd",
+            "in": "query",
+            "description": "End period time",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "description": "Min price",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "description": "Max price",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "equipmentid",
+            "in": "query",
+            "description": "Equipment id",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
           }
         ],
         "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Court"
+              }
+            }
+          },
           "400": {
             "description": "Invalid ID supplied"
           },
@@ -2843,13 +2865,15 @@
             "in": "formData",
             "name": "phone",
             "type": "string",
-            "description": "A person's phone."
+            "description": "A person's phone.",
+            "default": "79110001122"
           },
           {
             "in": "formData",
             "name": "key",
             "type": "string",
-            "description": "A person's key."
+            "description": "A person's key.",
+            "default": "10000"
           }
         ],
         "responses": {
@@ -3023,7 +3047,7 @@
         "tags": [
           "extention"
         ],
-        "summary": "Find all extentions(ready)",
+        "summary": "Find all extentions that are not confirmed or were confirmed in last 24 hours(ready)",
         "description": "Returns extentions description",
         "operationId": "getAllExtentions",
         "produces": [
@@ -3455,7 +3479,7 @@
       "type": "object",
       "required": [
         "ownerid",
-        "requestTime",
+        "name",
         "isdraft"
       ],
       "properties": {

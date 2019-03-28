@@ -24,7 +24,7 @@ def to_request_times(s, _vdvid, _id, _val, _uid):
         if times:
             id = times[0].vdvid
         if not times:
-            raise Exception('No time for request')
+            raise Exception(' No time for request')
         courtid = EntityRequest.get().filter_by(vdvid=_vdvid).all()[0].courtid
         pid = PropCourtTime.get().filter_by(vdvid = int(courtid)).filter_by(value = id).all()
         if not pid:
@@ -186,6 +186,10 @@ class EntityRequest(EntityBase, Base):
             if len(entity):
                 for _ in entity:
                     _.iscanceled = True
+                    pid = PropRequestTime.get().filter_by(vdvid=vdvid).all()
+                    for i in pid:
+                        PropCourtTime(_.courtid, PROPNAME_MAPPING['courtTime'], i.value).add(session=session,
+                                                                                             no_commit=True)
             session.db.commit()
 
     @classmethod
@@ -222,3 +226,16 @@ class EntityRequest(EntityBase, Base):
     def get_request_by_requestid(cls, requestid):
         objects = EntityRequest.get().filter_by(requestid=requestid).all()
         return objects
+
+    @classmethod
+    def delete_wide_object(cls, vdvid):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
+        PROP_MAPPING = {
+            'requestTime':  lambda _vdvid, _id: PropRequestTime.delete(_vdvid, _id, False),
+        }
+
+        for key, propid in PROPNAME_MAPPING.items():
+            if key in PROP_MAPPING:
+                PROP_MAPPING[key](vdvid, propid)
+        EntityRequest.delete(vdvid)

@@ -66,14 +66,14 @@ class EntityExtention(EntityBase, Base):
                 tariff = EntityTariff.get().filter_by(vdvid=_.tariffid).all()[0]
                 if _.isconfirmed == True:
                     return
-                if court.time_begin == None:
-                    court.time_begin = get_curr_date()
-                    court.time_end = time_to_str(time_add(get_curr_date(), tariff.months))
+                if court.timebegin == None:
+                    court.timebegin = get_curr_date()
+                    court.timeend = time_to_str(time_add(get_curr_date(), tariff.months))
                 else:
-                    if court.time_end > pytz.utc.localize(get_curr_date()):
-                        court.time_end = time_to_str(time_add(court.time_end, tariff.months))
+                    if court.timeend > pytz.utc.localize(get_curr_date()):
+                        court.timeend = time_to_str(time_add(court.timeend, tariff.months))
                     else:
-                        court.time_end = time_to_str(time_add(get_curr_date(), tariff.months))
+                        court.timeend = time_to_str(time_add(get_curr_date(), tariff.months))
                 court.ispublished = True
                 _.isconfirmed = True
                 _.confirmedtime = get_curr_date_str()
