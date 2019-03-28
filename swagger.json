@@ -1041,7 +1041,7 @@
         "tags": [
           "user"
         ],
-        "summary": "Remove court(ready)",
+        "summary": "Remove user(ready)",
         "description": "deleteUser (can only be applied to authorized user)",
         "operationId": "deleteUser",
         "produces": [
@@ -1065,6 +1065,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Ok"
+          },
           "400": {
             "description": "Invalid ID supplied"
           },
@@ -1225,6 +1228,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Ok"
+          },
           "400": {
             "description": "Invalid ID supplied"
           },
@@ -2171,6 +2177,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Ok"
+          },
           "400": {
             "description": "Invalid ID supplied"
           },

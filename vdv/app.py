@@ -606,9 +606,15 @@ def getAllCourts(**request_handler_args):
     # post_data = parse_qs(req.stream.read().decode('utf-8'))
     filter = req.params['filter1']  # post_data['filter']
 
+    sort_order = req.params['sortedby']
+
     with DBConnection() as session:
-        objects = session.db.query(EntityCourt, EntityRequest, func.count(EntityRequest.vdvid).label('total'))\
-            .filter(EntityRequest.courtid == EntityCourt.vdvid).group_by(EntityCourt.vdvid).group_by(EntityRequest.vdvid)
+        if sort_order == 'popularity':
+            objects = session.db.query(EntityCourt, EntityRequest, func.count(EntityRequest.vdvid).label('total'))\
+                .filter(EntityRequest.courtid == EntityCourt.vdvid).group_by(EntityCourt.vdvid).group_by(EntityRequest.vdvid)
+        else:
+            objects = session.db.query(EntityCourt)
+
     if filter == 'all':
         objects = objects
 
@@ -633,15 +639,16 @@ def getAllCourts(**request_handler_args):
         resp.status = falcon.HTTP_408
         return
 
-    sort_order = req.params['sortedby']
-
     if sort_order == 'price':
-        objects = objects.order_by(EntityCourt.price)
+        objects = objects.order_by(EntityCourt.price, EntityCourt.vdvid)
     if sort_order == 'popularity':
         objects = objects.distinct(EntityCourt.vdvid, 'total').order_by('total', EntityCourt.vdvid)
 
     a = objects.all()
-    b = [EntityCourt.get_wide_object(d[0].vdvid) for d in a]
+    if sort_order == 'popularity':
+        b = [EntityCourt.get_wide_object(d[0].vdvid) for d in a]
+    else:
+        b = [EntityCourt.get_wide_object(d.vdvid) for d in a]
     # seen = set()
     # c = []
     # for d in b:
@@ -1328,7 +1335,11 @@ def getUserByLandlord(**request_handler_args):
     phone = req.context['phone']
     landlordid = getIntPathParam("landlordId", **request_handler_args)
 
-    objects = EntityLandlord.get().filter_by(vdvid = landlordid)
+    objects = EntityLandlord.get().filter_by(vdvid = landlordid).all()
+
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
 
     res = []
     for _ in objects:
@@ -1686,9 +1697,6 @@ def getLocationsWithFilter(**request_handler_args):
         sportid = req.params['sportid']
     else:
         sportid = None
-    # date = req.params['date']
-    # timeBegin = req.params['timeBegin']
-    # timeEnd = req.params['timeEnd']
     if 'timeBegin' in req.params and 'timeEnd' in req.params:
         timeBegin = req.params['timeBegin']
         timeEnd = req.params['timeEnd']
@@ -1723,7 +1731,6 @@ def getLocationsWithFilter(**request_handler_args):
         free = [x.vdvid for x in EntityTime.get().filter(cast(EntityTime.time, Date) == date).distinct()]
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
-        # locations = [x.vdvid for x in PropLocation.get().filter(PropCourtTime.vdvid.in_(courts_times)).distinct(PropCourtTime.vdvid)]
         courts = courts.filter(EntityCourt.vdvid.in_(courts_times))
     if timeBegin and timeEnd and date:
         time_format = '%Y-%m-%d %H:%M:%S%z'
@@ -1735,7 +1742,6 @@ def getLocationsWithFilter(**request_handler_args):
             times.append(t.strftime(time_format))
             t = t + datetime.timedelta(minutes=30)
         timesid = [_.vdvid for _ in EntityTime.get().filter(EntityTime.time.in_(times)).all()]
-        # courts = courts.filter(PropCourtTime.get_object_property(EntityCourt.vdvid, PROPNAME_MAPPING['court_time']) in timesid)
         courts = courts.filter(all(
             elem in PropCourtTime.get_object_property(EntityCourt.vdvid, PROPNAME_MAPPING['courtTime']) for elem in
             timesid))
@@ -2157,16 +2163,16 @@ def sendkey(**request_handler_args):
 
         if validations:
             for validation in validations:
-                if validation.time_send.year != curr_time.year \
-                        or validation.time_send.month != curr_time.month \
-                        or validation.time_send.day != curr_time.day or validation.times_a_day < 2:
+                if validation.timesend.year != curr_time.year \
+                        or validation.timesend.month != curr_time.month \
+                        or validation.timesend.day != curr_time.day or validation.timesaday < 2:
 
                     data = {
                         'vdvid': validation.vdvid,
                         'code': key,
-                        'timesADay': 1 if validation.time_send.year != curr_time.year \
-                                            or validation.time_send.month != curr_time.month \
-                                            or validation.time_send.day != curr_time.day else 2,
+                        'timesADay': 1 if validation.timesend.year != curr_time.year \
+                                            or validation.timesend.month != curr_time.month \
+                                            or validation.timesend.day != curr_time.day else 2,
                         'timeSend': curr_time.strftime('%Y-%m-%d %H:%M')
                     }
 
