@@ -66,7 +66,7 @@ class EntityExtention(EntityBase, Base):
                 tariff = EntityTariff.get().filter_by(vdvid=_.tariffid).all()[0]
                 if _.isconfirmed == True:
                     return
-                if court.timebegin == None:
+                if court.timebegin == None or court.timeend == None:
                     court.timebegin = get_curr_date()
                     court.timeend = time_to_str(time_add(get_curr_date(), tariff.months))
                 else:

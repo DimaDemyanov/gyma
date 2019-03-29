@@ -15,7 +15,7 @@ Base = declarative_base()
 class EntityTariff(EntityBase, Base):
     __tablename__ = 'vdv_tariff'
 
-    vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
+    vdvid = Column(Integer, Sequence('vdv_tariffs_seq'), primary_key=True)
     months = Column(Integer)
     price = Column(Integer)
     sale = Column(Integer)

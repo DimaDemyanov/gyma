@@ -205,6 +205,9 @@ class EntityCourt(EntityBase, Base):
                         if 'price' in data:
                             _.price = data['price']
 
+                        if 'mainmediaid' in data:
+                            _.mainmediaid = data['mainmediaid']
+
                         if 'prop' in data:
                             for prop_name, prop_val in data['prop'].items():
                                 if prop_name in PROPNAME_MAPPING and prop_name in PROP_MAPPING:

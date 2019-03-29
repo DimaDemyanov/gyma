@@ -254,17 +254,20 @@ def getAllUserRequests(**request_handler_args):
         date = req.params['date']
     else:
         date = None
-    # ????
+
+    # TODO: rewrite SQL
+
     if date:
         ondate = EntityTime.get().filter(cast(EntityTime.time, Date) == date).all()
+        res = []
+        for _ in ondate:
+            reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['requestTime'])
+
+            for i in EntityRequest.get().filter_by(accountid=id).filter(EntityRequest.vdvid.in_(reqs)).all():
+                for j in EntityRequest.get_request_by_requestid(i.requestid):
+                    res.append(j)
     else:
-        ondate = EntityTime.get().all()
-    res = []
-    for _ in ondate:
-        reqs = PropRequestTime.get_objects(_.vdvid, PROPNAME_MAPPING['requestTime'])
-        for i in EntityRequest.get().filter_by(accountid=id).filter(EntityRequest.vdvid.in_(reqs)).all():
-            for j in EntityRequest.get_request_by_requestid(i.requestid):
-                res.append(j)
+        res = EntityRequest.get().filter_by(accountid=id).all()
     res = [EntityRequest.get_wide_object(o.vdvid) for o in res]
 
     a = res
@@ -511,6 +514,9 @@ def getSportById(**request_handler_args):
 
     id = getIntPathParam('sportId', **request_handler_args)
     objects = EntitySport.get().filter_by(vdvid=id).all()
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
 
     e_mail = req.context['phone']
     my_id = EntityAccount.get_id_from_email(e_mail)
@@ -723,7 +729,7 @@ def getCourtByLocationId(**request_handler_args):
     if len(locations) == 0:
         resp.status = falcon.HTTP_404
         return
-    objects = EntityCourt.get().filter_by(vdvid=locations[0]).all()
+    objects = EntityCourt.get().filter(EntityCourt.vdvid.in_(locations)).all()
 
     phone = req.context['phone']
 
@@ -817,7 +823,7 @@ def createCourt(**request_handler_args):
         resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
         return
-    resp.status = falcon.HTTP_406
+    resp.status = falcon.HTTP_405
 
 
 def updateCourt(**request_handler_args):
@@ -1178,7 +1184,7 @@ def deleteSimpleuser(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
     for o in objects:
-        EntitySimpleuser.delete(EntitySimpleuser, o.vdvid)
+        EntitySimpleuser.delete(o.vdvid)
     resp.status = falcon.HTTP_200
 
 
@@ -1786,6 +1792,7 @@ def getCourtsInArea(**request_handler_args):
 
     if 'sportid' in req.params:
         sportid = req.params['sportid']
+        sportid = sportid.split(',')
     else:
         sportid = None
     if 'timeBegin' in req.params and 'timeEnd' in req.params:
@@ -1816,7 +1823,7 @@ def getCourtsInArea(**request_handler_args):
     courts = EntityCourt.get()#.filter_by(ispublished=True)
 
     if sportid:
-        courts = courts.filter(EntityCourt.vdvid.in_(PropSport.get_objects(sportid, PROPNAME_MAPPING['sport'])))
+        courts = courts.filter(EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportid, PROPNAME_MAPPING['sport'])))
     if equipmentid:
         courts = courts.filter(
             EntityCourt.vdvid.in_(PropEquipment.get_objects(equipmentid, PROPNAME_MAPPING['equipment'])))
@@ -1835,9 +1842,7 @@ def getCourtsInArea(**request_handler_args):
             times.append(t.strftime(time_format))
             t = t + datetime.timedelta(minutes=30)
         timesid = [_.vdvid for _ in EntityTime.get().filter(EntityTime.time.in_(times)).all()]
-        courts = courts.filter(all(
-            elem in PropCourtTime.get_object_property(EntityCourt.vdvid, PROPNAME_MAPPING['courtTime']) for elem in
-            timesid))
+        courts = courts.filter(EntityCourt.vdvid.in_(PropCourtTime.get_objects_multiple_value(timesid, PROPNAME_MAPPING['courtTime'])))
     courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
     courts = courts.filter(EntityCourt.vdvid.in_(locations_id))
