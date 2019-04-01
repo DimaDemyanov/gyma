@@ -2397,6 +2397,7 @@ class Auth(object):
 
 def getConfigFromLaunchArguments():
     args = utils.RegisterLaunchArguments()
+
     cfgPath = args.cfgpath
     profile = args.profile
 
@@ -2406,13 +2407,17 @@ def getConfigFromLaunchArguments():
     return cfg
 
 
+from . import __path__ as ROOT_PATH
+SWAGGER_PATH = (ROOT_PATH[0] + "/../swagger.json")
+
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
+
 
 cfg = getConfigFromLaunchArguments()
 
 if 'server_host' in cfg:
-    with open('swagger.json') as f:
+    with open(SWAGGER_PATH) as f:
         swagger_json = json.loads(f.read(), object_pairs_hook=OrderedDict)
 
     server_host = cfg['server_host']
@@ -2433,8 +2438,12 @@ def getWSGIPortFromConfig(cfg=cfg):
     return None
 
 
-def runWSGIApp():
+def configureDBConnection():
     DBConnection.configure(**cfg['vdv_db'])
+
+
+def runWSGIApp():
+    configureDBConnection()
     configureOIDC()
 
     general_executor = ftr.ThreadPoolExecutor(max_workers=20)
@@ -2442,7 +2451,7 @@ def runWSGIApp():
     wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
 
     server = SpecServer(operation_handlers=operation_handlers)
-    configureSwaggerTemplate(server)
+    configureSwagger(server)
     api.add_sink(server, r'/')
 
     return wsgi_app
@@ -2454,10 +2463,18 @@ def configureOIDC(cfg=cfg):
         auth.Configure(**cfg_oidc)
 
 
-def configureSwaggerTemplate(server, cfg=cfg):
+def configureSwagger(server, swagger_json=swagger_json):
+    swagger_temp_path = './swagger_temp.json'
+    createSwaggerTemplate(swagger_temp_path)
+    loadSpecSwagger(server, swagger_temp_path)
+
+
+def createSwaggerTemplate(swagger_temp_path, swagger_json=swagger_json):
     json_string = json.dumps(swagger_json)
-    with open('swagger_temp.json', 'wt') as f:
+    with open(swagger_temp_path, 'wt') as f:
         f.write(json_string)
 
-    with open('swagger_temp.json') as f:
+
+def loadSpecSwagger(server, swagger_temp_path):
+    with open(swagger_temp_path) as f:
         server.load_spec_swagger(f.read())
