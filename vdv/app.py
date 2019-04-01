@@ -321,7 +321,6 @@ def getAllCourtRequest(**request_handler_args):
         res = session.db.query(EntityRequest)\
             .join(EntityCourt, EntityRequest.courtid == EntityCourt.vdvid)\
             .filter(cast(EntityTime.time, DateTime) > get_curr_date() - timedelta(hours=24))
-
     resp.body = obj_to_json([o[0].to_dict() for o in res])
     resp.status = falcon.HTTP_200
 
@@ -2163,8 +2162,8 @@ def getAllExtentions(**request_handler_args):
         EntityExtention.confirmedtime, DateTime) > one_day_earlier_datetime
 
     extentions = EntityExtention.get().filter(or_(
-            EntityExtention.isconfirmed is False,
-            is_one_day_passed_after_confirmation is True,))\
+            EntityExtention.isconfirmed == False,
+            is_one_day_passed_after_confirmation == True,))\
         .order_by(EntityExtention.created).all()
 
     resp.body = obj_to_json([o.to_dict() for o in extentions])
@@ -2179,16 +2178,15 @@ def getExtentionsByLandlordId(**request_handler_args):
     with DBConnection() as session:
         extentions = session.db.query(EntityExtention)\
             .join(EntityCourt, EntityExtention.courtid == EntityCourt.vdvid)\
-            .filter(EntityCourt.ownerid == id)\
-            .all()
+            .filter(EntityCourt.ownerid == id)
     isconfirmed = req.params['isconfirmed']
 
     # wide_info = EntityCourt.get_wide_object(id)
 
     if isconfirmed == 'confirmed':
-        extentions = extentions.filter(isconfirmed == "true")
+        extentions = extentions.filter(isconfirmed == "true").all()
     if isconfirmed == 'notconfirmed':
-        extentions = extentions.filter(isconfirmed == "false")
+        extentions = extentions.filter(isconfirmed == "false").all()
 
     resp.body = obj_to_json([o.to_dict() for o in extentions])
     resp.status = falcon.HTTP_200
