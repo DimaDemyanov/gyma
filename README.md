@@ -2,7 +2,7 @@
 
 ## Grabbing the code
 ```python
-git clone https://github.com/toshiks/VDV-Backend.git
+https://github.com/DimaDemyanov/gyma
 ```
 
 ## Environment
