@@ -5,6 +5,10 @@ import argparse
 import base64
 import requests
 
+from . import __path__ as ROOT_PATH
+CONFIG_PATH = (ROOT_PATH[0] + "/../config.json")
+
+
 def _DateToString(datetime):
     return datetime.ctime()
 
@@ -52,7 +56,7 @@ def GetAuthProfile(jso, profile_name="local", args=None):
 def RegisterLaunchArguments():
     parser = argparse.ArgumentParser(description='Serve the vdv server')
     parser.add_argument('--profile', help='clarify the profile in config.json to use', default='local')
-    parser.add_argument('--cfgpath', help='overrides the default path to config.json', default='./config.json')
+    parser.add_argument('--cfgpath', help='overrides the default path to config.json', default=CONFIG_PATH)
     parser.add_argument('--dbsid', help='overrides the DB SID in config.json')
     parser.add_argument('--dbuser', help='overrides the DB USER in config.json')
     parser.add_argument('--dbpswd', help='overrides the DB PASSWORD in config.json')

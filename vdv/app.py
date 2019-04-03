@@ -2395,30 +2395,29 @@ class Auth(object):
                                       challenges=['Bearer realm=http://GOOOOGLE'])
 
 
+def getConfigFromLaunchArguments():
+    args = utils.RegisterLaunchArguments()
+
+    cfgPath = args.cfgpath
+    profile = args.profile
+
+    with open(cfgPath) as f:
+        cfg = utils.GetAuthProfile(json.load(f), profile, args)
+
+    return cfg
+
+
+from . import __path__ as ROOT_PATH
+SWAGGER_PATH = (ROOT_PATH[0] + "/../swagger.json")
+
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-args = utils.RegisterLaunchArguments()
-
-cfgPath = args.cfgpath
-profile = args.profile
-# configure
-with open(cfgPath) as f:
-    cfg = utils.GetAuthProfile(json.load(f), profile, args)
-    DBConnection.configure(**cfg['vdv_db'])
-    if 'oidc' in cfg:
-        cfg_oidc = cfg['oidc']
-        auth.Configure(**cfg_oidc)
-
-general_executor = ftr.ThreadPoolExecutor(max_workers=20)
-
-wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
-# Auth(),
 
 
-server = SpecServer(operation_handlers=operation_handlers)
+cfg = getConfigFromLaunchArguments()
 
 if 'server_host' in cfg:
-    with open('swagger.json') as f:
+    with open(SWAGGER_PATH) as f:
         swagger_json = json.loads(f.read(), object_pairs_hook=OrderedDict)
 
     server_host = cfg['server_host']
@@ -2428,16 +2427,54 @@ if 'server_host' in cfg:
     if 'basePath' in swagger_json:
         baseURL = swagger_json['basePath']
 
-    json_string = json.dumps(swagger_json)
-
-    with open('swagger_temp.json', 'wt') as f:
-        f.write(json_string)
-
     EntityBase.host = server_host + baseURL
     EntityBase.MediaCls = EntityMedia
     EntityBase.MediaPropCls = PropMedia
 
-with open('swagger_temp.json') as f:
-    server.load_spec_swagger(f.read())
 
-api.add_sink(server, r'/')
+def getWSGIPortFromConfig(cfg=cfg):
+    if "api_port" in cfg:
+        return int(cfg["api_port"])
+    return None
+
+
+def configureDBConnection():
+    DBConnection.configure(**cfg['vdv_db'])
+
+
+def runWSGIApp():
+    configureDBConnection()
+    configureOIDC()
+
+    general_executor = ftr.ThreadPoolExecutor(max_workers=20)
+
+    wsgi_app = api = falcon.API(middleware=[CORS(), Auth(), MultipartMiddleware()])
+
+    server = SpecServer(operation_handlers=operation_handlers)
+    configureSwagger(server)
+    api.add_sink(server, r'/')
+
+    return wsgi_app
+
+
+def configureOIDC(cfg=cfg):
+    if 'oidc' in cfg:
+        cfg_oidc = cfg['oidc']
+        auth.Configure(**cfg_oidc)
+
+
+def configureSwagger(server, swagger_json=swagger_json):
+    swagger_temp_path = './swagger_temp.json'
+    createSwaggerTemplate(swagger_temp_path)
+    loadSpecSwagger(server, swagger_temp_path)
+
+
+def createSwaggerTemplate(swagger_temp_path, swagger_json=swagger_json):
+    json_string = json.dumps(swagger_json)
+    with open(swagger_temp_path, 'wt') as f:
+        f.write(json_string)
+
+
+def loadSpecSwagger(server, swagger_temp_path):
+    with open(swagger_temp_path) as f:
+        server.load_spec_swagger(f.read())
