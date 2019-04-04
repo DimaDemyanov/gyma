@@ -1,10 +1,13 @@
 from sqlalchemy import Column, String, Integer, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.db import DBConnection
+from gyma.vdv.Entities.EntityBase import EntityBase
+
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
+
 
 class EntityProp(EntityBase, Base):
     __tablename__ = 'vdv_prop'

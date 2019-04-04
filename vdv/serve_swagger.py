@@ -17,9 +17,13 @@ import json
 import logging
 from collections import OrderedDict
 from urllib.parse import parse_qs
+
+from falcon.routing import compile_uri_template
+
+
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
-from falcon.routing import compile_uri_template
+
 
 class SpecServer():
 
@@ -36,7 +40,6 @@ class SpecServer():
         self.operation_handlers = operation_handlers
         log.info("SpecServer initialised")
 
-
     def __call__(self, req, resp, **kwargs):
         # this is the main entry point to inbound request processing
         log.info("SpecServer called on path = %s" % req.path)
@@ -44,7 +47,6 @@ class SpecServer():
         self.req = req
         self.resp = resp
         self.process_inbound_request(req, resp)
-
 
     def process_inbound_request(self, req, resp):
 
@@ -56,7 +58,6 @@ class SpecServer():
         # self.parse_form_data()
         #
         self.dispatch_matched_operation_to_request_handlers(req, resp, matched_operation, uri_fields)
-
 
     def load_spec_swagger(self, swagger_spec):
         # a Swagger spec (typically filenamed api-docs.json) defines a number of API "operations"
@@ -170,7 +171,6 @@ class SpecServer():
                 self.form_fields = parse_qs(self.req.context['postdata'].decode('utf-8'))
             log.info("Form fields found: {}".format(self.form_fields))
 
-
     def dispatch_matched_operation_to_request_handlers(self, req, resp, matched_operation, uri_fields):
         # ok finally we can execute the auth function for the Swagger operation
         log.info('Dispatching to: {}'.format(matched_operation))
@@ -206,4 +206,3 @@ class SpecServer():
             return
             ####### OUR JOB IS FINISHED - WHAT HAPPENS NEXT?
             # control returns to Falcon and Falcon returns the response object to the client
-

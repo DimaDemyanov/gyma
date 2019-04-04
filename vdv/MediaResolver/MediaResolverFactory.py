@@ -1,4 +1,5 @@
-from vdv.MediaResolver.ImageResolver import ImageResolver
+from gyma.vdv.MediaResolver.ImageResolver import ImageResolver
+
 
 class MediaResolverFactory:
     resolvers = {
@@ -6,9 +7,9 @@ class MediaResolverFactory:
         'equipment': ImageResolver,
     }
     separator = '\r\n'.encode()
+
     @staticmethod
     def produce(type, data):
         if type in MediaResolverFactory.resolvers:
             return MediaResolverFactory.resolvers[type](type, data)
         raise Exception('such media type not supported')
-

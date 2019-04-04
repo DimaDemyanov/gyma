@@ -5,18 +5,18 @@ import datetime
 from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityAccount import EntityAccount
-from vdv.Entities.EntityCourt import EntityCourt
-from vdv.Entities.EntityLocation import EntityLocation
-from vdv.Entities.EntityProp import EntityProp
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityAccount import EntityAccount
+from gyma.vdv.Entities.EntityCourt import EntityCourt
+from gyma.vdv.Entities.EntityLocation import EntityLocation
+from gyma.vdv.Entities.EntityProp import EntityProp
 
+from gyma.vdv.Prop.PropLocation import PropLocation
+from gyma.vdv.Prop.PropReal import PropReal
+from gyma.vdv.Prop.PropPost import PropPost
 
-from vdv.Prop.PropLocation import PropLocation
-from vdv.Prop.PropReal import PropReal
-from vdv.Prop.PropPost import PropPost
+from gyma.vdv.db import DBConnection
 
-from vdv.db import DBConnection
 
 def serach_objects(params):
     def mock_bool(_id, _val, _type):

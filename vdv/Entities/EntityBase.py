@@ -3,9 +3,10 @@ import base64
 
 from collections import OrderedDict
 
-from vdv.db import DBConnection
+from gyma.vdv.db import DBConnection
 
-from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
+from gyma.vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
+
 
 class EntityBase:
     host = '.'

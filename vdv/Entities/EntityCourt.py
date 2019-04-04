@@ -6,17 +6,19 @@ from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean, cast
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityTime import EntityTime
-from vdv.Prop.PropCourtTime import PropCourtTime
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityProp import EntityProp
+from gyma.vdv.Entities.EntityTime import EntityTime
+from gyma.vdv.Prop.PropCourtTime import PropCourtTime
 
-from vdv.Prop.PropEquipment import PropEquipment
-from vdv.Prop.PropMedia import PropMedia
-from vdv.Prop.PropLocation import PropLocation
-from vdv.Prop.PropRequest import PropRequest
-from vdv.Prop.PropSport import PropSport
-from vdv.db import DBConnection
+from gyma.vdv.Prop.PropEquipment import PropEquipment
+from gyma.vdv.Prop.PropMedia import PropMedia
+from gyma.vdv.Prop.PropLocation import PropLocation
+from gyma.vdv.Prop.PropRequest import PropRequest
+from gyma.vdv.Prop.PropSport import PropSport
+
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
 
@@ -31,6 +33,7 @@ def create_times(s, _vdvid, _id, _val, _uid):
         PropCourtTime(_vdvid, _id, id).add(session=s, no_commit=True)
     s.db.commit()
 
+
 def update_times(s, _vdvid, _id, _val, _uid):
     ids = [_.vdvid for _ in EntityTime.get().filter(cast(EntityTime.time,Date) == cast(_val[0],Date)).all()]
     times_court = PropCourtTime.get().filter_by(vdvid = _vdvid).filter(PropCourtTime.value.in_(ids)).all()
@@ -38,6 +41,7 @@ def update_times(s, _vdvid, _id, _val, _uid):
         PropCourtTime.delete_one(_.vdvid, _.value)
     create_times(s, _vdvid, _id, _val, _uid)
     s.db.commit()
+
 
 class EntityCourt(EntityBase, Base):
     __tablename__ = 'vdv_court'

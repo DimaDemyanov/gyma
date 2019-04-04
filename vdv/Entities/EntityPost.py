@@ -5,14 +5,15 @@ import time
 from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityProp import EntityProp
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityProp import EntityProp
 
-from vdv.Prop.PropLocation import PropLocation
-from vdv.Prop.PropLike import PropLike
-from vdv.Prop.PropMedia import PropMedia
+from gyma.vdv.Prop.PropLocation import PropLocation
+from gyma.vdv.Prop.PropLike import PropLike
+from gyma.vdv.Prop.PropMedia import PropMedia
 
-from vdv.db import DBConnection
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
 
