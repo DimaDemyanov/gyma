@@ -1,11 +1,8 @@
-import sys
-sys.path.append("../..")
-
 from falcon import testing, API
 
-from vdv.serve_swagger import SpecServer
-from vdv.app import configureDBConnection, configureSwagger, operation_handlers
-from vdv.db import DBConnection
+from gyma.vdv.serve_swagger import SpecServer
+from gyma.vdv.app import configureDBConnection, configureSwagger, operation_handlers
+from gyma.vdv.db import DBConnection
 
 
 class BaseTestCase(testing.TestCase):
