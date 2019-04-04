@@ -4,13 +4,13 @@ import time
 from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityProp import EntityProp
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityProp import EntityProp
 
-from vdv.db import DBConnection
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
-
 
 
 class EntityHelp(EntityBase, Base):

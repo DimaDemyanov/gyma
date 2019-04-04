@@ -9,13 +9,13 @@ import falcon
 
 from vdv.Tests.BaseTestCase import BaseTestCase
 from vdv.app import SWAGGER_SPEC_PATH, operation_handlers
+from vdv.Tests import test_helpers
 
 
 SWAGGER_SPEC_PATH = '../../../vdv/../swagger.json'
 
 
-
-SWAGGER_SPEC = get_swagger_spec()
+SWAGGER_SPEC = test_helpers.get_swagger_spec()
 
 # class CourtAPITestCase(BaseTestCase):
 #     def test_create_new_court(self):
@@ -53,7 +53,7 @@ class GetAllCourtsTests(BaseTestCase):
         if operation_id not in operation_handlers:
             self.assertFalse("operationId '%s' doesn't match any path" % operation_id)
 
-        request_uri_path = get_uri_path_by_opearation_id(operation_id)
+        request_uri_path = test_helpers.get_uri_path_by_opearation_id(operation_id)
         if not request_uri_path:
             self.assertFalse("Can't get uri path for given operationId: %s" % operation_id)
 

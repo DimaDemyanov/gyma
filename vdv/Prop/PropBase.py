@@ -2,7 +2,8 @@ from collections import OrderedDict
 
 from sqlalchemy import Column, Boolean, Integer, Sequence
 
-from vdv.db import DBConnection
+from gyma.vdv.db import DBConnection
+
 
 class PropBase:
     id = Column(Integer, Sequence('vdv_prop_seq'), primary_key=True)

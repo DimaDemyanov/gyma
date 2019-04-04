@@ -3,13 +3,15 @@ from io import BytesIO
 from skimage import io
 from skimage.transform import rescale
 
-from vdv.MediaResolver.MediaResolver import MediaResolver
+from gyma.vdv.MediaResolver.MediaResolver import MediaResolver
 
 import uuid
+
 
 MAX_IMAGE_SIDE = 1024
 MIN_IMAGE_SIDE = 256
 MAX_ASPECT_RATIO = 1.34
+
 
 class ImageResolver(MediaResolver):
     def __init__(self, _type, data):
@@ -55,6 +57,3 @@ class ImageResolver(MediaResolver):
         self.url = './images/%s.jpg' % uuid.uuid4().hex
         io.imsave(self.url, img[:, :, :3])
         return self.url
-
-
-

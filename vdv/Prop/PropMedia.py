@@ -1,11 +1,13 @@
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityMedia import EntityMedia
-from vdv.Prop.PropBase import PropBase
+from gyma.vdv.Entities.EntityMedia import EntityMedia
+from gyma.vdv.Prop.PropBase import PropBase
+
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
 
-from vdv.db import DBConnection
 
 class PropMedia(PropBase, Base):
     __tablename__ = 'vdv_prop_media'

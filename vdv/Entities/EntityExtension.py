@@ -4,15 +4,15 @@ import pytz as pytz
 from sqlalchemy import Column, String, Integer, Date, Sequence, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityCourt import EntityCourt
-from vdv.Entities.EntityTariff import EntityTariff
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityCourt import EntityCourt
+from gyma.vdv.Entities.EntityTariff import EntityTariff
 
-from vdv.db import DBConnection
-from vdv.o_utils.utils import get_curr_date, time_add, time_to_str, str_to_time, get_curr_date_str
+from gyma.vdv.db import DBConnection
+from gyma.vdv.o_utils.utils import get_curr_date, time_add, time_to_str, str_to_time, get_curr_date_str
+
 
 Base = declarative_base()
-
 
 
 class EntityExtention(EntityBase, Base):
@@ -79,4 +79,3 @@ class EntityExtention(EntityBase, Base):
                 _.confirmedtime = get_curr_date_str()
                 _.adminid = adminid
                 session.db.commit()
-

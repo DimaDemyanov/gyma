@@ -1,22 +1,23 @@
-
 from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityLandlord import EntityLandlord
-from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityTime import EntityTime
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityLandlord import EntityLandlord
+from gyma.vdv.Entities.EntityProp import EntityProp
+from gyma.vdv.Entities.EntityTime import EntityTime
 
-from vdv.Prop.PropCourtTime import PropCourtTime
+from gyma.vdv.Prop.PropCourtTime import PropCourtTime
 
-from vdv.Prop.PropMedia import PropMedia
-from vdv.Prop.PropPost import PropPost
-from vdv.Prop.PropRequestTime import PropRequestTime
+from gyma.vdv.Prop.PropMedia import PropMedia
+from gyma.vdv.Prop.PropPost import PropPost
+from gyma.vdv.Prop.PropRequestTime import PropRequestTime
 
-from vdv.db import DBConnection
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
+
 
 def to_request_times(s, _vdvid, _id, _val, _uid):
     for _ in _val:
@@ -150,11 +151,10 @@ class EntityRequest(EntityBase, Base):
     def get_wide_object(cls, vdvid, items=[]):
         PROPNAME_MAPPING = EntityProp.map_name_id()
 
-
         requests = EntityRequest.get().filter_by(vdvid=vdvid).all()[0]
         result = requests.to_dict()
         if 'landlord' in items:
-            from vdv.Entities.EntityCourt import EntityCourt
+            from gyma.vdv.Entities.EntityCourt import EntityCourt
             result.update({'landlord': EntityLandlord.get_wide_object(EntityLandlord.get().filter_by(vdvid=EntityCourt.get().filter_by(vdvid = requests[0].courtid).all()[0].ownerid).all()[0].vdvid)})
         if 'times' in items:
             result.update({'times':
@@ -206,8 +206,6 @@ class EntityRequest(EntityBase, Base):
                         PropCourtTime.delete_one(_.courtid, t)
                         for req in EntityRequest.get().filter(EntityRequest.vdvid.in_(PropRequestTime.get_objects(t, PROPNAME_MAPPING['requestTime']))).all():
                             req.isconfirmed = False
-
-
 
                 session.db.commit()
 

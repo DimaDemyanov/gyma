@@ -1,10 +1,12 @@
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Prop.PropBase import PropBase
+from gyma.vdv.Prop.PropBase import PropBase
+
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
 
-from vdv.db import DBConnection
 
 class PropPost(PropBase, Base):
     __tablename__ = 'vdv_prop_post'

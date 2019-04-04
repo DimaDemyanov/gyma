@@ -5,9 +5,11 @@ import time
 from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityBase import EntityBase
+
 
 Base = declarative_base()
+
 
 class EntityTime(EntityBase, Base):
     __tablename__ = 'vdv_time'
@@ -20,4 +22,3 @@ class EntityTime(EntityBase, Base):
     def __init__(self, time):
         super().__init__()
         self.time = time
-
