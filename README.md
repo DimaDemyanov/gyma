@@ -12,6 +12,11 @@ python version more than 3.6
 ```python
 pip install ./Requirements.txt
 ```
+Copy ```./setup.py``` to root level directory and run from there (from root level):
+```python
+pip install -e .
+```
+Detailed instruction: [Stack Overflow](https://stackoverflow.com/questions/6323860/sibling-package-imports/50193944#50193944)
 
 ## Running server
 ```python

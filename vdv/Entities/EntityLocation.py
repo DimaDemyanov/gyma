@@ -39,8 +39,8 @@ class EntityLocation(EntityBase, Base):
         PROPNAME_MAPPING = EntityProp.map_name_id()
         location = EntityLocation.get().filter_by(vdvid = id).all()[0]
         obj_dict = location.to_dict()
-        from vdv.Entities.EntityCourt import EntityCourt
-        from vdv.Prop.PropLocation import PropLocation
+        from gyma.vdv.Entities.EntityCourt import EntityCourt
+        from gyma.vdv.Prop.PropLocation import PropLocation
         prices = [o.price for o in EntityCourt.get().filter(EntityCourt.vdvid.in_(PropLocation.get_objects(id, PROPNAME_MAPPING['location'])))]
         if len(prices) == 0:
             obj_dict.update({'minCost': -1, 'maxCost': -1})

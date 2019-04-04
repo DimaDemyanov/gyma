@@ -321,8 +321,9 @@ def getAllCourtRequest(**request_handler_args):
     # extentions = EntityExtention.get().filter(EntityExtention.isconfirmed == False or (cast(EntityExtention.confirmed_time, DateTime) > get_curr_date() - timedelta(hours=24))).all()
 
     with DBConnection() as session:
-        res = session.db.query(EntityRequest, EntityTime).filter(EntityRequest.vdvid==id).filter(cast(EntityTime.time, DateTime) > get_curr_date() - timedelta(hours=24)).distinct(EntityRequest.vdvid)
-
+        res = session.db.query(EntityRequest)\
+            .join(EntityCourt, EntityRequest.courtid == EntityCourt.vdvid)\
+            .filter(cast(EntityTime.time, DateTime) > get_curr_date() - timedelta(hours=24))
     resp.body = obj_to_json([o[0].to_dict() for o in res])
     resp.status = falcon.HTTP_200
 
@@ -616,13 +617,14 @@ def getAllCourts(**request_handler_args):
 
     with DBConnection() as session:
         if sort_order == 'popularity':
-            objects = session.db.query(EntityCourt, EntityRequest, func.count(EntityRequest.vdvid).label('total'))\
-                .filter(EntityRequest.courtid == EntityCourt.vdvid).group_by(EntityCourt.vdvid).group_by(EntityRequest.vdvid)
+            objects = session.db.query(EntityCourt, func.count(EntityRequest.vdvid).label('total'))\
+                .join(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
+                .group_by(EntityCourt.vdvid, EntityRequest.vdvid)
         else:
             objects = session.db.query(EntityCourt)
 
     if filter == 'all':
-        objects = objects
+        pass
 
     if filter == 'my':
         objects = objects.filter_by(ownerid=my_landlordid)
@@ -1865,9 +1867,9 @@ def getCourtsInArea(**request_handler_args):
 
     with DBConnection() as session:
         if sort_order == 'popularity':
-            objects = session.db.query(EntityCourt, EntityRequest, func.count(EntityRequest.vdvid).label('total')) \
-                .filter(EntityRequest.courtid == EntityCourt.vdvid).group_by(EntityCourt.vdvid).group_by(
-                EntityRequest.vdvid)
+            objects = session.db.query(EntityCourt, func.count(EntityRequest.vdvid).label('total'))\
+                .join(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
+                .group_by(EntityCourt.vdvid, EntityRequest.vdvid)
         else:
             objects = courts
 
@@ -1957,7 +1959,7 @@ def getAllTariffs(**request_handler_args):
 
     objects = EntityTariff.get().all()
 
-    resp.body = obj_to_json([o.to_dict() for o in objects ])
+    resp.body = obj_to_json([o.to_dict() for o in objects])
 
     resp.status = falcon.HTTP_200
 
@@ -2157,17 +2159,23 @@ def confirmExtention(**request_handler_args):  # TODO: implement it
     EntityExtention.confirm(id, adminid)
     resp.status = falcon.HTTP_200
 
+
 def getAllExtentions(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    extentions = EntityExtention.get().filter(or_(EntityExtention.isconfirmed == False,(cast(EntityExtention.confirmedtime, DateTime)
-                                                  > get_curr_date() - timedelta(hours=24))))\
-        .order_by(EntityExtention.created)\
-        .all()
+    one_day_earlier_datetime = get_curr_date() - timedelta(hours=24)
+    is_one_day_passed_after_confirmation = cast(
+        EntityExtention.confirmedtime, DateTime) > one_day_earlier_datetime
+
+    extentions = EntityExtention.get().filter(or_(
+            EntityExtention.isconfirmed == False,
+            is_one_day_passed_after_confirmation == True,))\
+        .order_by(EntityExtention.created).all()
 
     resp.body = obj_to_json([o.to_dict() for o in extentions])
     resp.status = falcon.HTTP_200
+
 
 def getExtentionsByLandlordId(**request_handler_args):
     req = request_handler_args['req']
@@ -2175,19 +2183,19 @@ def getExtentionsByLandlordId(**request_handler_args):
 
     id = getIntPathParam('landlordId', **request_handler_args)
     with DBConnection() as session:
-        objects = session.db.query(EntityExtention, EntityCourt).filter(EntityCourt.ownerid==id)
+        extentions = session.db.query(EntityExtention)\
+            .join(EntityCourt, EntityExtention.courtid == EntityCourt.vdvid)\
+            .filter(EntityCourt.ownerid == id)
     isconfirmed = req.params['isconfirmed']
 
     # wide_info = EntityCourt.get_wide_object(id)
 
-    extentions = objects
     if isconfirmed == 'confirmed':
-        extentions = extentions.filter(EntityExtention.isconfirmed==True)
+        extentions = extentions.filter(isconfirmed == "true").all()
     if isconfirmed == 'notconfirmed':
-        extentions = extentions.filter(EntityExtention.isconfirmed==False)
-    extentions = extentions.distinct(EntityExtention.vdvid)
+        extentions = extentions.filter(isconfirmed == "false").all()
 
-    resp.body = obj_to_json([o[0].to_dict() for o in extentions])
+    resp.body = obj_to_json([o.to_dict() for o in extentions])
     resp.status = falcon.HTTP_200
 
 

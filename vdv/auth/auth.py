@@ -1,10 +1,12 @@
-from vdv.auth.config import CONFIG, PROVIDER
+from gyma.vdv.auth.config import CONFIG, PROVIDER
 
 import urllib.request
 import json
 
+
 def Configure(**kwargs):
     CONFIG.update(kwargs)
+
 
 def Validate(token, provider):
     try:
