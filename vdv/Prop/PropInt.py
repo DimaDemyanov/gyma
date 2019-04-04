@@ -1,4 +1,4 @@
-from vdv.Prop.PropBase import PropBase
+from gyma.vdv.Prop.PropBase import PropBase
 
 from sqlalchemy.ext.declarative import declarative_base
 

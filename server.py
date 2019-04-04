@@ -1,6 +1,6 @@
 from waitress import serve
 
-from vdv.app import runWSGIApp, getWSGIPortFromConfig
+from gyma.vdv.app import runWSGIApp, getWSGIPortFromConfig
 
 
 if __name__ == '__main__':
