@@ -4,6 +4,15 @@ import json
 from gyma.vdv.app import SWAGGER_SPEC_PATH, baseURL
 
 
+def load_from_json_file(file_path):
+    try:
+        with open(file_path) as f:
+            result = json.loads(f.read())
+    except FileNotFoundError:
+        return None
+    return result
+
+
 def get_swagger_spec(swagger_spec_path=SWAGGER_SPEC_PATH):
     try:
         with open(SWAGGER_SPEC_PATH) as f:
