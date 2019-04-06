@@ -1,3 +1,5 @@
+import os
+
 from falcon import testing, API
 
 from gyma.vdv.serve_swagger import SpecServer
@@ -37,3 +39,9 @@ class BaseTestCase(testing.TestCase):
         if not request_uri_path:
             self.fail("Can't get uri path for given operationId: %s" % operation_id)
         return request_uri_path
+
+    @classmethod
+    def tearDown(cls):
+        swagger_temp_path = "./swagger_temp.json"
+        if os.path.exists(swagger_temp_path):
+            os.remove(swagger_temp_path)
