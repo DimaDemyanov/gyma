@@ -4,6 +4,18 @@ import json
 from gyma.vdv.app import SWAGGER_SPEC_PATH, baseURL
 
 
+TEST_ACCOUNT = {
+    "vdvid": 1000,
+    "name": "tester",
+    "phone": "79110001122",
+    "created": "None",
+    "updated": "None",
+    "mediaid": "None",
+    "email": "None",
+    "password": "None"
+}
+
+
 def load_from_json_file(file_path):
     try:
         with open(file_path) as f:

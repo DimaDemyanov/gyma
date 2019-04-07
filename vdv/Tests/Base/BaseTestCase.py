@@ -6,7 +6,10 @@ from gyma.vdv.serve_swagger import SpecServer
 from gyma.vdv.app import configureDBConnection, configureSwagger, operation_handlers
 from gyma.vdv.db import DBConnection
 
-from gyma.vdv.Tests import test_helpers
+from gyma.vdv.Tests.Base import test_helpers
+
+
+SWAGGER_TEMP_PATH = "./swagger_temp.json"
 
 
 class AuthenticationForTest(object):
@@ -15,6 +18,9 @@ class AuthenticationForTest(object):
 
 
 class BaseTestCase(testing.TestCase):
+
+    # MARK: - setUp & tearDown
+
     @classmethod
     def setUpClass(cls):
         """ Configure API and Connect to local DB """
@@ -25,10 +31,11 @@ class BaseTestCase(testing.TestCase):
         cls.api.add_sink(server, r'/')
         cls.client = testing.TestClient(cls.api)
 
-    def tearDown(self):
-        pass
+    @classmethod
+    def tearDownClass(cls):
+        cls.__remove_swagger_temp()
 
-        # TODO: Drop created Elements
+    # MARK: - Public methods
 
     def check_operation_id_has_operation_handler(self, operation_id):
         if operation_id not in operation_handlers:
@@ -40,8 +47,8 @@ class BaseTestCase(testing.TestCase):
             self.fail("Can't get uri path for given operationId: %s" % operation_id)
         return request_uri_path
 
-    @classmethod
-    def tearDown(cls):
-        swagger_temp_path = "./swagger_temp.json"
+    # MARK: - Private methods
+
+    def __remove_swagger_temp(swagger_temp_path=SWAGGER_TEMP_PATH):
         if os.path.exists(swagger_temp_path):
             os.remove(swagger_temp_path)

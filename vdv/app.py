@@ -1031,7 +1031,8 @@ def createAccount(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
+        logger.error("Invalid JSON was sent to request handler, can't get param: 'phone'")
         resp.status = falcon.HTTP_405
         return
 
