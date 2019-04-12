@@ -675,6 +675,8 @@ def getCourtById(**request_handler_args):
 
     id = getIntPathParam('courtId', **request_handler_args)
     objects = EntityCourt.get().filter_by(vdvid=id).all()
+    if len(objects) == 0:
+        return
 
     e_mail = req.context['phone']
     my_id = EntityAccount.get_id_from_email(e_mail)
@@ -1029,7 +1031,8 @@ def createAccount(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
+        logger.error("Invalid JSON was sent to request handler, can't get param: 'phone'")
         resp.status = falcon.HTTP_405
         return
 
@@ -2416,7 +2419,7 @@ def getConfigFromLaunchArguments():
 
 
 from . import __path__ as ROOT_PATH
-SWAGGER_PATH = (ROOT_PATH[0] + "/../swagger.json")
+SWAGGER_SPEC_PATH = (ROOT_PATH[0] + "/../swagger.json")
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -2425,7 +2428,7 @@ logger.setLevel(logging.DEBUG)
 cfg = getConfigFromLaunchArguments()
 
 if 'server_host' in cfg:
-    with open(SWAGGER_PATH) as f:
+    with open(SWAGGER_SPEC_PATH) as f:
         swagger_json = json.loads(f.read(), object_pairs_hook=OrderedDict)
 
     server_host = cfg['server_host']
