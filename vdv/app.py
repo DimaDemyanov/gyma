@@ -18,39 +18,39 @@ from datetime import timedelta
 
 import falcon
 from falcon_multipart.middleware import MultipartMiddleware
-from vdv.Entities.EntityCourt import EntityCourt, create_times, update_times
-from vdv import utils
-from vdv.Entities.EntityEquipment import EntityEquipment
-from vdv.Entities.EntityExtension import EntityExtention
-from vdv.Entities.EntityHelp import EntityHelp
-from vdv.Entities.EntityLandlord import EntityLandlord
-from vdv.Entities.EntityRequest import EntityRequest
-from vdv.Entities.EntitySimpleuser import EntitySimpleuser
-from vdv.Entities.EntitySport import EntitySport
-from vdv.Entities.EntityTariff import EntityTariff
-from vdv.Entities.EntityTime import EntityTime
-from vdv.Entities.EntityValidation import EntityValidation
-from vdv.Prop.PropCourtTime import PropCourtTime
-from vdv.Prop.PropEquipment import PropEquipment
-from vdv.Prop.PropRequestTime import PropRequestTime
-from vdv.Prop.PropSport import PropSport
-from vdv.auth import auth
-# from vdv.auth import JWT_SIGN_ALGORITHM
-from vdv.db import DBConnection
-from vdv.o_utils.utils import get_curr_date
-from vdv.serve_swagger import SpecServer
+from gyma.vdv.Entities.EntityCourt import EntityCourt, create_times, update_times
+from gyma.vdv import utils
+from gyma.vdv.Entities.EntityEquipment import EntityEquipment
+from gyma.vdv.Entities.EntityExtension import EntityExtention
+from gyma.vdv.Entities.EntityHelp import EntityHelp
+from gyma.vdv.Entities.EntityLandlord import EntityLandlord
+from gyma.vdv.Entities.EntityRequest import EntityRequest
+from gyma.vdv.Entities.EntitySimpleuser import EntitySimpleuser
+from gyma.vdv.Entities.EntitySport import EntitySport
+from gyma.vdv.Entities.EntityTariff import EntityTariff
+from gyma.vdv.Entities.EntityTime import EntityTime
+from gyma.vdv.Entities.EntityValidation import EntityValidation
+from gyma.vdv.Prop.PropCourtTime import PropCourtTime
+from gyma.vdv.Prop.PropEquipment import PropEquipment
+from gyma.vdv.Prop.PropRequestTime import PropRequestTime
+from gyma.vdv.Prop.PropSport import PropSport
+from gyma.vdv.auth import auth
+# from gyma.vdv.auth import JWT_SIGN_ALGORITHM
+from gyma.vdv.db import DBConnection
+from gyma.vdv.o_utils.utils import get_curr_date
+from gyma.vdv.serve_swagger import SpecServer
 
-from vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityBase import EntityBase
 
-from vdv.Entities.EntityAccount import EntityAccount
-from vdv.Entities.EntityLocation import EntityLocation, distanceMath
-from vdv.Entities.EntityMedia import EntityMedia
+from gyma.vdv.Entities.EntityAccount import EntityAccount
+from gyma.vdv.Entities.EntityLocation import EntityLocation, distanceMath
+from gyma.vdv.Entities.EntityMedia import EntityMedia
 
-from vdv.search import *
+from gyma.vdv.search import *
 
-from vdv.Prop.PropMedia import PropMedia
+from gyma.vdv.Prop.PropMedia import PropMedia
 
-from vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
+from gyma.vdv.MediaResolver.MediaResolverFactory import MediaResolverFactory
 
 from haversine import haversine
 

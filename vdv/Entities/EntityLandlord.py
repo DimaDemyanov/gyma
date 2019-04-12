@@ -5,18 +5,18 @@ import datetime
 from sqlalchemy import Column, String, Integer, Date, Sequence, Boolean, cast, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityTime import EntityTime
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityProp import EntityProp
+from gyma.vdv.Entities.EntityTime import EntityTime
 
-from vdv.Prop.PropMedia import PropMedia
-from vdv.Prop.PropPost import PropPost
-from vdv.Prop.PropRequestTime import PropRequestTime
+from gyma.vdv.Prop.PropMedia import PropMedia
+from gyma.vdv.Prop.PropPost import PropPost
+from gyma.vdv.Prop.PropRequestTime import PropRequestTime
 
-from vdv.db import DBConnection
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
-
 
 
 class EntityLandlord(EntityBase, Base):
@@ -53,7 +53,7 @@ class EntityLandlord(EntityBase, Base):
                 company = data['company']
             new_entity = EntityLandlord(accountid, money, isentity, company, False)
             vdvid = new_entity.add()
-            from vdv.Entities.EntityAccount import EntityAccount
+            from gyma.vdv.Entities.EntityAccount import EntityAccount
             account = EntityAccount.get().filter_by(vdvid=accountid).all()[0]
             account.accounttype = str(account.accounttype) + "/landlord"
         try:
@@ -121,11 +121,11 @@ class EntityLandlord(EntityBase, Base):
         count_come = 0
         count_not_come = 0
 
-        from vdv.Entities.EntityCourt import EntityCourt
+        from gyma.vdv.Entities.EntityCourt import EntityCourt
         courts = EntityCourt.get().filter_by(ownerid=vdvid).all()
 
         for c in courts:
-            from vdv.Entities.EntityRequest import EntityRequest
+            from gyma.vdv.Entities.EntityRequest import EntityRequest
             reqs = EntityRequest.get().filter_by(courtid=c.vdvid, isconfirmed=True, come=True).all()
             for _ in reqs:
                 times = PropRequestTime.get_object_property(_.vdvid, PROPNAME_MAPPING['requestTime'])

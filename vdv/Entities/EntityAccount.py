@@ -5,17 +5,17 @@ import datetime
 from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityCourt import EntityCourt
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityProp import EntityProp
+from gyma.vdv.Entities.EntityCourt import EntityCourt
 
-from vdv.Prop.PropMedia import PropMedia
-from vdv.Prop.PropPost import PropPost
+from gyma.vdv.Prop.PropMedia import PropMedia
+from gyma.vdv.Prop.PropPost import PropPost
 
-from vdv.db import DBConnection
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
-
 
 
 class EntityAccount(EntityBase, Base):

@@ -5,14 +5,15 @@ import time
 from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityProp import EntityProp
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityProp import EntityProp
 
-from vdv.Prop.PropLocation import PropLocation
-from vdv.Prop.PropLike import PropLike
-from vdv.Prop.PropMedia import PropMedia
+from gyma.vdv.Prop.PropLocation import PropLocation
+from gyma.vdv.Prop.PropLike import PropLike
+from gyma.vdv.Prop.PropMedia import PropMedia
 
-from vdv.db import DBConnection
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
 
@@ -75,7 +76,7 @@ class EntityPost(EntityBase, Base):
                         raise Exception('{%s} not existed property\nPlease use one of:\n%s' %
                                         (prop_name, str(PROPNAME_MAPPING)))
 
-                from vdv.Prop.PropPost import PropPost
+                from gyma.vdv.Prop.PropPost import PropPost
                 PropPost(userId, PROPNAME_MAPPING["post"], vdvid).add(session, no_commit=True)
                 session.db.commit()
 
@@ -134,6 +135,6 @@ class EntityPost(EntityBase, Base):
             if key in PROP_MAPPING:
                 PROP_MAPPING[key](vdvid, propid)
 
-        from vdv.Prop.PropPost import PropPost
+        from gyma.vdv.Prop.PropPost import PropPost
         for _ in EntityPost.get().filter_by(vdvid=vdvid).all():
             PropPost.delete(_.userid, PROPNAME_MAPPING["post"], False)

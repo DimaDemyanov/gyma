@@ -1,7 +1,10 @@
-from vdv.Prop.PropBase import PropBase
+from gyma.vdv.Prop.PropBase import PropBase
 
 from sqlalchemy.ext.declarative import declarative_base
+
+
 Base = declarative_base()
+
 
 class PropInt(PropBase, Base):
     __tablename__ = 'vdv_prop_int'

@@ -5,18 +5,17 @@ import datetime
 from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
-from vdv.Entities.EntityProp import EntityProp
-from vdv.Entities.EntityCourt import EntityCourt
+from gyma.vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityProp import EntityProp
+from gyma.vdv.Entities.EntityCourt import EntityCourt
 
+from gyma.vdv.Prop.PropMedia import PropMedia
+from gyma.vdv.Prop.PropPost import PropPost
 
-from vdv.Prop.PropMedia import PropMedia
-from vdv.Prop.PropPost import PropPost
+from gyma.vdv.db import DBConnection
 
-from vdv.db import DBConnection
 
 Base = declarative_base()
-
 
 
 class EntityValidation(EntityBase, Base):
@@ -148,4 +147,3 @@ class EntityValidation(EntityBase, Base):
         PROPNAME_MAPPING = EntityProp.map_name_id()
         res = PropBool.get_object_property(id, PROPNAME_MAPPING['private'])
         return res[0] if len(res) else False
-

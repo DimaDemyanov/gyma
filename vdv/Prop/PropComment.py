@@ -1,11 +1,13 @@
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityComment import EntityComment
-from vdv.Prop.PropBase import PropBase
+from gyma.vdv.Entities.EntityComment import EntityComment
+from gyma.vdv.Prop.PropBase import PropBase
+
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
 
-from vdv.db import DBConnection
 
 class PropComment(PropBase, Base):
     __tablename__ = 'vdv_prop_comment'
@@ -17,6 +19,6 @@ class PropComment(PropBase, Base):
     def get_object_property(cls, vdvid, propid):
         with DBConnection() as session:
             return [_[1].to_dict() for _ in session.db.query(cls, EntityComment).
-                filter(cls.vdvid == vdvid).
-                filter(cls.propid == propid).
-                filter(cls.value == EntityComment.vdvid).all()]
+                    filter(cls.vdvid == vdvid).
+                    filter(cls.propid == propid).
+                    filter(cls.value == EntityComment.vdvid).all()]

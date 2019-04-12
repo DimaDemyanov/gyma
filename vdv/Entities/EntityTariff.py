@@ -3,13 +3,12 @@ import datetime
 from sqlalchemy import Column, String, Integer, Date, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Entities.EntityBase import EntityBase
+from gyma.vdv.Entities.EntityBase import EntityBase
 
+from gyma.vdv.db import DBConnection
 
-from vdv.db import DBConnection
 
 Base = declarative_base()
-
 
 
 class EntityTariff(EntityBase, Base):

@@ -1,5 +1,6 @@
 import jwt
 
+
 oidc_params = {
     'client_id': 'star',
     'client_secret': 'a72581e1-09be-4cb0-9959-6b957372f749',
@@ -17,8 +18,10 @@ CHnH3akf3XIHEwdEcPs+tv2O4Iz0aS7NK9NfnVpe2RP1ePnJPo9R0DhLuQynrqKc
 PQIDAQAB
 -----END PUBLIC KEY-----'''
 
+
 def Configure(**kwargs):
     oidc_params.update(kwargs)
+
 
 def Validate(token):
     try:

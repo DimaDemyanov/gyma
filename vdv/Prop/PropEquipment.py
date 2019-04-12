@@ -1,9 +1,8 @@
-
-
 from sqlalchemy import Column, Integer, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 
-from vdv.Prop.PropBase import PropBase
+from gyma.vdv.Prop.PropBase import PropBase
+
 
 Base = declarative_base()
 
