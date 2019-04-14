@@ -82,17 +82,10 @@ class CreateAccountTests(BaseTestCase):
     # MARK: - Private methods:
 
     def _is_account_in_db(self, account_params):
-        try:
-            created_account = EntityAccount.get().filter_by(
-                phone=account_params['phone']
-            ).all()[0].to_dict()
-        except IndexError:
-            return False
-
-        all_account_objects = EntityAccount.get().all()
-        all_accounts = [o.to_dict() for o in all_account_objects]
-
-        return created_account in all_accounts
+        created_account = EntityAccount.get().filter_by(
+            phone=account_params['phone']
+        ).all()
+        return len(created_account) == 1
 
     def _is_account_objects_increased_by_value(self, value):
         with DBConnection() as session:

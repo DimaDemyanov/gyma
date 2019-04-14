@@ -34,11 +34,7 @@ class UpdateUserTests(BaseTestCase):
         self.valid_request_params = {"json": self.new_valid_account_params}
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntityAccount).filter(
-                EntityAccount.vdvid == self.created_account_id
-            ).delete()
-            session.db.commit()
+        EntityAccount.delete(self.created_account_id)
 
     # Tests
 

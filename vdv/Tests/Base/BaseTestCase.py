@@ -33,7 +33,7 @@ class BaseTestCase(testing.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.__remove_swagger_temp()
+        cls._remove_swagger_temp()
 
     # MARK: - Public methods
 
@@ -52,8 +52,11 @@ class BaseTestCase(testing.TestCase):
             dict2_value = dict2[dict1_param]
             self.assertEqual(dict2_value, dict1_value)
 
+    def create_request_uri_path_with_param(self, base_path, param):
+        return "{base_path}{param}".format(base_path=base_path, param=param)
+
     # MARK: - Private methods
 
-    def __remove_swagger_temp(swagger_temp_path=SWAGGER_TEMP_PATH):
+    def _remove_swagger_temp(swagger_temp_path=SWAGGER_TEMP_PATH):
         if os.path.exists(swagger_temp_path):
             os.remove(swagger_temp_path)
