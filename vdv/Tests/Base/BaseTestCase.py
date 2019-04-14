@@ -14,7 +14,7 @@ SWAGGER_TEMP_PATH = "./swagger_temp.json"
 
 class AuthenticationForTest(object):
     def process_request(self, req, resp):
-        req.context['phone'] = '79110001122'
+        req.context['phone'] = test_helpers.TEST_ACCOUNT['phone']
 
 
 class BaseTestCase(testing.TestCase):
@@ -46,6 +46,11 @@ class BaseTestCase(testing.TestCase):
         if not request_uri_path:
             self.fail("Can't get uri path for given operationId: %s" % operation_id)
         return request_uri_path
+
+    def check_dict1_in_dict2(self, dict1, dict2):
+        for dict1_param, dict1_value in dict1.items():
+            dict2_value = dict2[dict1_param]
+            self.assertEqual(str(dict2_value), str(dict1_value))
 
     # MARK: - Private methods
 
