@@ -519,9 +519,6 @@ def getSportById(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
 
-    e_mail = req.context['phone']
-    my_id = EntityAccount.get_id_from_email(e_mail)
-
     resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
@@ -586,9 +583,6 @@ def getEquipmentById(**request_handler_args):
 
     id = getIntPathParam('equipmentId', **request_handler_args)
     objects = EntityEquipment.get().filter_by(vdvid=id).all()
-
-    e_mail = req.context['phone']
-    my_id = EntityAccount.get_id_from_email(e_mail)
 
     resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
@@ -677,9 +671,6 @@ def getCourtById(**request_handler_args):
     objects = EntityCourt.get().filter_by(vdvid=id).all()
     if len(objects) == 0:
         return
-
-    e_mail = req.context['phone']
-    my_id = EntityAccount.get_id_from_email(e_mail)
 
     wide_info = EntityCourt.get_wide_object(id)
 
@@ -1264,9 +1255,6 @@ def getUserById(**request_handler_args):
     if len(objects) == 0:
         resp.status = falcon.HTTP_404
         return
-
-    e_mail = req.context['phone']
-    my_id = EntityAccount.get_id_from_email(e_mail)
 
     res = []
     for _ in objects:

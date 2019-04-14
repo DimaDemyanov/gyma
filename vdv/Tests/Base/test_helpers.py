@@ -40,6 +40,8 @@ def get_uri_path_by_opearation_id(operation_id, swagger_spec_path=SWAGGER_SPEC_P
     for path in swagger_spec['paths'].keys():
         for http_method in swagger_spec['paths'][path].keys():
             if swagger_spec['paths'][path][http_method]['operationId'] == operation_id:
+                if '{' in path:
+                    path = path[:path.find('{')]
                 return '{base_url}{path}'.format(base_url=baseURL, path=path)
 
 
