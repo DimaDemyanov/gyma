@@ -45,28 +45,28 @@ def get_uri_path_by_opearation_id(operation_id, swagger_spec_path=SWAGGER_SPEC_P
 
 # MARK: - Not in use:
 
-def get_uri_parameters_in_path(path, swagger_spec_path=SWAGGER_SPEC_PATH):
-    swagger_spec = get_swagger_spec(swagger_spec_path)
+# def get_uri_parameters_in_path(path, swagger_spec_path=SWAGGER_SPEC_PATH):
+#     swagger_spec = get_swagger_spec(swagger_spec_path)
 
-    for k in swagger_spec['paths'].keys():
-        for http_method in swagger_spec['paths'][k].keys():
-            http_method_description = swagger_spec['paths'][k][http_method]
-            if http_method_description['operationId'] == operationId:
-                parameters = http_method_description['parameters']
-                for parameter in parameters:
-                    if parameter['in'] != 'path':
-                        pass
-                        # not return
-                    else:
-                        pass
-                        # return
+#     for k in swagger_spec['paths'].keys():
+#         for http_method in swagger_spec['paths'][k].keys():
+#             http_method_description = swagger_spec['paths'][k][http_method]
+#             if http_method_description['operationId'] == operationId:
+#                 parameters = http_method_description['parameters']
+#                 for parameter in parameters:
+#                     if parameter['in'] != 'path':
+#                         pass
+#                         # not return
+#                     else:
+#                         pass
+#                         # return
 
 
 # MARK: - Not in use:
 
-def get_paramater_enum(parameter):
-    try:
-        parameter_enum = param['enum']
-    except KeyError:
-        return None
-    return parameter
+# def get_paramater_enum(parameter):
+#     try:
+#         parameter_enum = param['enum']
+#     except KeyError:
+#         return None
+#     return parameter

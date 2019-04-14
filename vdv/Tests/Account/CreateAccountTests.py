@@ -7,7 +7,6 @@ from gyma.vdv.Tests.Base.test_helpers import load_from_json_file, TEST_ACCOUNT
 
 from gyma.vdv.Entities.EntityAccount import EntityAccount
 
-from gyma.vdv.app import createAccount
 from gyma.vdv.db import DBConnection
 
 
