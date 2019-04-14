@@ -5,7 +5,7 @@ from gyma.vdv.app import SWAGGER_SPEC_PATH, baseURL
 
 
 TEST_ACCOUNT = {
-    "vdvid": 1000,
+    "vdvid": "1000",
     "name": "tester",
     "phone": "79110001122",
     "created": "None",
