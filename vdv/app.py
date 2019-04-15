@@ -16,6 +16,8 @@ import time
 from collections import OrderedDict
 from datetime import timedelta
 
+from gyma.vdv import app_helpers
+
 import falcon
 from falcon_multipart.middleware import MultipartMiddleware
 from gyma.vdv.Entities.EntityCourt import EntityCourt, create_times, update_times
@@ -1265,24 +1267,11 @@ def getUserById(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
 
-    e_mail = req.context['phone']
-    my_id = EntityAccount.get_id_from_email(e_mail)
-
-    res = []
-    for _ in objects:
-        obj_dict = _.to_dict(['vdvid', 'name', 'phone', 'mediaid'])
-
-        landlords = EntityLandlord.get().filter_by(accountid=_.vdvid).all()
-        if len(landlords) > 0:
-            obj_dict['landlord'] = EntityLandlord.get_wide_object(landlords[0].vdvid)
-        simpleusers = EntitySimpleuser.get().filter_by(accountid=_.vdvid).all()
-        if len(simpleusers) > 0:
-            obj_dict['simpleuser'] = EntitySimpleuser.get_wide_object(simpleusers[0].vdvid)
-
-        res.append(obj_dict)
+    res = app_helpers.get_user_wide_info(objects)
 
     resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
+
 
 def getUserByPhone(**request_handler_args):
     req = request_handler_args['req']
@@ -1300,18 +1289,7 @@ def getUserByPhone(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
 
-    res = []
-    for _ in objects:
-        obj_dict = _.to_dict(['vdvid', 'name', 'phone', 'mediaid'])
-
-        landlords = EntityLandlord.get().filter_by(accountid=_.vdvid).all()
-        if len(landlords) > 0:
-            obj_dict['landlord'] = EntityLandlord.get_wide_object(landlords[0].vdvid)
-        simpleusers = EntitySimpleuser.get().filter_by(accountid=_.vdvid).all()
-        if len(simpleusers) > 0:
-            obj_dict['simpleuser'] = EntitySimpleuser.get_wide_object(simpleusers[0].vdvid)
-
-        res.append(obj_dict)
+    res = app_helpers.get_user_wide_info(objects)
 
     resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
@@ -1327,18 +1305,7 @@ def getMyUser(**request_handler_args):
 
     objects = EntityAccount.get().filter_by(vdvid=id).all()
 
-    res = []
-    for _ in objects:
-        obj_dict = _.to_dict(['vdvid', 'name', 'phone', 'mediaid'])
-
-        landlords = EntityLandlord.get().filter_by(accountid=_.vdvid).all()
-        if len(landlords) > 0:
-            obj_dict['landlord'] = EntityLandlord.get_wide_object(landlords[0].vdvid)
-        simpleusers = EntitySimpleuser.get().filter_by(accountid=_.vdvid).all()
-        if len(simpleusers) > 0:
-            obj_dict['simpleuser'] = EntitySimpleuser.get_wide_object(simpleusers[0].vdvid)
-
-        res.append(obj_dict)
+    res = app_helpers.get_user_wide_info(objects)
 
     resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
