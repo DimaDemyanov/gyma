@@ -52,9 +52,6 @@ class BaseTestCase(testing.TestCase):
             dict2_value = dict2[dict1_param]
             self.assertEqual(dict2_value, dict1_value)
 
-    def create_request_uri_path_with_param(self, base_path, param):
-        return "{base_path}{param}".format(base_path=base_path, param=param)
-
     # MARK: - Private methods
 
     def _remove_swagger_temp(swagger_temp_path=SWAGGER_TEMP_PATH):
