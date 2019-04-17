@@ -88,10 +88,9 @@ class CreateAccountTests(BaseTestCase):
         return len(created_account) == 1
 
     def _is_account_objects_increased_by_value(self, value):
-        with DBConnection() as session:
-            account_objects_count = session.db.query(EntityAccount).filter(
-                EntityAccount.vdvid != TEST_ACCOUNT["vdvid"]
-            ).count()
+        account_objects_count = EntityAccount.get().filter(
+            EntityAccount.vdvid != TEST_ACCOUNT["vdvid"]
+        ).count()
         return account_objects_count == value
 
 
