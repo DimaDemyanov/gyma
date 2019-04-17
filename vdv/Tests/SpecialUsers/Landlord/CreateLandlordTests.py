@@ -5,7 +5,6 @@ import falcon
 from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
 from gyma.vdv.Tests.Base.test_helpers import load_from_json_file, TEST_ACCOUNT
 
-# from gyma.vdv.Entities.EntityAccount import EntityAccount
 from gyma.vdv.Entities.EntityLandlord import EntityLandlord
 
 from gyma.vdv.db import DBConnection
