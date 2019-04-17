@@ -1,4 +1,5 @@
 import unittest
+from json.decoder import JSONDecodeError
 
 import falcon
 
@@ -33,6 +34,14 @@ class UpdateUserTests(BaseTestCase):
         }
         self.valid_request_params = {"json": self.new_valid_account_params}
 
+        self.non_existing_account_params = {
+            'vdvid': -1,
+            'name': 'new username',
+        }
+        self.non_existing_account_request_params = {
+            "json": self.non_existing_account_params
+        }
+
     def tearDown(self):
         EntityAccount.delete(self.created_account_id)
 
@@ -48,12 +57,21 @@ class UpdateUserTests(BaseTestCase):
         self.assertEqual(resp.status, falcon.HTTP_200)
         self.check_dict1_in_dict2(self.new_valid_account_params, resp.json)
 
-    def test_update_username_given_invalid_params(self):
-        pass
-        # Can't simulate invalid JSON
-
     def test_update_not_existing_user(self):
-        pass
+        # When
+        resp = self.client.simulate_put(
+            self.request_uri_path, **self.non_existing_account_request_params
+        )
+
+        # Then
+        self.assertEqual(resp.status, falcon.HTTP_404)
+        self.assertFalse(self._is_resp_returned_json(resp))
+
+    # MARK: - Private methods
+
+    def _is_resp_returned_json(self, resp):
+        with self.assertRaises(JSONDecodeError):
+            resp.json
 
 
 if __name__ == '__main__':
