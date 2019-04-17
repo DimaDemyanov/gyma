@@ -3,7 +3,9 @@ import unittest
 import falcon
 
 from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
-from gyma.vdv.Tests.Base.test_helpers import load_from_json_file, TEST_ACCOUNT
+from gyma.vdv.Tests.Base.test_helpers import (
+    TEST_ACCOUNT, load_from_json_file, create_request_uri_path_with_param
+)
 
 from gyma.vdv.Entities.EntityAccount import EntityAccount
 
@@ -50,7 +52,7 @@ class CreateAccountTests(BaseTestCase):
 
     def test_delete_account_given_valid_user_id_param(self):
         # Given
-        request_uri_path_with_param = self.create_request_uri_path_with_param(
+        request_uri_path_with_param = create_request_uri_path_with_param(
             self.base_request_uri_path,
             self.valid_request_params['params']['userId']
         )
@@ -66,7 +68,7 @@ class CreateAccountTests(BaseTestCase):
 
     def test_delete_account_given_non_existing_user_id_param(self):
         # Given
-        request_uri_path_with_param = self.create_request_uri_path_with_param(
+        request_uri_path_with_param = create_request_uri_path_with_param(
             self.base_request_uri_path,
             self.non_existing_user_id_request_params['params']['userId']
         )
