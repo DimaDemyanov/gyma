@@ -15,7 +15,7 @@ from gyma.vdv.db import DBConnection
 TEST_PARAMETERS_PATH = './landlord.json'
 
 
-class CreateLandlordTests(BaseTestCase):
+class DeleteLandlordTests(BaseTestCase):
 
     # MARK: - setUp & tearDown
 

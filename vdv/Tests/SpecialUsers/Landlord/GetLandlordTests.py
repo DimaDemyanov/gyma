@@ -17,7 +17,7 @@ from gyma.vdv.app import stringToBool
 TEST_PARAMETERS_PATH = './landlord.json'
 
 
-class GetMylandlordTests(BaseTestCase):
+class GetLandlordTests(BaseTestCase):
 
     # setUp & tearDown
 
