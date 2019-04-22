@@ -49,14 +49,14 @@ def create_request_uri_path_with_param(base_path, param):
     return "{base_path}{param}".format(base_path=base_path, param=param)
 
 
-def convert_json_response_str_values_to_bool(response):
-    for key, value in response.items():
+def convert_dict_bool_str_values_to_bool(dict):
+    for key, value in dict.items():
         if value == 'True':
-            response[key] = True
+            dict[key] = True
         if value == 'False':
-            response[key] = False
+            dict[key] = False
 
-    return response
+    return dict
 
 
 # MARK: - Not in use:

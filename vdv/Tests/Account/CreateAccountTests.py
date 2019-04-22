@@ -1,4 +1,5 @@
 import unittest
+from collections import OrderedDict
 
 import falcon
 
@@ -82,10 +83,18 @@ class CreateAccountTests(BaseTestCase):
     # MARK: - Private methods:
 
     def _is_account_in_db(self, account_params):
-        created_account = EntityAccount.get().filter_by(
+        created_accounts = EntityAccount.get().filter_by(
             phone=account_params['phone']
         ).all()
-        return len(created_account) == 1
+
+        if len(created_accounts) != 1:
+            return False
+
+        created_account = created_accounts[0].to_dict()
+        self.check_dict1_in_dict2(
+            OrderedDict(account_params), created_account
+        )
+        return True
 
     def _is_account_objects_increased_by_value(self, value):
         account_objects_count = EntityAccount.get().filter(

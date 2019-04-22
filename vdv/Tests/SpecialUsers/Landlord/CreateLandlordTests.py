@@ -1,4 +1,5 @@
 import unittest
+from collections import OrderedDict
 
 import falcon
 
@@ -23,6 +24,8 @@ class CreateAccountTests(BaseTestCase):
         self.request_uri_path = self.get_request_uri_path(operation_id)
 
         self.valid_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        self.valid_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
+
         self.valid_request_params = {"json": self.valid_landlord_params}
 
         self.invalid_landlord_params = {"accountid": -1}
@@ -85,7 +88,15 @@ class CreateAccountTests(BaseTestCase):
         created_landlord = EntityLandlord.get().filter_by(
             accountid=landlord_params['accountid']
         ).all()
-        return len(created_landlord) == 1
+
+        if len(created_landlord) != 1:
+            return False
+
+        created_landlord = created_landlord[0].to_dict()
+        self.check_dict1_in_dict2(
+            OrderedDict(landlord_params), created_landlord
+        )
+        return True
 
     def _is_landlord_objects_increased_by_value(self, value, landlord_params):
         landlord_objects_count = EntityLandlord.get().filter(

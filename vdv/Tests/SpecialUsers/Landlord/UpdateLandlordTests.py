@@ -24,6 +24,7 @@ class UpdateLandlordTests(BaseTestCase):
         self.request_uri_path = self.get_request_uri_path(operation_id)
 
         self.old_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        self.old_account_params['accountid'] = TEST_ACCOUNT['vdvid']
         self.created_account_id = EntityLandlord.add_from_json(
             self.old_account_params
         )

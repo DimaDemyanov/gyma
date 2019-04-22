@@ -4,7 +4,7 @@ import falcon
 
 from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
 from gyma.vdv.Tests.Base.test_helpers import (
-    load_from_json_file, create_request_uri_path_with_param
+    load_from_json_file, create_request_uri_path_with_param, TEST_ACCOUNT
 )
 
 from gyma.vdv.Entities.EntityLandlord import EntityLandlord
@@ -25,6 +25,8 @@ class DeleteLandlordTests(BaseTestCase):
         self.base_request_uri_path = self.get_request_uri_path(operation_id)
 
         self.new_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        self.new_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
+
         self.created_landlord_id = EntityLandlord.add_from_json(
             self.new_landlord_params
         )

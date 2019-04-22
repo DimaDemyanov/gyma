@@ -48,8 +48,11 @@ class BaseTestCase(testing.TestCase):
         return request_uri_path
 
     def check_dict1_in_dict2(self, dict1, dict2):
-        for dict1_param, dict1_value in dict1.items():
-            dict2_value = dict2[dict1_param]
+        test_helpers.convert_dict_bool_str_values_to_bool(dict1)
+        test_helpers.convert_dict_bool_str_values_to_bool(dict2)
+
+        for dict1_key, dict1_value in dict1.items():
+            dict2_value = dict2[dict1_key]
             self.assertEqual(dict2_value, dict1_value)
 
     # MARK: - Private methods
