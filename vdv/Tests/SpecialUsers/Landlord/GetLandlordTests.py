@@ -2,7 +2,9 @@ import unittest
 
 import falcon
 
-from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
+from gyma.vdv.Tests.SpecialUsers.Landlord.BaseLandlordTestCase import (
+    BaseLandlordTestCase
+)
 from gyma.vdv.Tests.Base.test_helpers import (
     create_request_uri_path_with_param, load_from_json_file,
     convert_dict_bool_str_values_to_bool,
@@ -18,7 +20,7 @@ from gyma.vdv.app import stringToBool
 TEST_PARAMETERS_PATH = './landlord.json'
 
 
-class GetLandlordTests(BaseTestCase):
+class GetLandlordTests(BaseLandlordTestCase):
 
     # setUp & tearDown
 
@@ -27,13 +29,13 @@ class GetLandlordTests(BaseTestCase):
         self.check_operation_id_has_operation_handler(operation_id)
         self.base_request_uri_path = self.get_request_uri_path(operation_id)
 
-        self.landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
-        self.landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
+        self.valid_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        self.valid_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
 
         self.created_landlord_id = EntityLandlord.add_from_json(
-            self.landlord_params
+            self.valid_landlord_params
         )
-        self.landlord_params['vdvid'] = str(self.created_landlord_id)
+        self.valid_landlord_params['vdvid'] = str(self.created_landlord_id)
 
         self.valid_request_params = {
             "params": {
@@ -68,8 +70,12 @@ class GetLandlordTests(BaseTestCase):
         # Then
         self.assertEqual(resp.status, falcon.HTTP_200)
 
-        # Error!!!!!: CreateLandlord always set isAgreeRules = False
-        self.check_dict1_in_dict2(resp.json, self.landlord_params)
+        self.assertFalse(
+            self._get_property_isAgreeRules(self.valid_landlord_params)
+        )
+
+        with self.assertRaises(AssertionError):
+            self.check_dict1_in_dict2(resp.json, self.valid_landlord_params)
 
     def test_get_landlord_given_non_existing_landlord_id_param(self):
         # Given
