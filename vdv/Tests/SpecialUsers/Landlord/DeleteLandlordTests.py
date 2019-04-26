@@ -19,18 +19,21 @@ class DeleteLandlordTests(BaseTestCase):
 
     # MARK: - setUp & tearDown
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        super(DeleteLandlordTests, cls).setUpClass()
+
         operation_id = 'deleteLandlord'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.base_request_uri_path = self.get_request_uri_path(operation_id)
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.base_request_uri_path = cls.get_request_uri_path(operation_id)
 
-        self.new_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
-        self.new_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
+        cls.new_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        cls.new_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
 
+    def setUp(self):
         self.created_landlord_id = EntityLandlord.add_from_json(
             self.new_landlord_params
         )
-
         self.valid_request_params = {
             "params": {
                 "landlordId": self.created_landlord_id

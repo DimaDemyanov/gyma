@@ -24,14 +24,18 @@ class GetLandlordTests(BaseLandlordTestCase):
 
     # setUp & tearDown
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        super(GetLandlordTests, cls).setUpClass()
+
         operation_id = 'getLandlord'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.base_request_uri_path = self.get_request_uri_path(operation_id)
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.base_request_uri_path = cls.get_request_uri_path(operation_id)
 
-        self.valid_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
-        self.valid_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
+        cls.valid_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        cls.valid_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
 
+    def setUp(self):
         self.created_landlord_id = EntityLandlord.add_from_json(
             self.valid_landlord_params
         )

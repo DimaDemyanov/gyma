@@ -20,18 +20,23 @@ class CreateAccountTests(BaseLandlordTestCase):
 
     # MARK: - setUp & tearDown
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        super(CreateAccountTests, cls).setUpClass()
+
         operation_id = 'createLandlord'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.request_uri_path = self.get_request_uri_path(operation_id)
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.request_uri_path = cls.get_request_uri_path(operation_id)
 
-        self.valid_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
-        self.valid_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
+        # Property 'isagreerules' should be set to False for tests passing.
+        # If it is True, tests wouldn't pass but everything will work.
+        # Need TOFIX maybe
+        cls.valid_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        cls.valid_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
+        cls.valid_request_params = {"json": cls.valid_landlord_params}
 
-        self.valid_request_params = {"json": self.valid_landlord_params}
-
-        self.invalid_landlord_params = {"accountid": -1}
-        self.invalid_request_params = {"json":  self.invalid_landlord_params}
+        cls.invalid_landlord_params = {"accountid": -1}
+        cls.invalid_request_params = {"json":  cls.invalid_landlord_params}
 
     def tearDown(self):
         with DBConnection() as session:
@@ -52,10 +57,7 @@ class CreateAccountTests(BaseLandlordTestCase):
         self.assertFalse(
             self._get_property_isAgreeRules(self.valid_landlord_params)
         )
-        with self.assertRaises(AssertionError):
-            self.assertTrue(
-                self._is_landlord_in_db(self.valid_landlord_params)
-            )
+        self.assertTrue(self._is_landlord_in_db(self.valid_landlord_params))
 
     def test_create_landlord_given_invalid_landlord_params(self):
         # When
@@ -106,7 +108,6 @@ class CreateAccountTests(BaseLandlordTestCase):
             OrderedDict(landlord_params), created_landlord
         )
         return True
-
 
     def _is_landlord_objects_increased_by_value(self, value, landlord_params):
         landlord_objects_count = EntityLandlord.get().filter(

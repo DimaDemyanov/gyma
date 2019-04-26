@@ -18,13 +18,18 @@ class UpdateLandlordTests(BaseTestCase):
 
     # setUp & tearDown
 
-    def setUp(self):
-        operation_id = 'updateLandlord'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.request_uri_path = self.get_request_uri_path(operation_id)
+    @classmethod
+    def setUpClass(cls):
+        super(UpdateLandlordTests, cls).setUpClass()
 
-        self.old_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
-        self.old_account_params['accountid'] = TEST_ACCOUNT['vdvid']
+        operation_id = 'updateLandlord'
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.request_uri_path = cls.get_request_uri_path(operation_id)
+
+        cls.old_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        cls.old_account_params['accountid'] = TEST_ACCOUNT['vdvid']
+
+    def setUp(self):
         self.created_account_id = EntityLandlord.add_from_json(
             self.old_account_params
         )

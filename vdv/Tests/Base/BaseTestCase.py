@@ -37,14 +37,23 @@ class BaseTestCase(testing.TestCase):
 
     # MARK: - Public methods
 
-    def check_operation_id_has_operation_handler(self, operation_id):
+    @classmethod
+    def check_operation_id_has_operation_handler(cls, operation_id):
         if operation_id not in operation_handlers:
-            self.fail("operationId '%s' doesn't match operation handler" % operation_id)
+            cls.fail(
+                "operationId '%s' doesn't match operation handler" %
+                operation_id
+            )
 
-    def get_request_uri_path(self, operation_id):
-        request_uri_path = test_helpers.get_uri_path_by_opearation_id(operation_id)
+    @classmethod
+    def get_request_uri_path(cls, operation_id):
+        request_uri_path = test_helpers.get_uri_path_by_opearation_id(
+            operation_id
+        )
         if not request_uri_path:
-            self.fail("Can't get uri path for given operationId: %s" % operation_id)
+            cls.fail(
+                "Can't get uri path for given operationId: %s" % operation_id
+            )
         return request_uri_path
 
     def check_dict1_in_dict2(self, dict1, dict2):
