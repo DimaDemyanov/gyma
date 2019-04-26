@@ -15,16 +15,21 @@ from gyma.vdv.db import DBConnection
 TEST_PARAMETERS_PATH = './account.json'
 
 
-class CreateAccountTests(BaseTestCase):
+class DeleteAccountTests(BaseTestCase):
 
     # MARK: - setUp & tearDown
 
-    def setUp(self):
-        operation_id = 'deleteUser'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.base_request_uri_path = self.get_request_uri_path(operation_id)
+    @classmethod
+    def setUpClass(cls):
+        super(DeleteAccountTests, cls).setUpClass()
 
-        self.new_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        operation_id = 'deleteUser'
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.base_request_uri_path = cls.get_request_uri_path(operation_id)
+
+        cls.new_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
+
+    def setUp(self):
         self.created_account_id = EntityAccount.add_from_json(
             self.new_account_params
         )

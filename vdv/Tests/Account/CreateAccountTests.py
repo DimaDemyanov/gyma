@@ -18,17 +18,20 @@ class CreateAccountTests(BaseTestCase):
 
     # MARK: - setUp & tearDown
 
-    def setUp(self):
-        operation_id = 'createAccount'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.request_uri_path = self.get_request_uri_path(operation_id)
+    @classmethod
+    def setUpClass(cls):
+        super(CreateAccountTests, cls).setUpClass()
 
-        self.valid_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
-        self.valid_request_params = {"json": self.valid_account_params}
+        operation_id = 'createAccount'
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.request_uri_path = cls.get_request_uri_path(operation_id)
+
+        cls.valid_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        cls.valid_request_params = {"json": cls.valid_account_params}
 
         # Invalid because request hasn't "name" param
-        self.invalid_account_params = {"phone": "None"}
-        self.invalid_request_params = {"json":  self.invalid_account_params}
+        cls.invalid_account_params = {"phone": "None"}
+        cls.invalid_request_params = {"json":  cls.invalid_account_params}
 
     def tearDown(self):
         with DBConnection() as session:
