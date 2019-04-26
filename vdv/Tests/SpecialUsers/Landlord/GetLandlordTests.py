@@ -77,9 +77,7 @@ class GetLandlordTests(BaseLandlordTestCase):
         self.assertFalse(
             self._get_property_isAgreeRules(self.valid_landlord_params)
         )
-
-        with self.assertRaises(AssertionError):
-            self.check_dict1_in_dict2(resp.json, self.valid_landlord_params)
+        self.check_dict1_in_dict2(resp.json, self.valid_landlord_params)
 
     def test_get_landlord_given_non_existing_landlord_id_param(self):
         # Given
