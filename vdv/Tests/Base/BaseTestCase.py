@@ -64,7 +64,10 @@ class BaseTestCase(testing.TestCase):
 
         for dict1_key, dict1_value in dict1.items():
             dict2_value = dict2[dict1_key]
-            self.assertEqual(dict2_value, dict1_value)
+            if type(dict1_value) is dict:
+                self.check_dict1_in_dict2(dict2_value, dict1_value)
+            else:
+                self.assertEqual(dict2_value, dict1_value)
 
     # MARK: - Private methods
 
