@@ -1202,7 +1202,7 @@ def confirmRules(**request_handler_args):
         EntityLandlord.confirm_rules(object.vdvid)
 
     if specialuser == 'simpleuser':
-        users =  EntitySimpleuser.get().filter_by(accountid=id).all()
+        users = EntitySimpleuser.get().filter_by(accountid=id).all()
         if len(users) == 0:
             resp.status = falcon.HTTP_404
             return

@@ -28,7 +28,8 @@ class CreateAccountTests(BaseLandlordTestCase):
         cls.check_operation_id_has_operation_handler(operation_id)
         cls.request_uri_path = cls.get_request_uri_path(operation_id)
 
-        # Property 'isagreerules' should be set to False for tests passing.
+        # Property 'isagreerules' should be set to False in json
+        # for tests passing.
         # If it is True, tests wouldn't pass but everything will work.
         # Need TOFIX maybe
         cls.valid_landlord_params = load_from_json_file(TEST_PARAMETERS_PATH)

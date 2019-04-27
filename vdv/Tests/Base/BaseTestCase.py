@@ -35,7 +35,7 @@ class BaseTestCase(testing.TestCase):
     def tearDownClass(cls):
         cls._remove_swagger_temp()
 
-    # MARK: - Public methods
+    # MARK: - Public class methods
 
     @classmethod
     def check_operation_id_has_operation_handler(cls, operation_id):
@@ -55,6 +55,8 @@ class BaseTestCase(testing.TestCase):
                 "Can't get uri path for given operationId: %s" % operation_id
             )
         return request_uri_path
+
+    # MARK: - Public methods
 
     def check_dict1_in_dict2(self, dict1, dict2):
         test_helpers.convert_dict_bool_str_values_to_bool(dict1)
