@@ -28,8 +28,7 @@ class LoactionTestCase(BaseTestCase):
         cls.valid_location_params = load_from_json_file(TEST_PARAMETERS_PATH)
         cls.valid_request_params = {"json": cls.valid_location_params}
 
-        # Invalid because request hasn't "name" param
-        # cls.invalid_location_params = {"longitude": "40.9823", "latitude": "2"}
+        # Invalid because request hasn't all required params
         cls.invalid_location_params = {"latitude": "2"}
         cls.invalid_request_params = {"json":  cls.invalid_location_params}
 
