@@ -1628,7 +1628,12 @@ def createLocation(**request_handler_args):
         resp.status = falcon.HTTP_405
         return
 
-    if not name:
+    locations_with_same_name = EntityLocation.get().filter_by(name=name).all()
+    if len(locations_with_same_name) != 0:
+        resp.status = falcon.HTTP_412
+        return
+
+    if not name or not latitude or not longitude:
         resp.status = falcon.HTTP_405
         return
 
