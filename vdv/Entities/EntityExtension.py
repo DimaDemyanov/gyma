@@ -15,8 +15,8 @@ from gyma.vdv.o_utils.utils import get_curr_date, time_add, time_to_str, str_to_
 Base = declarative_base()
 
 
-class EntityExtention(EntityBase, Base):
-    __tablename__ = 'vdv_extention'
+class EntityExtension(EntityBase, Base):
+    __tablename__ = 'vdv_extension'
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     courtid = Column(Integer)
@@ -41,7 +41,7 @@ class EntityExtention(EntityBase, Base):
             courtid = data['courtid']
             tariffid = data['tariffid']
 
-            new_entity = EntityExtention(courtid, tariffid)
+            new_entity = EntityExtension(courtid, tariffid)
             vdvid = new_entity.add()
         else:
             raise Exception('Validation exception')
@@ -50,7 +50,7 @@ class EntityExtention(EntityBase, Base):
     @classmethod
     def update_from_json(cls, data):
         if 'vdvid' in data:
-            ext = EntityExtention.get().filter_by(vdvid=data['vdvid']).all()[0]
+            ext = EntityExtension.get().filter_by(vdvid=data['vdvid']).all()[0]
             if 'tariffid' in data:
                 ext.tariffid = data['tariffid']
         else:
@@ -59,7 +59,7 @@ class EntityExtention(EntityBase, Base):
     @classmethod
     def confirm(cls, vdvid, adminid):
         with DBConnection() as session:
-            extensions = session.db.query(EntityExtention).filter_by(vdvid=vdvid).all()
+            extensions = session.db.query(EntityExtension).filter_by(vdvid=vdvid).all()
 
             for _ in extensions:
                 court = session.db.query(EntityCourt).filter_by(vdvid=_.courtid).all()[0]

@@ -21,7 +21,7 @@ from falcon_multipart.middleware import MultipartMiddleware
 from gyma.vdv.Entities.EntityCourt import EntityCourt, create_times, update_times
 from gyma.vdv import utils
 from gyma.vdv.Entities.EntityEquipment import EntityEquipment
-from gyma.vdv.Entities.EntityExtension import EntityExtention
+from gyma.vdv.Entities.EntityExtension import EntityExtension
 from gyma.vdv.Entities.EntityHelp import EntityHelp
 from gyma.vdv.Entities.EntityLandlord import EntityLandlord
 from gyma.vdv.Entities.EntityRequest import EntityRequest
@@ -318,7 +318,7 @@ def getAllCourtRequest(**request_handler_args):
     res = []
 
     id = getIntPathParam('courtId', **request_handler_args)
-    # extentions = EntityExtention.get().filter(EntityExtention.isconfirmed == False or (cast(EntityExtention.confirmed_time, DateTime) > get_curr_date() - timedelta(hours=24))).all()
+    # extensions = EntityExtension.get().filter(EntityExtension.isconfirmed == False or (cast(EntityExtension.confirmed_time, DateTime) > get_curr_date() - timedelta(hours=24))).all()
 
     with DBConnection() as session:
         res = session.db.query(EntityRequest)\
@@ -2111,7 +2111,7 @@ def setDoneHelp(**request_handler_args):
     EntityHelp.set_done(id)
     resp.status = falcon.HTTP_200
 
-def createExtention(**request_handler_args):  # TODO: implement it
+def createExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
@@ -2121,19 +2121,19 @@ def createExtention(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_400
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-        id = EntityExtention.add_from_json(params)
+        id = EntityExtension.add_from_json(params)
     except Exception as e:
         logger.info(e)
         resp.status = falcon.HTTP_412
         return
     if id:
-        objects = EntityExtention.get().filter_by(vdvid=id).all()
+        objects = EntityExtension.get().filter_by(vdvid=id).all()
 
         resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
-def updateExtention(**request_handler_args):  # TODO: implement it
+def updateExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
@@ -2144,66 +2144,66 @@ def updateExtention(**request_handler_args):  # TODO: implement it
 
     params = json.loads(req.stream.read().decode('utf-8'))
     try:
-        id = EntityExtention.update_from_json(params)
+        id = EntityExtension.update_from_json(params)
     except Exception as e:
         logger.info(e)
         resp.status = falcon.HTTP_412
         return
     if id:
-        objects = EntityExtention.get().filter_by(vdvid=id).all()
+        objects = EntityExtension.get().filter_by(vdvid=id).all()
         resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
-def confirmExtention(**request_handler_args):  # TODO: implement it
+def confirmExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
-    id = getIntPathParam('extentionid', **request_handler_args)
+    id = getIntPathParam('extensionid', **request_handler_args)
     if('adminid' in req.params):
         adminid = req.params['adminid']
     else:
         resp.status = falcon.HTTP_407
         return
-    EntityExtention.confirm(id, adminid)
+    EntityExtension.confirm(id, adminid)
     resp.status = falcon.HTTP_200
 
 
-def getAllExtentions(**request_handler_args):
+def getAllExtensions(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     one_day_earlier_datetime = get_curr_date() - timedelta(hours=24)
     is_one_day_passed_after_confirmation = cast(
-        EntityExtention.confirmedtime, DateTime) > one_day_earlier_datetime
+        EntityExtension.confirmedtime, DateTime) > one_day_earlier_datetime
 
-    extentions = EntityExtention.get().filter(or_(
-            EntityExtention.isconfirmed == False,
+    extensions = EntityExtension.get().filter(or_(
+            EntityExtension.isconfirmed == False,
             is_one_day_passed_after_confirmation == True,))\
-        .order_by(EntityExtention.created).all()
+        .order_by(EntityExtension.created).all()
 
-    resp.body = obj_to_json([o.to_dict() for o in extentions])
+    resp.body = obj_to_json([o.to_dict() for o in extensions])
     resp.status = falcon.HTTP_200
 
 
-def getExtentionsByLandlordId(**request_handler_args):
+def getExtensionsByLandlordId(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('landlordId', **request_handler_args)
     with DBConnection() as session:
-        extentions = session.db.query(EntityExtention)\
-            .join(EntityCourt, EntityExtention.courtid == EntityCourt.vdvid)\
+        extensions = session.db.query(EntityExtension)\
+            .join(EntityCourt, EntityExtension.courtid == EntityCourt.vdvid)\
             .filter(EntityCourt.ownerid == id)
     isconfirmed = req.params['isconfirmed']
 
     # wide_info = EntityCourt.get_wide_object(id)
 
     if isconfirmed == 'confirmed':
-        extentions = extentions.filter(isconfirmed == "true").all()
+        extensions = extensions.filter(isconfirmed == "true").all()
     if isconfirmed == 'notconfirmed':
-        extentions = extentions.filter(isconfirmed == "false").all()
+        extensions = extensions.filter(isconfirmed == "false").all()
 
-    resp.body = obj_to_json([o.to_dict() for o in extentions])
+    resp.body = obj_to_json([o.to_dict() for o in extensions])
     resp.status = falcon.HTTP_200
 
 
@@ -2332,12 +2332,12 @@ operation_handlers = {
     'getAllTariffs': [getAllTariffs],
     'deleteTariff': [deleteTariff],
 
-    # Extention methods
-    'createExtention': [createExtention],
-    'updateExtention': [updateExtention],
-    'confirmExtention': [confirmExtention],
-    'getAllExtentions': [getAllExtentions],
-    'getExtentionsByLandlordId': [getExtentionsByLandlordId]
+    # Extension methods
+    'createExtension': [createExtension],
+    'updateExtension': [updateExtension],
+    'confirmExtension': [confirmExtension],
+    'getAllExtensions': [getAllExtensions],
+    'getExtensionsByLandlordId': [getExtensionsByLandlordId]
 }
 
 
