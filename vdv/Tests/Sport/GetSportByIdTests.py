@@ -5,14 +5,11 @@ import falcon
 from gyma.vdv.Tests.Sport.BaseSportTestCase import BaseSportTestCase
 from gyma.vdv.Tests.Base.test_helpers import (
     create_request_uri_path_with_param, load_from_json_file,
-    convert_dict_bool_str_values_to_bool,
-    TEST_ACCOUNT
 )
 
 from gyma.vdv.Entities.EntitySport import EntitySport
 
 from gyma.vdv.db import DBConnection
-from gyma.vdv.app import stringToBool
 
 
 TEST_PARAMETERS_PATH = './sport.json'
