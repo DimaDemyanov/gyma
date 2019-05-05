@@ -465,11 +465,16 @@ def createSport(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_400
 
     params = json.loads(req.stream.read().decode('utf-8'))
+    name = params.get('name')
+    sports_with_same_name = EntitySport.get().filter_by(name=name).all()
+    if len(sports_with_same_name) != 0:
+        resp.status = falcon.HTTP_412
+        return
     try:
         id = EntitySport.add_from_json(params)
     except Exception as e:
         logger.info(e)
-        resp.status = falcon.HTTP_412
+        resp.status = falcon.HTTP_501
         return
     if id:
         objects = EntitySport.get().filter_by(vdvid=id).all()

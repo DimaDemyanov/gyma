@@ -63,6 +63,8 @@ class BaseTestCase(testing.TestCase):
         test_helpers.convert_dict_bool_str_values_to_bool(dict2)
 
         for dict1_key, dict1_value in dict1.items():
+            if dict1_key == 'vdvid':
+                continue
             dict2_value = dict2[dict1_key]
             if type(dict1_value) is dict:
                 self.check_dict1_in_dict2(dict2_value, dict1_value)
