@@ -3,10 +3,8 @@ from collections import OrderedDict
 
 import falcon
 
-from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
-from gyma.vdv.Tests.Base.test_helpers import (
-    load_from_json_file, TEST_ACCOUNT, convert_dict_bool_str_values_to_bool
-)
+from gyma.vdv.Tests.Location.BaseLocationTestCase import BaseLocationTestCase
+from gyma.vdv.Tests.Base.test_helpers import load_from_json_file
 
 from gyma.vdv.Entities.EntityLocation import EntityLocation
 
@@ -16,10 +14,13 @@ from gyma.vdv.db import DBConnection
 TEST_PARAMETERS_PATH = './location.json'
 
 
-class LocationTestCase(BaseTestCase):
+class CreateLocationTests(BaseLocationTestCase):
+
+    # MARK: - setUp & tearDown
+
     @classmethod
     def setUpClass(cls):
-        super(LocationTestCase, cls).setUpClass()
+        super(CreateLocationTests, cls).setUpClass()
 
         operation_id = 'createLocation'
         cls.check_operation_id_has_operation_handler(operation_id)
@@ -31,28 +32,6 @@ class LocationTestCase(BaseTestCase):
         # Invalid because request hasn't all required params
         cls.invalid_location_params = {"latitude": "2"}
         cls.invalid_request_params = {"json":  cls.invalid_location_params}
-
-    def check_dict1_in_dict2(self, dict1, dict2):
-        convert_dict_bool_str_values_to_bool(dict1)
-        convert_dict_bool_str_values_to_bool(dict2)
-
-        for dict1_key, dict1_value in dict1.items():
-            if dict1_key == 'vdvid':
-                continue
-            try:
-                dict1_value = round(float(dict1_value), 4)
-            except ValueError:
-                continue
-            dict2_value = dict2[dict1_key]
-            if type(dict1_value) is dict:
-                self.check_dict1_in_dict2(dict2_value, dict1_value)
-            else:
-                self.assertEqual(dict2_value, dict1_value)
-
-
-class CreateLocationTests(LocationTestCase):
-
-    # MARK: - setUp & tearDown
 
     def tearDown(self):
         with DBConnection() as session:
