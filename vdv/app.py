@@ -1943,6 +1943,7 @@ def createTariff(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
+
 def deleteTariff(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
 
