@@ -43,6 +43,11 @@ class DeleteSportTests(BaseSportTestCase):
                 "sportId": "0"
             }
         }
+        self.invalid_sport_id_request_params = {
+            "params": {
+                "sportId": "invalid because not 'int'"
+            }
+        }
 
     def tearDown(self):
         if self._is_sport_in_db(self.valid_request_params):
@@ -81,6 +86,22 @@ class DeleteSportTests(BaseSportTestCase):
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_404)
+
+    def test_delete_sport_given_invalid_sport_id_param(self):
+        # Given
+        request_uri_path_with_param = create_request_uri_path_with_param(
+            self.base_request_uri_path,
+            self.invalid_sport_id_request_params['params']['sportId']
+        )
+
+        # When
+        resp = self.client.simulate_delete(
+            request_uri_path_with_param,
+            **self.non_existing_sport_id_request_params
+        )
+
+        # Then
+        self.assertEqual(resp.status, falcon.HTTP_400)
 
 
 if __name__ == '__main__':
