@@ -40,8 +40,8 @@ class BaseTestCase(testing.TestCase):
     @classmethod
     def check_operation_id_has_operation_handler(cls, operation_id):
         if operation_id not in operation_handlers:
-            cls.fail(
-                "operationId '%s' doesn't match operation handler" %
+            raise Exception(
+                "operationId '%s' doesn't match any operation handler" %
                 operation_id
             )
 

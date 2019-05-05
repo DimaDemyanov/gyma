@@ -22,6 +22,10 @@ class GetSportsTests(BaseSportTestCase):
     def setUpClass(cls):
         super(GetSportsTests, cls).setUpClass()
 
+        operation_id = 'getSports'
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.request_uri_path = cls.get_request_uri_path(operation_id)
+
         cls.valid_sport_params = load_from_json_file(TEST_PARAMETERS_PATH)
         cls.created_sport_id = EntitySport.add_from_json(
             cls.valid_sport_params

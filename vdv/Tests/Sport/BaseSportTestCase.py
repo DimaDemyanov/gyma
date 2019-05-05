@@ -8,19 +8,8 @@ from gyma.vdv.Entities.EntitySport import EntitySport
 
 class BaseSportTestCase(BaseTestCase):
 
-    # MARK: - setUp & tearDown
-
-    @classmethod
-    def setUpClass(cls):
-        super(BaseSportTestCase, cls).setUpClass()
-
-        operation_id = 'getSports'
-        cls.check_operation_id_has_operation_handler(operation_id)
-        cls.request_uri_path = cls.get_request_uri_path(operation_id)
-
     # MARK: - Private methods:
 
-    # TODO: Create SportTestCase with method below for reuse
     def _is_sport_in_db(self, sport_params):
         created_sports = EntitySport.get().filter_by(
             name=sport_params.get('name')
