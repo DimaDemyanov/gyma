@@ -16,10 +16,10 @@ from gyma.vdv.db import DBConnection
 TEST_PARAMETERS_PATH = './location.json'
 
 
-class LoactionTestCase(BaseTestCase):
+class LocationTestCase(BaseTestCase):
     @classmethod
     def setUpClass(cls):
-        super(LoactionTestCase, cls).setUpClass()
+        super(LocationTestCase, cls).setUpClass()
 
         operation_id = 'createLocation'
         cls.check_operation_id_has_operation_handler(operation_id)
@@ -50,7 +50,7 @@ class LoactionTestCase(BaseTestCase):
                 self.assertEqual(dict2_value, dict1_value)
 
 
-class CreateLocationTests(LoactionTestCase):
+class CreateLocationTests(LocationTestCase):
 
     # MARK: - setUp & tearDown
 
