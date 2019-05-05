@@ -48,6 +48,19 @@ class CreateExtensionTests(BaseTestCase):
                 courtid=cls.created_court_id,
                 tariffid=cls.created_tariff_id
             ).delete()
+
+            session.db.query(EntityCourt).filter_by(
+                vdvid=cls.created_court_id
+            ).delete()
+
+            session.db.query(EntityLandlord).filter_by(
+                vdvid=cls.created_landlord_id
+            ).delete()
+
+            session.db.query(EntityTariff).filter_by(
+                vdvid=cls.created_tariff_id
+            ).delete()
+
             session.db.commit()
 
     # MARK: - Tests
@@ -109,9 +122,9 @@ class CreateExtensionTests(BaseTestCase):
 
     @classmethod
     def _create_court(cls):
-        created_landlord_id = cls._create_landlord()
+        cls.created_landlord_id = cls._create_landlord()
         valid_court_params = load_from_json_file(COURT_PARAMETERS_PATH)
-        valid_court_params['ownerid'] = str(created_landlord_id)
+        valid_court_params['ownerid'] = str(cls.created_landlord_id)
 
         created_court_id = EntityCourt.add_from_json(valid_court_params)
         return created_court_id
