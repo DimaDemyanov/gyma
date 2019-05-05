@@ -4,7 +4,7 @@ from collections import OrderedDict
 import falcon
 
 from gyma.vdv.Tests.Base.test_helpers import load_from_json_file, TEST_ACCOUNT
-from gyma.vdv.Tests.Sport.SportTestCase import SportTestCase
+from gyma.vdv.Tests.Sport.BaseSportTestCase import BaseSportTestCase
 
 from gyma.vdv.Entities.EntitySport import EntitySport
 
@@ -14,7 +14,7 @@ from gyma.vdv.db import DBConnection
 TEST_PARAMETERS_PATH = './sport.json'
 
 
-class CreateSportTests(SportTestCase):
+class CreateSportTests(BaseSportTestCase):
 
     # MARK: - setUp & tearDown
 

@@ -6,13 +6,13 @@ from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
 from gyma.vdv.Entities.EntitySport import EntitySport
 
 
-class SportTestCase(BaseTestCase):
+class BaseSportTestCase(BaseTestCase):
 
     # MARK: - setUp & tearDown
 
     @classmethod
     def setUpClass(cls):
-        super(SportTestCase, cls).setUpClass()
+        super(BaseSportTestCase, cls).setUpClass()
 
         operation_id = 'getSports'
         cls.check_operation_id_has_operation_handler(operation_id)
