@@ -538,11 +538,16 @@ def createEquipment(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_400
 
     params = json.loads(req.stream.read().decode('utf-8'))
+    name = params.get('name')
+    equipment_with_same_name = EntityEquipment.get().filter_by(name=name).all()
+    if len(equipment_with_same_name) != 0:
+        resp.status = falcon.HTTP_412
+        return
     try:
         id = EntityEquipment.add_from_json(params)
     except Exception as e:
         logger.info(e)
-        resp.status = falcon.HTTP_412
+        resp.status = falcon.HTTP_501
         return
     if id:
         objects = EntityEquipment.get().filter_by(vdvid=id).all()
@@ -550,7 +555,6 @@ def createEquipment(**request_handler_args):  # TODO: implement it
         resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
-
 
 def deleteEquipment(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
