@@ -556,6 +556,7 @@ def createEquipment(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
+
 def deleteEquipment(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
 
@@ -592,6 +593,9 @@ def getEquipmentById(**request_handler_args):
 
     id = getIntPathParam('equipmentId', **request_handler_args)
     objects = EntityEquipment.get().filter_by(vdvid=id).all()
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
 
     resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
