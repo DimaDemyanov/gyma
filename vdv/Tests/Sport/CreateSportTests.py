@@ -4,7 +4,7 @@ from collections import OrderedDict
 import falcon
 
 from gyma.vdv.Tests.Base.test_helpers import load_from_json_file, TEST_ACCOUNT
-from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
+from gyma.vdv.Tests.Sport.SportTestCase import SportTestCase
 
 from gyma.vdv.Entities.EntitySport import EntitySport
 
@@ -14,17 +14,13 @@ from gyma.vdv.db import DBConnection
 TEST_PARAMETERS_PATH = './sport.json'
 
 
-class CreateSportTests(BaseTestCase):
+class CreateSportTests(SportTestCase):
 
     # MARK: - setUp & tearDown
 
     @classmethod
     def setUpClass(cls):
         super(CreateSportTests, cls).setUpClass()
-
-        operation_id = 'createSport'
-        cls.check_operation_id_has_operation_handler(operation_id)
-        cls.request_uri_path = cls.get_request_uri_path(operation_id)
 
         cls.valid_sport_params = load_from_json_file(TEST_PARAMETERS_PATH)
         cls.valid_request_params = {"json": cls.valid_sport_params}
