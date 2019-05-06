@@ -24,19 +24,8 @@ class BaseExtensionTestCase(BaseTestCase):
     @classmethod
     def setUpClass(cls):
         super(BaseExtensionTestCase, cls).setUpClass()
-
-        operation_id = 'createExtension'
-        cls.check_operation_id_has_operation_handler(operation_id)
-        cls.request_uri_path = cls.get_request_uri_path(operation_id)
-
         cls.created_court_id = cls._create_court()
         cls.created_tariff_id = cls._create_tariff()
-
-        cls.valid_extension_params = cls._create_valid_extension_params()
-        cls.valid_request_params = {"json": cls.valid_extension_params}
-
-        cls.invalid_extension_params = {}
-        cls.invalid_request_params = {"json":  cls.invalid_extension_params}
 
     @classmethod
     def tearDownClass(cls):
@@ -78,13 +67,6 @@ class BaseExtensionTestCase(BaseTestCase):
         return True
 
     # MARK: - Private class methods
-
-    @classmethod
-    def _create_valid_extension_params(cls):
-        valid_extension_params = load_from_json_file(EXTENSION_PARAMETERS_PATH)
-        valid_extension_params['courtid'] = str(cls.created_court_id)
-        valid_extension_params['tariffid'] = str(cls.created_tariff_id)
-        return valid_extension_params
 
     @classmethod
     def _create_tariff(cls):
