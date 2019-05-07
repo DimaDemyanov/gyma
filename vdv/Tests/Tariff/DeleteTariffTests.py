@@ -50,8 +50,9 @@ class DeleteTariffTests(BaseTariffTestCase):
         }
 
     def tearDown(self):
-        if self._is_tariff_in_db(self.valid_request_params):
-            EntityTariff.delete(self.created_tariff_id)
+        with DBConnection() as session:
+            session.db.query(EntityTariff).delete()
+            session.db.commit()
 
     # MARK: - Tests
 
