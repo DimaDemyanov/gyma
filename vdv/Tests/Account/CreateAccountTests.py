@@ -1,4 +1,5 @@
 import unittest
+from collections import OrderedDict
 
 import falcon
 
@@ -7,7 +8,6 @@ from gyma.vdv.Tests.Base.test_helpers import load_from_json_file, TEST_ACCOUNT
 
 from gyma.vdv.Entities.EntityAccount import EntityAccount
 
-from gyma.vdv.app import createAccount
 from gyma.vdv.db import DBConnection
 
 
@@ -18,17 +18,20 @@ class CreateAccountTests(BaseTestCase):
 
     # MARK: - setUp & tearDown
 
-    def setUp(self):
-        operation_id = 'createAccount'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.request_uri_path = self.get_request_uri_path(operation_id)
+    @classmethod
+    def setUpClass(cls):
+        super(CreateAccountTests, cls).setUpClass()
 
-        self.valid_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
-        self.valid_request_params = {"json": self.valid_account_params}
+        operation_id = 'createAccount'
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.request_uri_path = cls.get_request_uri_path(operation_id)
+
+        cls.valid_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        cls.valid_request_params = {"json": cls.valid_account_params}
 
         # Invalid because request hasn't "name" param
-        self.invalid_account_params = {"phone": "None"}
-        self.invalid_request_params = {"json":  self.invalid_account_params}
+        cls.invalid_account_params = {"phone": "None"}
+        cls.invalid_request_params = {"json":  cls.invalid_account_params}
 
     def tearDown(self):
         with DBConnection() as session:
@@ -47,7 +50,7 @@ class CreateAccountTests(BaseTestCase):
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_200)
-        self.assertTrue(self.__is_account_in_db(self.valid_account_params))
+        self.assertTrue(self._is_account_in_db(self.valid_account_params))
 
     def test_create_account_given_invalid_account_params(self):
         # When
@@ -57,7 +60,7 @@ class CreateAccountTests(BaseTestCase):
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_501)
-        self.assertFalse(self.__is_account_in_db(self.invalid_account_params))
+        self.assertFalse(self._is_account_in_db(self.invalid_account_params))
 
     def test_create_account_given_not_json_file(self):
         # When
@@ -67,7 +70,7 @@ class CreateAccountTests(BaseTestCase):
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_405)
-        self.assertFalse(self.__is_account_in_db(self.invalid_account_params))
+        self.assertFalse(self._is_account_in_db(self.invalid_account_params))
 
     def test_create_account_when_account_with_same_phone_already_exists(self):
         # When
@@ -78,28 +81,28 @@ class CreateAccountTests(BaseTestCase):
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_412)
-        self.assertFalse(self.__is_account_objects_increased_by_value(2))
+        self.assertFalse(self._is_account_objects_increased_by_value(2))
 
     # MARK: - Private methods:
 
-    def __is_account_in_db(self, account_params):
-        try:
-            created_account = EntityAccount.get().filter_by(
-                phone=account_params['phone']
-            ).all()[0].to_dict()
-        except IndexError:
+    def _is_account_in_db(self, account_params):
+        created_accounts = EntityAccount.get().filter_by(
+            phone=account_params['phone']
+        ).all()
+
+        if len(created_accounts) != 1:
             return False
 
-        all_account_objects = EntityAccount.get().all()
-        all_accounts = [o.to_dict() for o in all_account_objects]
+        created_account = created_accounts[0].to_dict()
+        self.check_dict1_in_dict2(
+            OrderedDict(account_params), created_account
+        )
+        return True
 
-        return created_account in all_accounts
-
-    def __is_account_objects_increased_by_value(self, value):
-        with DBConnection() as session:
-            account_objects_count = session.db.query(EntityAccount).filter(
-                EntityAccount.vdvid != TEST_ACCOUNT["vdvid"]
-            ).count()
+    def _is_account_objects_increased_by_value(self, value):
+        account_objects_count = EntityAccount.get().filter(
+            EntityAccount.vdvid != TEST_ACCOUNT["vdvid"]
+        ).count()
         return account_objects_count == value
 
 
