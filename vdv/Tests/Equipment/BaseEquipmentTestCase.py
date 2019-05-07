@@ -1,4 +1,3 @@
-import unittest
 from collections import OrderedDict
 
 from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
