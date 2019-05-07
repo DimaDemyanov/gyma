@@ -10,8 +10,6 @@ from gyma.vdv.Tests.Equipment.BaseEquipmentTestCase import (
 
 from gyma.vdv.Entities.EntityEquipment import EntityEquipment
 
-from gyma.vdv.db import DBConnection
-
 
 TEST_PARAMETERS_PATH = './equipment.json'
 
@@ -35,9 +33,7 @@ class CreateEquipmentTests(BaseEquipmentTestCase):
         cls.invalid_request_params = {"json":  {}}
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntityEquipment).delete()
-            session.db.commit()
+        self._delete_created_equipments()
 
     # MARK: - Tests
 

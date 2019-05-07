@@ -9,8 +9,6 @@ from gyma.vdv.Tests.Base.test_helpers import (
 
 from gyma.vdv.Entities.EntityEquipment import EntityEquipment
 
-from gyma.vdv.db import DBConnection
-
 
 TEST_PARAMETERS_PATH = './equipment.json'
 
@@ -50,8 +48,7 @@ class DeleteEquipmentTests(BaseEquipmentTestCase):
         }
 
     def tearDown(self):
-        if self._is_equipment_in_db(self.valid_request_params):
-            EntityEquipment.delete(self.created_equipment_id)
+        self._delete_created_equipments()
 
     # MARK: - Tests
 

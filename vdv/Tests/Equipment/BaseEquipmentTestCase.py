@@ -5,6 +5,8 @@ from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
 
 from gyma.vdv.Entities.EntityEquipment import EntityEquipment
 
+from gyma.vdv.db import DBConnection
+
 
 class BaseEquipmentTestCase(BaseTestCase):
 
@@ -23,3 +25,8 @@ class BaseEquipmentTestCase(BaseTestCase):
             OrderedDict(equipment_params), created_equipment
         )
         return True
+
+    def _delete_created_equipments(self):
+        with DBConnection() as session:
+            session.db.query(EntityEquipment).delete()
+            session.db.commit()
