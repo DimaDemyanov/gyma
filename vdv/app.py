@@ -2153,7 +2153,8 @@ def updateExtension(**request_handler_args):  # TODO: implement it
         objects = EntityExtension.get().filter_by(vdvid=id).all()
         resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
-    resp.status = falcon.HTTP_200
+        return
+    resp.status = falcon.HTTP_404
 
 def confirmExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']

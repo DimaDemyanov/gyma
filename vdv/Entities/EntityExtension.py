@@ -49,12 +49,19 @@ class EntityExtension(EntityBase, Base):
 
     @classmethod
     def update_from_json(cls, data):
-        if 'vdvid' in data:
-            ext = EntityExtension.get().filter_by(vdvid=data['vdvid']).all()[0]
-            if 'tariffid' in data:
-                ext.tariffid = data['tariffid']
-        else:
+        if 'vdvid' not in data:
             raise Exception('Validation exception')
+        if 'tariffid' in data:
+            with DBConnection() as session:
+                extensions = session.db.query(EntityExtension).filter_by(
+                    vdvid=data['vdvid']).all()
+                if len(extensions) == 0:
+                    return None
+                extension = extensions[0]
+                extension.tariffid = data['tariffid']
+                session.db.commit()
+                return extension.vdvid
+        return None
 
     @classmethod
     def confirm(cls, vdvid, adminid):
