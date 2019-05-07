@@ -9,8 +9,6 @@ from gyma.vdv.Tests.Base.test_helpers import (
 
 from gyma.vdv.Entities.EntitySimpleuser import EntitySimpleuser
 
-from gyma.vdv.db import DBConnection
-
 
 TEST_PARAMETERS_PATH = './simpleuser.json'
 
@@ -46,8 +44,7 @@ class DeleteSimpleuserTests(BaseTestCase):
         }
 
     def tearDown(self):
-        if self._is_simpleuser_in_db(self.created_simpleuser_id):
-            EntitySimpleuser.delete(self.created_simpleuser_id)
+        self._delete_created_simpleusers()
 
     # MARK: - Tests
 

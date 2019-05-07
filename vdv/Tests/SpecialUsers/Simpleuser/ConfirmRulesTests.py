@@ -9,8 +9,6 @@ from gyma.vdv.Tests.Base.test_helpers import load_from_json_file, TEST_ACCOUNT
 
 from gyma.vdv.Entities.EntitySimpleuser import EntitySimpleuser
 
-from gyma.vdv.db import DBConnection
-
 
 TEST_PARAMETERS_PATH = './simpleuser.json'
 
@@ -48,10 +46,7 @@ class ConfirmRulesTests(BaseSimpleuserTestCase):
             self.valid_simpleuser_params)
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntitySimpleuser).filter_by(
-                vdvid=self.created_simpleuser_id).delete()
-            session.db.commit()
+        self._delete_created_simpleusers()
 
     # MARK: - Tests
 

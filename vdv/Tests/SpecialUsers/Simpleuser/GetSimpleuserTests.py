@@ -13,7 +13,6 @@ from gyma.vdv.Tests.Base.test_helpers import (
 
 from gyma.vdv.Entities.EntitySimpleuser import EntitySimpleuser
 
-from gyma.vdv.db import DBConnection
 from gyma.vdv.app import stringToBool
 
 
@@ -54,9 +53,7 @@ class GetSimpleuserTests(BaseSimpleuserTestCase):
         }
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntitySimpleuser).delete()
-            session.db.commit()
+        self._delete_created_simpleusers()
 
     # Tests
 
