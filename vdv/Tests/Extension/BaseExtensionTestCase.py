@@ -29,6 +29,7 @@ class BaseExtensionTestCase(BaseTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super(BaseExtensionTestCase, cls).tearDownClass()
         with DBConnection() as session:
             session.db.query(EntityExtension).filter_by(
                 courtid=cls.created_court_id,
