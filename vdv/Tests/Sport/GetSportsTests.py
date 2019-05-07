@@ -33,9 +33,7 @@ class GetSportsTests(BaseSportTestCase):
         cls.valid_sport_params['vdvid'] = str(cls.created_sport_id)
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntitySport).delete()
-            session.db.commit()
+        self._delete_created_sports()
 
     # MARK: - Tests
 

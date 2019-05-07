@@ -9,8 +9,6 @@ from gyma.vdv.Tests.Base.test_helpers import (
 
 from gyma.vdv.Entities.EntitySport import EntitySport
 
-from gyma.vdv.db import DBConnection
-
 
 TEST_PARAMETERS_PATH = './sport.json'
 
@@ -50,9 +48,7 @@ class DeleteSportTests(BaseSportTestCase):
         }
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntitySport).delete()
-            session.db.commit()
+        self._delete_created_sports()
 
     # MARK: - Tests
 
