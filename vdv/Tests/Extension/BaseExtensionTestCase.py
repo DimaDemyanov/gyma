@@ -34,20 +34,11 @@ class BaseExtensionTestCase(BaseTestCase):
                 courtid=cls.created_court_id,
                 tariffid=cls.created_tariff_id
             ).delete()
-
-            session.db.query(EntityCourt).filter_by(
-                vdvid=cls.created_court_id
-            ).delete()
-
-            session.db.query(EntityLandlord).filter_by(
-                vdvid=cls.created_landlord_id
-            ).delete()
-
-            session.db.query(EntityTariff).filter_by(
-                vdvid=cls.created_tariff_id
-            ).delete()
-
             session.db.commit()
+
+        EntityCourt.delete(cls.created_court_id)
+        EntityLandlord.delete(cls.created_landlord_id)
+        EntityTariff.delete(cls.created_tariff_id)
 
     # MARK: - Private methods:
 
@@ -69,27 +60,34 @@ class BaseExtensionTestCase(BaseTestCase):
     # MARK: - Private class methods
 
     @classmethod
-    def _create_tariff(cls):
-        valid_tariff_params = load_from_json_file(TARIFF_PARAMETERS_PATH)
+    def _create_tariff(cls, tariff_params_path=TARIFF_PARAMETERS_PATH):
+        valid_tariff_params = load_from_json_file(tariff_params_path)
 
         created_tariff_id = EntityTariff.add_from_json(valid_tariff_params)
         return created_tariff_id
 
     @classmethod
-    def _create_court(cls):
+    def _create_court(cls, court_params_path=COURT_PARAMETERS_PATH):
         cls.created_landlord_id = cls._create_landlord()
-        valid_court_params = load_from_json_file(COURT_PARAMETERS_PATH)
+        valid_court_params = load_from_json_file(court_params_path)
         valid_court_params['ownerid'] = str(cls.created_landlord_id)
 
         created_court_id = EntityCourt.add_from_json(valid_court_params)
         return created_court_id
 
     @classmethod
-    def _create_landlord(cls):
-        valid_landlord_params = load_from_json_file(LANDLORD_PARAMETERS_PATH)
+    def _create_landlord(cls, landlord_params_path=LANDLORD_PARAMETERS_PATH):
+        valid_landlord_params = load_from_json_file(landlord_params_path)
         valid_landlord_params['accountid'] = TEST_ACCOUNT['vdvid']
 
         created_landlord_id = EntityLandlord.add_from_json(
             valid_landlord_params
         )
         return created_landlord_id
+
+    @classmethod
+    def _create_valid_extension_params(cls):
+        valid_extension_params = load_from_json_file(EXTENSION_PARAMETERS_PATH)
+        valid_extension_params['courtid'] = str(cls.created_court_id)
+        valid_extension_params['tariffid'] = str(cls.created_tariff_id)
+        return valid_extension_params

@@ -51,15 +51,6 @@ class CreateExtensionTests(BaseExtensionTestCase):
             self._is_extension_in_db(self.invalid_extension_params)
         )
 
-    # MARK: - Private class methods
-
-    @classmethod
-    def _create_valid_extension_params(cls):
-        valid_extension_params = load_from_json_file(EXTENSION_PARAMETERS_PATH)
-        valid_extension_params['courtid'] = str(cls.created_court_id)
-        valid_extension_params['tariffid'] = str(cls.created_tariff_id)
-        return valid_extension_params
-
 
 if __name__ == '__main__':
     unittest.main()
