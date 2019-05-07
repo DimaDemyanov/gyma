@@ -50,8 +50,9 @@ class DeleteSportTests(BaseSportTestCase):
         }
 
     def tearDown(self):
-        if self._is_sport_in_db(self.valid_request_params):
-            EntitySport.delete(self.created_sport_id)
+        with DBConnection() as session:
+            session.db.query(EntitySport).delete()
+            session.db.commit()
 
     # MARK: - Tests
 
