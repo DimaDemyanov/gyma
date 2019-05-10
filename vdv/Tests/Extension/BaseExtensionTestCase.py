@@ -61,6 +61,14 @@ class BaseExtensionTestCase(BaseTestCase):
     # MARK: - Private class methods
 
     @classmethod
+    def _delete_created_extension(self, extension_id):
+        with DBConnection() as session:
+            session.db.query(EntityExtension).filter_by(
+                vdvid=extension_id
+            ).delete()
+            session.db.commit()
+
+    @classmethod
     def _create_tariff(cls, tariff_params_path=TARIFF_PARAMETERS_PATH):
         valid_tariff_params = load_from_json_file(tariff_params_path)
 

@@ -31,12 +31,11 @@ class GetExtensionsByLandlordId(BaseExtensionTestCase):
         cls.base_request_uri_path = cls.get_request_uri_path(operation_id)
 
         cls.valid_extension_params = cls._create_valid_extension_params()
-
-    def setUp(self):
-        self.created_extension_id = EntityExtension.add_from_json(
-            self.valid_extension_params
+        cls.created_extension_id = EntityExtension.add_from_json(
+            cls.valid_extension_params
         )
 
+    def setUp(self):
         self.valid_request_params_isConfirmed = {
             "params": {
                 "landlordId": str(self.created_landlord_id),
@@ -56,8 +55,10 @@ class GetExtensionsByLandlordId(BaseExtensionTestCase):
             }
         }
 
-    def tearDown(self):
-        EntityExtension.delete(self.created_extension_id)
+    @classmethod
+    def tearDownClass(cls):
+        super(GetExtensionsByLandlordId, cls).tearDownClass()
+        cls._delete_created_extension(cls.created_extension_id)
 
     # Tests
 
@@ -76,25 +77,11 @@ class GetExtensionsByLandlordId(BaseExtensionTestCase):
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_200)
+
+        # request should return list of extensions whith 1 extension
         resp_list = resp.json
         self.assertEqual(len(resp_list), 1)
         self.check_dict1_in_dict2(self.valid_extension_params, resp_list[0])
-
-    # def test_get_extensions_given_non_existing_landlord_id_param(self):
-    #     # Given
-    #     request_uri_path_with_param = create_request_uri_path_with_param(
-    #         self.base_request_uri_path,
-    #         self.non_existing_landlord_id_request_params['params']['landlordId']
-    #     )
-
-    #     # When
-    #     resp = self.client.simulate_get(
-    #         request_uri_path_with_param,
-    #         **self.non_existing_landlord_id_request_params
-    #     )
-
-    #     # Then
-    #     self.assertEqual(resp.status, falcon.HTTP_404)
 
 
 if __name__ == '__main__':
