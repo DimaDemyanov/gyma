@@ -2200,9 +2200,13 @@ def getExtensionsByLandlordId(**request_handler_args):
     # wide_info = EntityCourt.get_wide_object(id)
 
     if isconfirmed == 'confirmed':
-        extensions = extensions.filter(isconfirmed == "true").all()
+        extensions = extensions.filter(
+            EntityExtension.isconfirmed == "true"
+        ).all()
     if isconfirmed == 'notconfirmed':
-        extensions = extensions.filter(isconfirmed == "false").all()
+        extensions = extensions.filter(
+            EntityExtension.isconfirmed == "False"
+        ).all()
 
     resp.body = obj_to_json([o.to_dict() for o in extensions])
     resp.status = falcon.HTTP_200
