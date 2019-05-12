@@ -51,7 +51,13 @@ class GetExtensionsByLandlordId(BaseExtensionTestCase):
         self.non_existing_landlord_id_request_params = {
             "params": {
                 "landlordId": "0",
-                "isconfirmed": "confirmed"
+                "isconfirmed": "notconfirmed"
+            }
+        }
+        self.invalid_landlord_id_request_params = {
+            "params": {
+                "landlordId": None,
+                "isconfirmed": "notconfirmed"
             }
         }
 
@@ -82,6 +88,38 @@ class GetExtensionsByLandlordId(BaseExtensionTestCase):
         resp_list = resp.json
         self.assertEqual(len(resp_list), 1)
         self.check_dict1_in_dict2(self.valid_extension_params, resp_list[0])
+
+    def test_get_extensions_given_non_existing_landlord_id_param(self):
+        # Given
+        request_uri_path_with_param = create_request_uri_path_with_param(
+            self.base_request_uri_path,
+            self.non_existing_landlord_id_request_params['params']['landlordId']
+        )
+
+        # When
+        resp = self.client.simulate_get(
+            request_uri_path_with_param,
+            **self.non_existing_landlord_id_request_params
+        )
+
+        # Then
+        self.assertEqual(resp.status, falcon.HTTP_404)
+
+    def test_get_extensions_given_invalid_landlord_id_param(self):
+        # Given
+        request_uri_path_with_param = create_request_uri_path_with_param(
+            self.base_request_uri_path,
+            self.invalid_landlord_id_request_params
+        )
+
+        # When
+        resp = self.client.simulate_get(
+            request_uri_path_with_param,
+            **self.invalid_landlord_id_request_params
+        )
+
+        # Then
+        self.assertEqual(resp.status, falcon.HTTP_400)
 
 
 if __name__ == '__main__':

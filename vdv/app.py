@@ -2191,6 +2191,16 @@ def getExtensionsByLandlordId(**request_handler_args):
     resp = request_handler_args['resp']
 
     id = getIntPathParam('landlordId', **request_handler_args)
+
+    if id is None:
+        resp.status = falcon.HTTP_400
+        return
+
+    landlords = EntityLandlord.get().filter_by(vdvid=id).all()
+    if len(landlords) == 0:
+        resp.status = falcon.HTTP_404
+        return
+
     with DBConnection() as session:
         extensions = session.db.query(EntityExtension)\
             .join(EntityCourt, EntityExtension.courtid == EntityCourt.vdvid)\
