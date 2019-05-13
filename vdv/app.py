@@ -820,6 +820,11 @@ def createCourt(**request_handler_args):
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
         params['ispublished'] = False
+        name = params.get('name')
+        courts_with_same_name = EntityCourt.get().filter_by(name=name).all()
+        if len(courts_with_same_name) != 0:
+            resp.status = falcon.HTTP_412
+            return
         id = EntityCourt.add_from_json(params)
     except Exception as e:
         logger.info(e)
