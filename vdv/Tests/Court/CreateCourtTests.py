@@ -3,7 +3,6 @@ import unittest
 import falcon
 
 from gyma.vdv.Tests.Court.BaseCourtTestCase import BaseCourtTestCase
-from gyma.vdv.Tests.Base.test_helpers import load_from_json_file
 
 from gyma.vdv.Entities.EntityCourt import EntityCourt
 

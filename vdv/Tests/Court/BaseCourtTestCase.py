@@ -51,11 +51,8 @@ class BaseCourtTestCase(BaseTestCase):
     # MARK: - Private class methods
 
     @classmethod
-    def _create_court(cls, court_params_path=COURT_PARAMETERS_PATH):
-        valid_court_params = load_from_json_file(court_params_path)
-        valid_court_params['ownerid'] = str(cls.created_landlord_id)
-
-        created_court_id = EntityCourt.add_from_json(valid_court_params)
+    def _create_court(cls, court_params):
+        created_court_id = EntityCourt.add_from_json(court_params)
         return created_court_id
 
     @classmethod
