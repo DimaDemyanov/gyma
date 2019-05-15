@@ -871,15 +871,14 @@ def deleteCourt(**request_handler_args):
     if id is not None:
         try:
             EntityCourt.delete_wide_object(id)
-            EntityCourt.delete(id)
         except FileNotFoundError:
-            resp.status = falcon.HTTP_404
+            resp.status = falcon.HTTP_405
             return
 
         try:
-            EntityCourt.delete_wide_object(id)
+            EntityCourt.delete(id)
         except FileNotFoundError:
-            resp.status = falcon.HTTP_405
+            resp.status = falcon.HTTP_404
             return
 
         object = EntityCourt.get().filter_by(vdvid=id).all()
