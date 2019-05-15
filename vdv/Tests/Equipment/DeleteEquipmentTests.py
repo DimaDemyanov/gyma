@@ -94,7 +94,7 @@ class DeleteEquipmentTests(BaseEquipmentTestCase):
         # When
         resp = self.client.simulate_delete(
             request_uri_path_with_param,
-            **self.non_existing_equipment_id_request_params
+            **self.invalid_equipment_id_request_params
         )
 
         # Then
