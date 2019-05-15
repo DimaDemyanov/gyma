@@ -683,6 +683,7 @@ def getCourtById(**request_handler_args):
     id = getIntPathParam('courtId', **request_handler_args)
     objects = EntityCourt.get().filter_by(vdvid=id).all()
     if len(objects) == 0:
+        resp.status = falcon.HTTP_404
         return
 
     wide_info = EntityCourt.get_wide_object(id)
