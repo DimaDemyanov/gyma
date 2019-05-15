@@ -705,8 +705,12 @@ def getCourtByLandlordId(**request_handler_args):
 
     id = getIntPathParam('landlordId', **request_handler_args)
     objects = EntityCourt.get().filter_by(ownerid=id).all()
+
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
+
     ispublished = req.params['ispublished']
-    phone = req.context['phone']
 
     # wide_info = EntityCourt.get_wide_object(id)
 
