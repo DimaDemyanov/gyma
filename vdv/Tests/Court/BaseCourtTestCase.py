@@ -70,3 +70,20 @@ class BaseCourtTestCase(BaseTestCase):
         valid_court_params = load_from_json_file(COURT_PARAMETERS_PATH)
         valid_court_params['ownerid'] = str(cls.created_landlord_id)
         return valid_court_params
+
+    # MARK: - Private methods
+
+    def _get_property_isPublished(self, court_params):
+        with DBConnection() as session:
+            ispublished_property_of_courts_with_same_name = session.db.query(
+                EntityCourt.ispublished
+            ).filter_by(name=court_params.get('name')).all()
+
+        # len == 1 because there should be only 1 court with given name
+        if len(ispublished_property_of_courts_with_same_name) != 1:
+            return None
+
+        # It is list of 1 tuple with 1 element: isPublished property
+        isPublished = ispublished_property_of_courts_with_same_name[0][0]
+
+        return isPublished

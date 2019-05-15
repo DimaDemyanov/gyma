@@ -12,15 +12,15 @@ from gyma.vdv.Entities.EntityCourt import EntityCourt
 from gyma.vdv.db import DBConnection
 
 
-class ConfirmCourtByIdTests(BaseCourtTestCase):
+class DeclineCourtByIdTests(BaseCourtTestCase):
 
     # MARK: - setUp & tearDown
 
     @classmethod
     def setUpClass(cls):
-        super(ConfirmCourtByIdTests, cls).setUpClass()
+        super(DeclineCourtByIdTests, cls).setUpClass()
 
-        operation_id = 'confirmCourtById'
+        operation_id = 'declineCourtById'
         cls.check_operation_id_has_operation_handler(operation_id)
         cls.base_request_uri_path = cls.get_request_uri_path(operation_id)
 
@@ -41,11 +41,11 @@ class ConfirmCourtByIdTests(BaseCourtTestCase):
     @classmethod
     def tearDownClass(cls):
         EntityCourt.delete(cls.created_court_id)
-        super(ConfirmCourtByIdTests, cls).tearDownClass()
+        super(DeclineCourtByIdTests, cls).tearDownClass()
 
     # MARK: - Tests
 
-    def test_confirm_court_given_valid_court_id_param(self):
+    def test_decline_court_given_valid_court_id_param(self):
         # Given
         request_uri_path_with_param = create_request_uri_path_with_param(
             self.base_request_uri_path,
@@ -59,11 +59,11 @@ class ConfirmCourtByIdTests(BaseCourtTestCase):
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_200)
-        self.assertTrue(
+        self.assertFalse(
             self._get_property_isPublished(self.valid_court_params)
         )
 
-    def test_confirm_court_given_non_existing_court_id_param(self):
+    def test_decline_court_given_non_existing_court_id_param(self):
         # Given
         request_uri_path_with_param = create_request_uri_path_with_param(
             self.base_request_uri_path,
