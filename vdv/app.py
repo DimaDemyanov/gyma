@@ -999,11 +999,21 @@ def createCourtTimesOnDate(**request_handler_args):
     resp = request_handler_args['resp']
 
     courtid = req.params['courtid']
-    #params = req.params['times']
+
+    courts = EntityCourt.get().filter_by(vdvid=courtid).all()
+    if len(courts) == 0:
+        resp.status = falcon.HTTP_404
+        return
+
     params = json.loads(req.stream.read().decode('utf-8'))
 
-    with DBConnection() as session:
-        create_times(session, courtid, PROPNAME_MAPPING['courtTime'], params['times'], 0)
+    try:
+        with DBConnection() as session:
+            create_times(session, courtid, PROPNAME_MAPPING['courtTime'], params['times'], 0)
+    except Exception as e:
+        logger.error(e)
+        resp.status = falcon.HTTP_400
+        return
 
     resp.status = falcon.HTTP_200
 
