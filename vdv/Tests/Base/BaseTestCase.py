@@ -67,7 +67,10 @@ class BaseTestCase(testing.TestCase):
                 continue
             dict2_value = dict2[dict1_key]
             if type(dict1_value) is dict:
-                self.check_dict1_in_dict2(dict2_value, dict1_value)
+                try:
+                    self.check_dict1_in_dict2(dict2_value, dict1_value)
+                except KeyError:
+                    self.check_dict1_in_dict2(dict1_value, dict2_value)
             else:
                 self.assertEqual(dict2_value, dict1_value)
 

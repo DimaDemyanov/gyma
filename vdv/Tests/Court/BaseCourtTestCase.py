@@ -67,7 +67,7 @@ class BaseCourtTestCase(BaseTestCase):
 
     @classmethod
     def _create_valid_court_params(cls, court_params_path=COURT_PARAMETERS_PATH):
-        valid_court_params = load_from_json_file(COURT_PARAMETERS_PATH)
+        valid_court_params = load_from_json_file(court_params_path)
         valid_court_params['ownerid'] = str(cls.created_landlord_id)
         return valid_court_params
 

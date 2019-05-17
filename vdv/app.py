@@ -744,8 +744,6 @@ def getCourtByLocationId(**request_handler_args):
         return
     objects = EntityCourt.get().filter(EntityCourt.vdvid.in_(locations)).all()
 
-    phone = req.context['phone']
-
     res = []
     for _ in objects:
         obj_dict = _.to_dict()
