@@ -1,0 +1,10 @@
+{
+  "ownerid": "Should be changed",
+  "name": "Workout",
+  "desc": "Very cool workout place",
+  "price": "0",
+  "isdraft": true,
+   "prop": {
+    "courtTime": ["2030-01-01"]
+  }
+}
