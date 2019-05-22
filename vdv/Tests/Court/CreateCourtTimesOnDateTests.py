@@ -2,17 +2,12 @@ import unittest
 
 import falcon
 
-from gyma.vdv.Tests.Court.BaseCourtTestCase import BaseCourtTestCase
+from gyma.vdv.Tests.Court.BaseCourtTimeTestCase import BaseCourtTimeTestCase
 
 from gyma.vdv.Entities.EntityCourt import EntityCourt
-from gyma.vdv.Entities.EntityTime import EntityTime
-
-from gyma.vdv.Prop.PropCourtTime import PropCourtTime
-
-from gyma.vdv.db import DBConnection
 
 
-class CreateCourtTimesOnDateTests(BaseCourtTestCase):
+class CreateCourtTimesOnDateTests(BaseCourtTimeTestCase):
 
     # MARK: - setUp & tearDown
 
@@ -52,8 +47,8 @@ class CreateCourtTimesOnDateTests(BaseCourtTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls._delete_created_court_time_reference(cls.created_court_id)
-        cls._delete_created_time()
+        # WARNING: be sure to delete references from PropCourtTime
+        cls._delete_created_times()
         EntityCourt.delete(cls.created_court_id)
         super(CreateCourtTimesOnDateTests, cls).tearDownClass()
 
@@ -71,6 +66,13 @@ class CreateCourtTimesOnDateTests(BaseCourtTestCase):
             self._is_court_time_in_db(self.valid_court_time_param)
         )
 
+        created_time_id = self._get_created_time_id(
+            self.valid_court_time_param
+        )
+        self._delete_created_court_time_reference(
+            self.created_court_id, created_time_id
+        )
+
     def test_create_court_time_given_non_existing_court_param(self):
         # When
         resp = self.client.simulate_post(
@@ -82,36 +84,6 @@ class CreateCourtTimesOnDateTests(BaseCourtTestCase):
         self.assertFalse(
             self._is_court_time_in_db(self.valid_court_time_param)
         )
-
-    # MARK - Private class methods
-
-    @classmethod
-    def _delete_created_court_time_reference(cls, court_id):
-        with DBConnection() as session:
-            session.db.query(PropCourtTime).filter_by(vdvid=court_id).delete()
-            session.db.commit()
-
-    @classmethod
-    def _delete_created_time(cls):
-        with DBConnection() as session:
-            session.db.query(EntityTime).delete()
-            session.db.commit()
-
-    # MARK - Private methods
-
-    def _is_court_time_in_db(self, court_time):
-        created_times = EntityTime.get().filter_by(time=court_time).all()
-
-        if len(created_times) != 1:
-            return False
-
-        created_time_id = created_times[0].vdvid
-
-        court_times = PropCourtTime.get().filter_by(
-            vdvid=self.created_court_id, value=created_time_id
-        ).all()
-
-        return len(court_times) == 1
 
 
 if __name__ == '__main__':
