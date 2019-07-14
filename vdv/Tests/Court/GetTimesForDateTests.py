@@ -55,8 +55,6 @@ class GetTimesForDateTests(BaseCourtTimeTestCase):
 
     # MARK: - Tests
 
-    # TODO: Add checking resp.body. BUG: raise error
-
     def test_get_court_time_given_valid_params(self):
         # When
         resp = self.client.simulate_get(
@@ -65,6 +63,17 @@ class GetTimesForDateTests(BaseCourtTimeTestCase):
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_200)
+        expected_result = [
+            {
+                "time": "{court_date} {court_time}".format(
+                    court_date=self.valid_court_params['prop']['courtTime'][0],
+                    # court_date contains only date so by default time is midnight
+                    court_time="00:00:00+03:00"
+                    ),
+                "state": "free"
+            },
+        ]
+        self.assertEqual(resp.json, expected_result)
 
     def test_get_court_time_given_non_existing_court_param(self):
         # When
@@ -74,6 +83,8 @@ class GetTimesForDateTests(BaseCourtTimeTestCase):
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_404)
+
+    # TODO: Add new methods which create and user requests
 
     # MARK - Private class methods
 

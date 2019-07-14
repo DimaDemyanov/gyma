@@ -15,6 +15,7 @@ SWAGGER_TEMP_PATH = "./swagger_temp.json"
 class AuthenticationForTest(object):
     def process_request(self, req, resp):
         req.context['phone'] = test_helpers.TEST_ACCOUNT['phone']
+        req.context['accountid'] = test_helpers.TEST_ACCOUNT['vdvid']
 
 
 class BaseTestCase(testing.TestCase):
