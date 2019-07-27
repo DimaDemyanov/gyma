@@ -618,7 +618,7 @@ def getAllCourts(**request_handler_args):
     with DBConnection() as session:
         if sort_order == 'popularity':
             objects = session.db.query(EntityCourt, func.count(EntityRequest.vdvid).label('total'))\
-                .join(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
+                .outerjoin(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
                 .group_by(EntityCourt.vdvid, EntityRequest.vdvid)
         else:
             objects = session.db.query(EntityCourt)
