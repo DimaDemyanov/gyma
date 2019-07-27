@@ -627,7 +627,7 @@ def getAllCourts(**request_handler_args):
         pass
 
     if filter == 'my':
-        objects = objects.filter_by(ownerid=my_landlordid)
+        objects = objects.filter(EntityCourt.ownerid == my_landlordid)
 
     if filter == 'notmy':
         objects = objects.filter(EntityCourt.ownerid != my_landlordid)
@@ -635,13 +635,13 @@ def getAllCourts(**request_handler_args):
     filter = req.params['filter2']  # post_data['filter']
 
     if filter == 'drafts':
-        objects = objects.filter_by(isdraft=True)
+        objects = objects.filter(EntityCourt.isdraft == True)
 
     if filter == 'published':
-        objects = objects.filter_by(ispublished=True)
+        objects = objects.filter(EntityCourt.ispublished == True)
 
     if filter == 'notpublished':
-        objects = objects.filter_by(ispublished=False)
+        objects = objects.filter(EntityCourt.ispublished == False)
 
     if not objects:
         resp.status = falcon.HTTP_408
