@@ -521,9 +521,6 @@ def getSportById(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
 
-    e_mail = req.context['phone']
-    my_id = EntityAccount.get_id_from_email(e_mail)
-
     resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
@@ -589,9 +586,6 @@ def getEquipmentById(**request_handler_args):
     id = getIntPathParam('equipmentId', **request_handler_args)
     objects = EntityEquipment.get().filter_by(vdvid=id).all()
 
-    e_mail = req.context['phone']
-    my_id = EntityAccount.get_id_from_email(e_mail)
-
     resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
 
@@ -620,7 +614,7 @@ def getAllCourts(**request_handler_args):
     with DBConnection() as session:
         if sort_order == 'popularity':
             objects = session.db.query(EntityCourt, func.count(EntityRequest.vdvid).label('total'))\
-                .join(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
+                .outerjoin(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
                 .group_by(EntityCourt.vdvid, EntityRequest.vdvid)
         else:
             objects = session.db.query(EntityCourt)
@@ -629,7 +623,7 @@ def getAllCourts(**request_handler_args):
         pass
 
     if filter == 'my':
-        objects = objects.filter_by(ownerid=my_landlordid)
+        objects = objects.filter(EntityCourt.ownerid == my_landlordid)
 
     if filter == 'notmy':
         objects = objects.filter(EntityCourt.ownerid != my_landlordid)
@@ -637,13 +631,13 @@ def getAllCourts(**request_handler_args):
     filter = req.params['filter2']  # post_data['filter']
 
     if filter == 'drafts':
-        objects = objects.filter_by(isdraft=True)
+        objects = objects.filter(EntityCourt.isdraft == True)
 
     if filter == 'published':
-        objects = objects.filter_by(ispublished=True)
+        objects = objects.filter(EntityCourt.ispublished == True)
 
     if filter == 'notpublished':
-        objects = objects.filter_by(ispublished=False)
+        objects = objects.filter(EntityCourt.ispublished == False)
 
     if not objects:
         resp.status = falcon.HTTP_408
@@ -679,9 +673,6 @@ def getCourtById(**request_handler_args):
     objects = EntityCourt.get().filter_by(vdvid=id).all()
     if len(objects) == 0:
         return
-
-    e_mail = req.context['phone']
-    my_id = EntityAccount.get_id_from_email(e_mail)
 
     wide_info = EntityCourt.get_wide_object(id)
 
@@ -1836,7 +1827,7 @@ def getCourtsInArea(**request_handler_args):
     with DBConnection() as session:
         if sort_order == 'popularity':
             objects = session.db.query(EntityCourt, func.count(EntityRequest.vdvid).label('total'))\
-                .join(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
+                .outerjoin(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
                 .group_by(EntityCourt.vdvid, EntityRequest.vdvid)
         else:
             objects = courts
@@ -1845,7 +1836,7 @@ def getCourtsInArea(**request_handler_args):
         objects = objects
 
     if filter == 'my':
-        objects = objects.filter_by(ownerid=my_landlordid)
+        objects = objects.filter(EntityCourt.ownerid == my_landlordid)
 
     if filter == 'notmy':
         objects = objects.filter(EntityCourt.ownerid != my_landlordid)
@@ -1853,13 +1844,13 @@ def getCourtsInArea(**request_handler_args):
     filter = req.params['filter2']  # post_data['filter']
 
     if filter == 'drafts':
-        objects = objects.filter_by(isdraft=True)
+        objects = objects.filter(EntityCourt.isdraft == True)
 
     if filter == 'published':
-        objects = objects.filter_by(ispublished=True)
+        objects = objects.filter(EntityCourt.ispublished == True)
 
     if filter == 'notpublished':
-        objects = objects.filter_by(ispublished=False)
+        objects = objects.filter(EntityCourt.ispublished == False)
 
     if not objects:
         resp.status = falcon.HTTP_408
