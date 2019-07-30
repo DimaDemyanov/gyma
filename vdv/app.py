@@ -29,6 +29,7 @@ from gyma.vdv.Entities.EntityLandlord import EntityLandlord
 from gyma.vdv.Entities.EntityRequest import EntityRequest
 from gyma.vdv.Entities.EntitySimpleuser import EntitySimpleuser
 from gyma.vdv.Entities.EntitySport import EntitySport
+from gyma.vdv.Entities.EntitySportIcon import EntitySportIcon
 from gyma.vdv.Entities.EntityTariff import EntityTariff
 from gyma.vdv.Entities.EntityTime import EntityTime
 from gyma.vdv.Entities.EntityValidation import EntityValidation
@@ -522,6 +523,20 @@ def getSportById(**request_handler_args):
         return
 
     resp.body = obj_to_json(objects[0].to_dict())
+    resp.status = falcon.HTTP_200
+
+
+def getSportIcon(**request_handler_args):
+    req = request_handler_args['req']
+    resp = request_handler_args['resp']
+
+    id = getIntPathParam('sportId', **request_handler_args)
+    icons = EntitySportIcon.get().filter_by(sportid=id).all()
+    if not icons:
+        resp.status = falcon.HTTP_404
+        return
+
+    resp.body = obj_to_json(icons[0].to_dict())
     resp.status = falcon.HTTP_200
 
 
@@ -2209,6 +2224,7 @@ operation_handlers = {
     'deleteSport': [deleteSport],
     'getSports': [getSports],
     'getSportById': [getSportById],
+    'getSportIcon': [getSportIcon],
 
     # Equipment methods
     'createEquipment': [createEquipment],
