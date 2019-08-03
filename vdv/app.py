@@ -158,8 +158,8 @@ def httpDefault(**request_handler_args):
         else:
             return None
 
-    if path.endswith('swagger.json'):
-        path = path.replace('swagger.json', 'swagger_temp.json')
+    # if path.endswith('swagger.json'):
+    #     path = path.replace('swagger.json', 'swagger_temp.json')
 
     ctype = guess_response_type(path)
 
@@ -2320,7 +2320,7 @@ operation_handlers = {
 
 
 class CORS(object):
-    def process_response(self, req, resp, resource):
+    def process_response(self, req, resp, resource, req_succeeded):
         origin = req.get_header('Origin')
         if origin:
             resp.set_header('Access-Control-Allow-Origin', origin)
