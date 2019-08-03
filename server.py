@@ -1,3 +1,5 @@
+import os
+
 from waitress import serve
 
 from gyma.vdv.app import runWSGIApp, getWSGIPortFromConfig
@@ -7,6 +9,7 @@ if __name__ == '__main__':
     wsgi_app = runWSGIApp()
 
     WSGI_PORT = getWSGIPortFromConfig()
+    os.chdir('./gyma')
     if not WSGI_PORT:
         WSGI_PORT = 80
 
