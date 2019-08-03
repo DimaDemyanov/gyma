@@ -1,29 +1,34 @@
 FROM python:3
 
 WORKDIR /usr/src/app
+RUN mkdir ./gyma
 
 COPY Requirements.txt ./
 RUN pip install --no-cache-dir -r Requirements.txt
 
-COPY vdv/ ./vdv/
-COPY swagger-ui/ ./swagger-ui/
+COPY vdv/ ./gyma/vdv/
+COPY swagger-ui/ ./gyma/swagger-ui/
 
-COPY server.py 		./server.py
-COPY config.json 	./config.json
-COPY swagger.json 	./swagger.json
-COPY VERSION 		./VERSION
-COPY startup.sh ./startup.sh
-RUN chmod 777 ./startup.sh && \
-    sed -i 's/\r//' ./startup.sh
+COPY setup.py       ./setup.py
+COPY server.py 		./gyma/server.py
+COPY config.json 	./gyma/config.json
+COPY swagger.json 	./gyma/swagger.json
+COPY VERSION 		./gyma/VERSION
+COPY startup.sh     ./gyma/startup.sh
 
-RUN mkdir -p ./logs
-RUN chmod 777 ./logs
-VOLUME ./logs
+RUN chmod 777 ./gyma/startup.sh && \
+    sed -i 's/\r//' ./gyma/startup.sh
 
-RUN mkdir -p ./images
-RUN chmod 777 ./images
-VOLUME ./images
- 
+RUN pip install -e .
+
+RUN mkdir -p ./gyma/logs
+RUN chmod 777 ./gyma/logs
+VOLUME ./gyma/logs
+
+RUN mkdir -p ./gyma/images
+RUN chmod 777 ./gyma/images
+VOLUME ./gyma/images
+
 EXPOSE 4201
  
-CMD ["./startup.sh"]
+CMD ["./gyma/startup.sh"]

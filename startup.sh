@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-python3 ./server.py --profile $PROFILE
+python3 ./gyma/server.py --profile $PROFILE
