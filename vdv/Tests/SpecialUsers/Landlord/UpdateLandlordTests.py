@@ -1,4 +1,5 @@
 import unittest
+import sys
 from json.decoder import JSONDecodeError
 
 import falcon
@@ -11,7 +12,7 @@ from gyma.vdv.Entities.EntityLandlord import EntityLandlord
 from gyma.vdv.db import DBConnection
 
 
-TEST_PARAMETERS_PATH = './landlord.json'
+TEST_PARAMETERS_PATH = '{dir_path}/landlord.json'.format(dir_path=sys.path[0])
 
 
 class UpdateLandlordTests(BaseTestCase):
