@@ -20,18 +20,20 @@ class EntitySport(EntityBase, Base):
 
     json_serialize_items_list = ['vdvid', 'name', 'iconid']
 
-    def __init__(self, name):
+    def __init__(self, name, iconid):
         super().__init__()
         self.name = name
+        self.iconid = iconid
 
     @classmethod
     def add_from_json(cls, data):
         vdvid = None
 
-        if 'name' in data:
+        if 'name' in data and 'iconid' in data:
             name = data['name']
+            iconid = data['iconid']
 
-            new_entity = EntitySport(name)
+            new_entity = EntitySport(name, iconid)
             vdvid = new_entity.add()
 
             try:
