@@ -471,11 +471,16 @@ def createSport(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_400
 
     params = json.loads(req.stream.read().decode('utf-8'))
+    name = params.get('name')
+    sports_with_same_name = EntitySport.get().filter_by(name=name).all()
+    if len(sports_with_same_name) != 0:
+        resp.status = falcon.HTTP_412
+        return
     try:
         id = EntitySport.add_from_json(params)
     except Exception as e:
         logger.info(e)
-        resp.status = falcon.HTTP_412
+        resp.status = falcon.HTTP_501
         return
     if id:
         objects = EntitySport.get().filter_by(vdvid=id).all()
@@ -553,11 +558,16 @@ def createEquipment(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_400
 
     params = json.loads(req.stream.read().decode('utf-8'))
+    name = params.get('name')
+    equipment_with_same_name = EntityEquipment.get().filter_by(name=name).all()
+    if len(equipment_with_same_name) != 0:
+        resp.status = falcon.HTTP_412
+        return
     try:
         id = EntityEquipment.add_from_json(params)
     except Exception as e:
         logger.info(e)
-        resp.status = falcon.HTTP_412
+        resp.status = falcon.HTTP_501
         return
     if id:
         objects = EntityEquipment.get().filter_by(vdvid=id).all()
@@ -603,6 +613,9 @@ def getEquipmentById(**request_handler_args):
 
     id = getIntPathParam('equipmentId', **request_handler_args)
     objects = EntityEquipment.get().filter_by(vdvid=id).all()
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
 
     resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
@@ -1068,7 +1081,7 @@ def createLandlord(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
         resp.status = falcon.HTTP_405
         return
 
@@ -1145,7 +1158,7 @@ def createSimpleuser(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
         resp.status = falcon.HTTP_405
         return
 
@@ -1249,7 +1262,7 @@ def updateUser(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
         resp.status = falcon.HTTP_405
         return
 
@@ -1618,7 +1631,12 @@ def createLocation(**request_handler_args):
         resp.status = falcon.HTTP_405
         return
 
-    if not name:
+    locations_with_same_name = EntityLocation.get().filter_by(name=name).all()
+    if len(locations_with_same_name) != 0:
+        resp.status = falcon.HTTP_412
+        return
+
+    if not name or not latitude or not longitude:
         resp.status = falcon.HTTP_405
         return
 
