@@ -1,5 +1,6 @@
 import unittest
 from collections import OrderedDict
+import sys
 
 import falcon
 
@@ -11,7 +12,7 @@ from gyma.vdv.Entities.EntityLocation import EntityLocation
 from gyma.vdv.db import DBConnection
 
 
-TEST_PARAMETERS_PATH = './location.json'
+TEST_PARAMETERS_PATH = '{dir_path}/location.json'.format(dir_path=sys.path[0])
 
 
 class CreateLocationTests(BaseLocationTestCase):

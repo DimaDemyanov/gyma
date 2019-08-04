@@ -6,7 +6,7 @@ TEST_DIRS = [
     # './Court'
     './Equipment/',
     './Extension/',
-    # './Location/',
+    './Location/',
     # './SpecialUsers/Landlord',
     # './SpecialUsers/Simpleuser',
     # './Sport',

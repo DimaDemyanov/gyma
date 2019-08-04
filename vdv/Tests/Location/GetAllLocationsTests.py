@@ -48,7 +48,6 @@ class GetAllLocationsTests(BaseTestCase):
         self.check_dict1_in_dict2(
             expected_location, OrderedDict(resp.json[0])
         )
-        # self.assertEqual(resp.json, expected_result)
 
     # MARK: - Private methods
 
