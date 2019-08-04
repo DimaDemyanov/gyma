@@ -5,6 +5,8 @@ from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
 
 from gyma.vdv.Entities.EntitySport import EntitySport
 
+from gyma.vdv.db import DBConnection
+
 
 class BaseSportTestCase(BaseTestCase):
 
@@ -23,3 +25,8 @@ class BaseSportTestCase(BaseTestCase):
             OrderedDict(sport_params), created_sport
         )
         return True
+
+    def _delete_created_sports(self):
+        with DBConnection() as session:
+            session.db.query(EntitySport).delete()
+            session.db.commit()

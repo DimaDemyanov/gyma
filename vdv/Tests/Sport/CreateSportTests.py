@@ -9,8 +9,6 @@ from gyma.vdv.Tests.Sport.BaseSportTestCase import BaseSportTestCase
 
 from gyma.vdv.Entities.EntitySport import EntitySport
 
-from gyma.vdv.db import DBConnection
-
 
 TEST_PARAMETERS_PATH = '{dir_path}/sport.json'.format(dir_path=sys.path[0])
 
@@ -34,9 +32,7 @@ class CreateSportTests(BaseSportTestCase):
         cls.invalid_request_params = {"json":  {}}
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntitySport).delete()
-            session.db.commit()
+        self._delete_created_sports()
 
     # MARK: - Tests
 
@@ -62,7 +58,7 @@ class CreateSportTests(BaseSportTestCase):
 
     def test_create_sport_when_same_sport_already_exists(self):
         # When
-        for i in range(2):
+        for _ in range(2):
             resp = self.client.simulate_post(
                 self.request_uri_path, **self.valid_request_params
             )
