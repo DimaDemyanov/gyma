@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 import falcon
 
@@ -17,7 +18,7 @@ from gyma.vdv.db import DBConnection
 from gyma.vdv.app import stringToBool
 
 
-TEST_PARAMETERS_PATH = './simpleuser.json'
+TEST_PARAMETERS_PATH = '{dir_path}/simpleuser.json'.format(dir_path=sys.path[0])
 
 
 class GetSimpleuserTests(BaseSimpleuserTestCase):

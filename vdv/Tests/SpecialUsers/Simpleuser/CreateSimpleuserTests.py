@@ -1,5 +1,6 @@
 import unittest
 from collections import OrderedDict
+import sys
 
 import falcon
 
@@ -13,7 +14,7 @@ from gyma.vdv.Entities.EntitySimpleuser import EntitySimpleuser
 from gyma.vdv.db import DBConnection
 
 
-TEST_PARAMETERS_PATH = './simpleuser.json'
+TEST_PARAMETERS_PATH = '{dir_path}/simpleuser.json'.format(dir_path=sys.path[0])
 
 
 class CreateSimpleuserTests(BaseSimpleuserTestCase):
