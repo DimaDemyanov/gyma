@@ -16,8 +16,9 @@ class EntitySport(EntityBase, Base):
 
     vdvid = Column(Integer, Sequence('vdv_seq'), primary_key=True)
     name = Column(String)
+    iconid = Column(Integer)
 
-    json_serialize_items_list = ['vdvid', 'name']
+    json_serialize_items_list = ['vdvid', 'name', 'iconid']
 
     def __init__(self, name):
         super().__init__()
