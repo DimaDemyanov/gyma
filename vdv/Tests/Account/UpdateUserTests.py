@@ -1,3 +1,4 @@
+import sys
 import unittest
 from json.decoder import JSONDecodeError
 
@@ -11,7 +12,7 @@ from gyma.vdv.Entities.EntityAccount import EntityAccount
 from gyma.vdv.db import DBConnection
 
 
-TEST_PARAMETERS_PATH = './account.json'
+TEST_PARAMETERS_PATH = '{dir_path}/account.json'.format(dir_path=sys.path[0])
 
 
 class UpdateUserTests(BaseTestCase):
