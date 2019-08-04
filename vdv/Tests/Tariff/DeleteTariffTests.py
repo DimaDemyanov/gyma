@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 import falcon
 
@@ -12,7 +13,7 @@ from gyma.vdv.Entities.EntityTariff import EntityTariff
 from gyma.vdv.db import DBConnection
 
 
-TEST_PARAMETERS_PATH = './tariff.json'
+TEST_PARAMETERS_PATH = '{dir_path}/tariff.json'.format(dir_path=sys.path[0])
 
 
 class DeleteTariffTests(BaseTariffTestCase):
@@ -50,8 +51,7 @@ class DeleteTariffTests(BaseTariffTestCase):
         }
 
     def tearDown(self):
-        if self._is_tariff_in_db(self.valid_request_params):
-            EntityTariff.delete(self.created_tariff_id)
+        self._delete_all_tariffs()
 
     # MARK: - Tests
 

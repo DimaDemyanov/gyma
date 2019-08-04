@@ -5,6 +5,8 @@ from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
 
 from gyma.vdv.Entities.EntityTariff import EntityTariff
 
+from gyma.vdv.db import DBConnection
+
 
 class BaseTariffTestCase(BaseTestCase):
 
@@ -25,3 +27,8 @@ class BaseTariffTestCase(BaseTestCase):
             OrderedDict(tariff_params), created_tariff
         )
         return True
+
+    def _delete_all_tariffs(self):
+       with DBConnection() as session:
+            session.db.query(EntityTariff).delete()
+            session.db.commit()

@@ -10,7 +10,7 @@ TEST_DIRS = [
     # './SpecialUsers/Landlord',
     # './SpecialUsers/Simpleuser',
     # './Sport',
-    # './Tariff',
+    './Tariff',
 ]
 TEST_FILE_PATTERN = '*Tests.py'
 

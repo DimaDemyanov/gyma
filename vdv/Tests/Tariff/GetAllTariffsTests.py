@@ -1,5 +1,6 @@
 import unittest
 from collections import OrderedDict
+import sys
 
 import falcon
 
@@ -11,7 +12,7 @@ from gyma.vdv.Entities.EntityTariff import EntityTariff
 from gyma.vdv.db import DBConnection
 
 
-TEST_PARAMETERS_PATH = './tariff.json'
+TEST_PARAMETERS_PATH = '{dir_path}/tariff.json'.format(dir_path=sys.path[0])
 
 
 class GetTariffsTests(BaseTariffTestCase):
@@ -33,9 +34,7 @@ class GetTariffsTests(BaseTariffTestCase):
         cls.valid_tariff_params['vdvid'] = str(cls.created_tariff_id)
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntityTariff).delete()
-            session.db.commit()
+        self._delete_all_tariffs()
 
     # MARK: - Tests
 
