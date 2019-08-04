@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 import falcon
 
@@ -11,7 +12,9 @@ from gyma.vdv.Prop.PropCourtTime import PropCourtTime
 from gyma.vdv.db import DBConnection
 
 
-COURT_PARAMETERS_PATH = './court_with_courtTime_prop.json'
+
+DIR_PATH = sys.path[0]
+COURT_PARAMETERS_PATH = '{}/court_with_courtTime_prop.json'.format(DIR_PATH)
 
 
 class GetTimesForDateTests(BaseCourtTimeTestCase):

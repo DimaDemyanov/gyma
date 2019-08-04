@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 import falcon
 
@@ -11,8 +12,9 @@ from gyma.vdv.Entities.EntityCourt import EntityCourt
 from gyma.vdv.Entities.EntityLocation import EntityLocation
 
 
-COURT_PARAMETERS_PATH = './court_with_location_prop.json'
-LOCATION_PARAMETERS_PATH = './location.json'
+DIR_PATH = sys.path[0]
+COURT_PARAMETERS_PATH = '{}/court_with_location_prop.json'.format(DIR_PATH)
+LOCATION_PARAMETERS_PATH = '{}/location.json'.format(DIR_PATH)
 
 
 class GetCourtByLocationIdTests(BaseCourtTestCase):

@@ -1,3 +1,4 @@
+import sys
 from collections import OrderedDict
 
 from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
@@ -9,8 +10,9 @@ from gyma.vdv.Entities.EntityLandlord import EntityLandlord
 from gyma.vdv.db import DBConnection
 
 
-LANDLORD_PARAMETERS_PATH = './landlord.json'
-COURT_PARAMETERS_PATH = './court.json'
+DIR_PATH = sys.path[0]
+LANDLORD_PARAMETERS_PATH = '{}/landlord.json'.format(DIR_PATH)
+COURT_PARAMETERS_PATH = '{}/court.json'.format(DIR_PATH)
 
 
 class BaseCourtTestCase(BaseTestCase):

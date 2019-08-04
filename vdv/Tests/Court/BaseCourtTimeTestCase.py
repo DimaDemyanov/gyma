@@ -1,3 +1,5 @@
+import sys
+
 from gyma.vdv.Tests.Court.BaseCourtTestCase import BaseCourtTestCase
 
 from gyma.vdv.Entities.EntityTime import EntityTime
@@ -7,7 +9,8 @@ from gyma.vdv.Prop.PropCourtTime import PropCourtTime
 from gyma.vdv.db import DBConnection
 
 
-COURT_PARAMETERS_PATH = './court_with_courtTime_prop.json'
+DIR_PATH = sys.path[0]
+COURT_PARAMETERS_PATH = '{}/court_with_courtTime_prop.json'.format(sys.path[0])
 
 
 class BaseCourtTimeTestCase(BaseCourtTestCase):

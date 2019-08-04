@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 import falcon
 
@@ -7,8 +8,9 @@ from gyma.vdv.Tests.Court.BaseCourtTestCase import BaseCourtTestCase
 from gyma.vdv.Entities.EntityCourt import EntityCourt
 
 
-OLD_COURT_PARAMETERS_PATH = './court.json'
-NEW_COURT_PARAMETERS_PATH = './court1.json'
+DIR_PATH = sys.path[0]
+OLD_COURT_PARAMETERS_PATH = '{}/court.json'.format(DIR_PATH)
+NEW_COURT_PARAMETERS_PATH = '{}/court1.json'.format(DIR_PATH)
 
 
 class UpdateCourtTests(BaseCourtTestCase):

@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 import falcon
 
@@ -7,7 +8,8 @@ from gyma.vdv.Tests.Court.BaseCourtTimeTestCase import BaseCourtTimeTestCase
 from gyma.vdv.Entities.EntityCourt import EntityCourt
 
 
-COURT_PARAMETERS_PATH = './court_with_courtTime_prop.json'
+DIR_PATH = sys.path[0]
+COURT_PARAMETERS_PATH = '{}/court_with_courtTime_prop.json'.format(DIR_PATH)
 
 
 class UpdateCourtTimesOnDateTests(BaseCourtTimeTestCase):
