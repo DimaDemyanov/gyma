@@ -6,21 +6,24 @@ from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
 from gyma.vdv.Tests.Base.test_helpers import TEST_ACCOUNT
 
 
-class GetMyUserTests(BaseTestCase):
+class GetUserByPhoneTests(BaseTestCase):
 
     # setUp & tearDown
 
-    def setUp(self):
-        operation_id = 'getUserByPhone'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.request_uri_path = self.get_request_uri_path(operation_id)
+    @classmethod
+    def setUpClass(cls):
+        super(GetUserByPhoneTests, cls).setUpClass()
 
-        self.valid_request_params = {
+        operation_id = 'getUserByPhone'
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.request_uri_path = cls.get_request_uri_path(operation_id)
+
+        cls.valid_request_params = {
             "params": {
                 "phone": TEST_ACCOUNT['phone']
             }
         }
-        self.non_existing_phone_request_params = {
+        cls.non_existing_phone_request_params = {
             "params": {
                 "phone": "0"
             }
