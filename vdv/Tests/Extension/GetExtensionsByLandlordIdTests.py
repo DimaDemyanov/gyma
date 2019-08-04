@@ -15,9 +15,6 @@ from gyma.vdv.Entities.EntityExtension import EntityExtension
 from gyma.vdv.db import DBConnection
 
 
-TEST_PARAMETERS_PATH = './extension.json'
-
-
 class GetExtensionsByLandlordId(BaseExtensionTestCase):
 
     # setUp & tearDown

@@ -4,14 +4,14 @@ from json.decoder import JSONDecodeError
 import falcon
 
 from gyma.vdv.Tests.Extension.BaseExtensionTestCase import (
-    BaseExtensionTestCase, EXTENSION_PARAMETERS_PATH
+    BaseExtensionTestCase, EXTENSION_PARAMETERS_PATH, DIR_PATH
 )
 
 from gyma.vdv.Entities.EntityExtension import EntityExtension
 from gyma.vdv.Entities.EntityTariff import EntityTariff
 
 
-TARIFF_PARAMETERS_PATH = './tariff1.json'
+TARIFF_PARAMETERS_PATH = '{}/tariff1.json'.format(DIR_PATH)
 
 
 class UpdateExtensionTests(BaseExtensionTestCase):

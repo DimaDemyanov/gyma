@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import sys
 
 from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
 from gyma.vdv.Tests.Base.test_helpers import load_from_json_file, TEST_ACCOUNT
@@ -11,10 +12,12 @@ from gyma.vdv.Entities.EntityTariff import EntityTariff
 from gyma.vdv.db import DBConnection
 
 
-EXTENSION_PARAMETERS_PATH = './extension.json'
-LANDLORD_PARAMETERS_PATH = './landlord.json'
-COURT_PARAMETERS_PATH = './court.json'
-TARIFF_PARAMETERS_PATH = './tariff.json'
+DIR_PATH = sys.path[0]
+
+EXTENSION_PARAMETERS_PATH = '{}/extension.json'.format(DIR_PATH)
+LANDLORD_PARAMETERS_PATH = '{}/landlord.json'.format(DIR_PATH)
+COURT_PARAMETERS_PATH = '{}/court.json'.format(DIR_PATH)
+TARIFF_PARAMETERS_PATH = '{}/tariff.json'.format(DIR_PATH)
 
 
 class BaseExtensionTestCase(BaseTestCase):
