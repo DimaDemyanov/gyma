@@ -57,7 +57,7 @@ class CreateSportTests(BaseSportTestCase):
 
     def test_create_sport_when_same_sport_already_exists(self):
         # When
-        for i in range(2):
+        for _ in range(2):
             resp = self.client.simulate_post(
                 self.request_uri_path, **self.valid_request_params
             )
