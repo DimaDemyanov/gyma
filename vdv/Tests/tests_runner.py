@@ -1,4 +1,4 @@
-from unittest import TestLoader, TextTestRunner
+import unittest
 
 
 TEST_DIRS = [
@@ -16,10 +16,10 @@ TEST_FILE_PATTERN = '*Tests.py'
 
 
 def run_tests(test_dirs=TEST_DIRS, pattern=TEST_FILE_PATTERN):
-    loader = TestLoader()
     for test_dir in test_dirs:
+        loader = unittest.TestLoader()
         suite = loader.discover(start_dir=test_dir, pattern=pattern)
-        runner = TextTestRunner()
+        runner = unittest.TextTestRunner()
         runner.run(suite)
 
 
