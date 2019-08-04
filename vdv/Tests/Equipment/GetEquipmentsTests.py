@@ -1,5 +1,6 @@
 import unittest
 from collections import OrderedDict
+import sys
 
 import falcon
 
@@ -11,7 +12,7 @@ from gyma.vdv.Entities.EntityEquipment import EntityEquipment
 from gyma.vdv.db import DBConnection
 
 
-TEST_PARAMETERS_PATH = './equipment.json'
+TEST_PARAMETERS_PATH = '{dir_path}/equipment.json'.format(dir_path=sys.path[0])
 
 
 class GetEquipmentsTests(BaseEquipmentTestCase):
