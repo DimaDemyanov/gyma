@@ -1,4 +1,6 @@
 import unittest
+import sys
+from collections import OrderedDict
 
 import falcon
 
@@ -8,7 +10,7 @@ from gyma.vdv.Tests.Base.test_helpers import load_from_json_file
 from gyma.vdv.Entities.EntityLocation import EntityLocation
 
 
-TEST_PARAMETERS_PATH = './location.json'
+TEST_PARAMETERS_PATH = '{dir_path}/location.json'.format(dir_path=sys.path[0])
 
 
 class GetAllLocationsTests(BaseTestCase):
@@ -31,7 +33,7 @@ class GetAllLocationsTests(BaseTestCase):
         ).add()
 
     def tearDown(self):
-        if self._is_location_in_db(self.created_location_id):
+        if self._is_location_in_db():
             EntityLocation.delete(self.created_location_id)
 
     # MARK: - Tests
@@ -39,15 +41,18 @@ class GetAllLocationsTests(BaseTestCase):
     def test_get_all_users_return_only_created_location(self):
         # When
         resp = self.client.simulate_get(self.request_uri_path)
-        expected_result = [self._get_created_location()]
+        expected_location = self._get_created_location()
 
         # Then
         self.assertEqual(resp.status, falcon.HTTP_200)
-        self.assertEqual(resp.json, expected_result)
+        self.check_dict1_in_dict2(
+            expected_location, OrderedDict(resp.json[0])
+        )
+        # self.assertEqual(resp.json, expected_result)
 
     # MARK: - Private methods
 
-    def _is_location_in_db(self, created_landlord_id):
+    def _is_location_in_db(self):
         created_locations = self._get_created_locations()
         return len(created_locations) == 1
 
