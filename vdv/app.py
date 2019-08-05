@@ -1685,60 +1685,55 @@ def getLocationsWithFilter(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
+    params = json.loads(req.stream.read().decode('utf-8'))
     PROPNAME_MAPPING = EntityProp.map_name_id()
-    if 'sportid' in req.params:
-        sportid = req.params['sportid']
-    else:
-        sportid = None
-    if 'timeBegin' in req.params and 'timeEnd' in req.params:
-        timeBegin = req.params['timeBegin']
-        timeEnd = req.params['timeEnd']
-    else:
-        timeBegin = None
-        timeEnd = None
-    if 'date' in req.params:
-        date = req.params['date']
-    else:
-        date = None
-    if 'minPrice' in req.params:
-        minPrice = req.params['minPrice']
-    else:
+
+    date = params.get('date')
+    startTime = params.get('startTime')
+    endTime = params.get('endTime')
+    sportIds = params.get('sports')
+    equipmentIds = params.get('equipments')
+
+    minPrice = params.get('minPrice')
+    if not minPrice:
         minPrice = -2
-    if 'maxPrice' in req.params:
-        maxPrice = req.params['maxPrice']
-    else:
+
+    maxPrice = params.get('maxPrice')
+    if not maxPrice:
         maxPrice = 6000
-    if 'equipmentid' in req.params:
-        equipmentid = req.params['equipmentid']
-    else:
-        equipmentid = None
 
     courts = EntityCourt.get().filter_by(ispublished=True)
+    courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
-    if sportid:
-        courts = courts.filter(EntityCourt.vdvid.in_(PropSport.get_objects(sportid, PROPNAME_MAPPING['sport'])))
-    if equipmentid:
-        courts = courts.filter(
-            EntityCourt.vdvid.in_(PropEquipment.get_objects(equipmentid, PROPNAME_MAPPING['equipment'])))
+    if sportIds:
+       courts = courts.filter(EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+    if equipmentIds:
+        courts = courts.filter(EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
     if date:
-        free = [x.vdvid for x in EntityTime.get().filter(cast(EntityTime.time, Date) == date).distinct()]
+        free = [x.vdvid for x in EntityTime.get().filter(
+            cast(EntityTime.time, Date) == date).distinct()]
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
         courts = courts.filter(EntityCourt.vdvid.in_(courts_times))
-    if timeBegin and timeEnd and date:
+    if startTime and endTime and date:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
-        timeBegin = datetime.datetime.strptime(date + ' ' + timeBegin + ':00', time_format)
-        timeEnd = datetime.datetime.strptime(date + ' ' + timeEnd + ':00', time_format)
-        t = timeBegin
-        while t < timeEnd:
+        startTime = datetime.datetime.strptime(
+            '{date} {startTime}'.format(date=date, startTime=startTime),
+            time_format
+        )
+        endTime = datetime.datetime.strptime(
+            '{date} {endTime}'.format(date=date, endTime=endTime),
+            time_format
+        )
+        t = startTime
+        while t < endTime:
             times.append(t.strftime(time_format))
             t = t + datetime.timedelta(minutes=30)
         timesid = [_.vdvid for _ in EntityTime.get().filter(EntityTime.time.in_(times)).all()]
         courts = courts.filter(all(
             elem in PropCourtTime.get_object_property(EntityCourt.vdvid, PROPNAME_MAPPING['courtTime']) for elem in
             timesid))
-    courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
     locationsid = []
 
@@ -1756,12 +1751,15 @@ def getLocationsWithFilter(**request_handler_args):
 def getCourtsInArea(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
+
+    params = json.loads(req.stream.read().decode('utf-8'))
     PROPNAME_MAPPING = EntityProp.map_name_id()
+
     ## Getting locations in area
 
-    x = req.params['x']
-    y = req.params['y']
-    radius = req.params['radius']
+    x = params['x']
+    y = params['y']
+    radius = params['radius']
 
     objects = EntityLocation.get().filter(distanceMath(EntityLocation.latitude, EntityLocation.longitude,
                                                        float(x), float(y), func) < (
@@ -1773,62 +1771,54 @@ def getCourtsInArea(**request_handler_args):
 
     ## Getting courts with filters
 
-    if 'sportid' in req.params:
-        sportid = req.params['sportid']
-        sportid = sportid.split(',')
-    else:
-        sportid = None
-    if 'timeBegin' in req.params and 'timeEnd' in req.params:
-        timeBegin = req.params['timeBegin']
-        timeEnd = req.params['timeEnd']
-    else:
-        timeBegin = None
-        timeEnd = None
-    if 'date' in req.params:
-        date = req.params['date']
-    else:
-        date = None
-    if 'minPrice' in req.params:
-        minPrice = req.params['minPrice']
-    else:
+    date = params.get('date')
+    startTime = params.get('startTime')
+    endTime = params.get('endTime')
+    sportIds = params.get('sports')
+    equipmentIds = params.get('equipments')
+
+    minPrice = params.get('minPrice')
+    if not minPrice:
         minPrice = -2
-    if 'maxPrice' in req.params:
-        maxPrice = req.params['maxPrice']
-    else:
+
+    maxPrice = params.get('maxPrice')
+    if not maxPrice:
         maxPrice = 6000
-    if 'equipmentid' in req.params:
-        equipmentid = req.params['equipmentid']
-    else:
-        equipmentid = None
 
     # GET ONLY PUBLISHED
 
-    courts = EntityCourt.get()  # .filter_by(ispublished=True)
+    courts = EntityCourt.get() # .filter_by(ispublished=True)
+    courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
-    if sportid:
+    if sportIds:
         courts = courts.filter(
-            EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportid, PROPNAME_MAPPING['sport'])))
-    if equipmentid:
+            EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+    if equipmentIds:
         courts = courts.filter(
-            EntityCourt.vdvid.in_(PropEquipment.get_objects(equipmentid, PROPNAME_MAPPING['equipment'])))
+            EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
     if date:
         free = [x.vdvid for x in EntityTime.get().filter(cast(EntityTime.time, Date) == date).distinct()]
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
         courts = courts.filter(EntityCourt.vdvid.in_(courts_times))
-    if timeBegin and timeEnd and date:
+    if startTime and endTime and date:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
-        timeBegin = datetime.datetime.strptime(date + ' ' + timeBegin + ':00', time_format)
-        timeEnd = datetime.datetime.strptime(date + ' ' + timeEnd + ':00', time_format)
-        t = timeBegin
-        while t < timeEnd:
+        startTime = datetime.datetime.strptime(
+            '{date} {startTime}'.format(date=date, startTime=startTime),
+            time_format
+        )
+        endTime = datetime.datetime.strptime(
+            '{date} {endTime}'.format(date=date, endTime=endTime),
+            time_format
+        )
+        t = startTime
+        while t < endTime:
             times.append(t.strftime(time_format))
             t = t + datetime.timedelta(minutes=30)
         timesid = [_.vdvid for _ in EntityTime.get().filter(EntityTime.time.in_(times)).all()]
         courts = courts.filter(
             EntityCourt.vdvid.in_(PropCourtTime.get_objects_multiple_value(timesid, PROPNAME_MAPPING['courtTime'])))
-    courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
     courts = courts.filter(EntityCourt.vdvid.in_(locations_id))
 
@@ -1842,9 +1832,9 @@ def getCourtsInArea(**request_handler_args):
         resp.status = falcon.HTTP_407
         return
 
-    filter = req.params['filter1']  # post_data['filter']
+    filter = params['filter1']  # post_data['filter']
 
-    sort_order = req.params['sortedby']
+    sort_order = params['sortedby']
 
     with DBConnection() as session:
         if sort_order == 'popularity':
@@ -1863,7 +1853,7 @@ def getCourtsInArea(**request_handler_args):
     if filter == 'notmy':
         objects = objects.filter(EntityCourt.ownerid != my_landlordid)
 
-    filter = req.params['filter2']  # post_data['filter']
+    filter = params['filter2']  # post_data['filter']
 
     if filter == 'drafts':
         objects = objects.filter(EntityCourt.isdraft == True)

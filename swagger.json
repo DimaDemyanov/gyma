@@ -2194,69 +2194,28 @@
       }
     },
     "/location/filter": {
-      "get": {
+      "post": {
         "tags": [
           "location"
         ],
         "summary": "Get all published locations with applied filter(ready)",
         "description": "Returns a list of locations descriptions",
         "operationId": "getLocationsWithFilter",
+        "consumes": [
+          "application/json"
+        ],
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "sportid",
-            "in": "query",
-            "description": "Sport id",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "date",
-            "in": "query",
-            "description": "date",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "timeBegin",
-            "in": "query",
-            "description": "Start period time",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "timeEnd",
-            "in": "query",
-            "description": "End period time",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "minPrice",
-            "in": "query",
-            "description": "Min price",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "maxPrice",
-            "in": "query",
-            "description": "Max price",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "equipmentid",
-            "in": "query",
-            "description": "Equipment id",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
+            "name": "locationFilters",
+            "in": "body",
+            "description": "Location filters encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LocationFilters"
+            }
           }
         ],
         "responses": {
@@ -2351,132 +2310,28 @@
       }
     },
     "/inarea/courts": {
-      "get": {
+      "post": {
         "tags": [
           "court"
         ],
-        "summary": "Get courts in area(ready, but POPOULARITY DOESN'T work)",
+        "summary": "Get courts in area(ready)",
         "description": "Returns a list of courts descriptions",
         "operationId": "getCourtsInArea",
+        "consumes": [
+          "application/json"
+        ],
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "radius",
-            "in": "query",
-            "description": "area radius",
+            "name": "inAreaCourtsParams",
+            "in": "body",
+            "description": "In area courts params encoded in JSON string",
             "required": true,
-            "type": "number",
-            "format": "float",
-            "default": 30
-          },
-          {
-            "name": "x",
-            "in": "query",
-            "description": "center x",
-            "required": true,
-            "type": "number",
-            "format": "float",
-            "default": 59.95
-          },
-          {
-            "name": "y",
-            "in": "query",
-            "description": "center y",
-            "required": true,
-            "type": "number",
-            "format": "float",
-            "default": 30.34
-          },
-          {
-            "name": "filter1",
-            "in": "query",
-            "description": "filter by owner",
-            "required": true,
-            "type": "string",
-            "enum": [
-              "all",
-              "my",
-              "notmy"
-            ]
-          },
-          {
-            "name": "filter2",
-            "in": "query",
-            "description": "filter",
-            "required": true,
-            "type": "string",
-            "enum": [
-              "all",
-              "published",
-              "notpublished",
-              "drafts"
-            ]
-          },
-          {
-            "name": "sortedby",
-            "in": "query",
-            "description": "sorting type",
-            "required": true,
-            "type": "string",
-            "enum": [
-              "price",
-              "popularity",
-              "any"
-            ]
-          },
-          {
-            "name": "sportid",
-            "in": "query",
-            "description": "Sports id with ',' as separator",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "date",
-            "in": "query",
-            "description": "date",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "timeBegin",
-            "in": "query",
-            "description": "Start period time",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "timeEnd",
-            "in": "query",
-            "description": "End period time",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "minPrice",
-            "in": "query",
-            "description": "Min price",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "maxPrice",
-            "in": "query",
-            "description": "Max price",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "equipmentid",
-            "in": "query",
-            "description": "Equipment id",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
+            "schema": {
+              "$ref": "#/definitions/CourtsInArea"
+            }
           }
         ],
         "responses": {
@@ -3609,6 +3464,86 @@
         }
       }
     },
+    "CourtsInArea": {
+      "type": "object",
+      "required": [
+        "radius",
+        "x",
+        "y",
+        "filter1",
+        "filter2",
+        "sortedby"
+      ],
+      "properties": {
+        "radius": {
+          "description": "area radius",
+          "type": "number",
+          "format": "float",
+          "example": 30
+        },
+        "x": {
+          "description": "center x",
+          "type": "number",
+          "format": "float",
+          "example": 59.95
+        },
+        "y": {
+          "description": "center y",
+          "type": "number",
+          "format": "float",
+          "example": 30.34
+        },
+        "filter1": {
+          "type": "string",
+          "example": "all/my/notmy"
+        },
+        "filter2": {
+          "type": "string",
+          "example": "all/published/notpublished/drafts"
+        },
+        "sortedby": {
+          "type": "string",
+          "example": "price/popularity/any"
+        },
+        "date": {
+          "type": "string",
+          "example": "2018-03-28"
+        },
+        "startTime": {
+          "type": "string",
+          "example": "20:24:00+0000"
+        },
+        "endTime": {
+          "type": "string",
+          "example": "22:24:00+0000"
+        },
+        "minPrice": {
+          "type": "number",
+          "format": "int64"
+        },
+        "maxPrice": {
+          "type": "number",
+          "format": "int64",
+          "example": "1000"
+        },
+        "sports": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "example": ["sportId"]
+        },
+        "equipments": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "example": ["equipmentId"]
+        }
+      }
+    },
     "Time": {
       "type": "object",
       "required": [
@@ -3751,6 +3686,46 @@
         "maxCost": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "LocationFilters": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "date": {
+          "type": "string",
+          "example": "2018-03-28"
+        },
+        "startTime": {
+          "type": "string",
+          "example": "20:24:00+0000"
+        },
+        "endTime": {
+          "type": "string",
+          "example": "22:24:00+0000"
+        },
+        "minPrice": {
+          "type": "number",
+          "format": "int64"
+        },
+        "maxPrice": {
+          "type": "number",
+          "format": "int64"
+        },
+        "sports": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "equipments": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
         }
       }
     },
