@@ -2194,69 +2194,28 @@
       }
     },
     "/location/filter": {
-      "get": {
+      "post": {
         "tags": [
           "location"
         ],
         "summary": "Get all published locations with applied filter(ready)",
         "description": "Returns a list of locations descriptions",
         "operationId": "getLocationsWithFilter",
+        "consumes": [
+          "application/json"
+        ],
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "sportid",
-            "in": "query",
-            "description": "Sport id",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "date",
-            "in": "query",
-            "description": "date",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "timeBegin",
-            "in": "query",
-            "description": "Start period time",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "timeEnd",
-            "in": "query",
-            "description": "End period time",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "minPrice",
-            "in": "query",
-            "description": "Min price",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "maxPrice",
-            "in": "query",
-            "description": "Max price",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "equipmentid",
-            "in": "query",
-            "description": "Equipment id",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
+            "name": "locationFilters",
+            "in": "body",
+            "description": "Location filters encoded in JSON string",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LocationFilters"
+            }
           }
         ],
         "responses": {
@@ -2431,7 +2390,8 @@
             "in": "query",
             "description": "Sports id with ',' as separator",
             "required": false,
-            "type": "string"
+            "type": "integer",
+            "format": "int64"
           },
           {
             "name": "date",
@@ -3751,6 +3711,46 @@
         "maxCost": {
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "LocationFilters": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "date": {
+          "type": "string",
+          "example": "2018-03-28"
+        },
+        "startTime": {
+          "type": "string",
+          "example": "20:24:00+0000"
+        },
+        "endTime": {
+          "type": "string",
+          "example": "22:24:00+0000"
+        },
+        "minPrice": {
+          "type": "number",
+          "format": "int64"
+        },
+        "maxPrice": {
+          "type": "number",
+          "format": "int64"
+        },
+        "sports": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "equipments": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
         }
       }
     },
