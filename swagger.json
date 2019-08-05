@@ -3725,6 +3725,10 @@
         "name": {
           "type": "string",
           "example": "Footboll"
+        },
+        "iconid": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
