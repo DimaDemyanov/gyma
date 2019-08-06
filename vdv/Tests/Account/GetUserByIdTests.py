@@ -8,21 +8,24 @@ from gyma.vdv.Tests.Base.test_helpers import (
 )
 
 
-class GetMyUserTests(BaseTestCase):
+class GetUserByIdTests(BaseTestCase):
 
     # setUp & tearDown
 
-    def setUp(self):
-        operation_id = 'getUser'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.base_request_uri_path = self.get_request_uri_path(operation_id)
+    @classmethod
+    def setUpClass(cls):
+        super(GetUserByIdTests, cls).setUpClass()
 
-        self.valid_request_params = {
+        operation_id = 'getUser'
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.base_request_uri_path = cls.get_request_uri_path(operation_id)
+
+        cls.valid_request_params = {
             "params": {
                 "userId": TEST_ACCOUNT['vdvid']
             }
         }
-        self.non_existing_user_id_request_params = {
+        cls.non_existing_user_id_request_params = {
             "params": {
                 "userId": "0"
             }

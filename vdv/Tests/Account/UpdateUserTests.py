@@ -18,12 +18,17 @@ class UpdateUserTests(BaseTestCase):
 
     # setUp & tearDown
 
-    def setUp(self):
-        operation_id = 'updateUser'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.request_uri_path = self.get_request_uri_path(operation_id)
+    @classmethod
+    def setUpClass(cls):
+        super(UpdateUserTests, cls).setUpClass()
 
-        self.old_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
+        operation_id = 'updateUser'
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.request_uri_path = cls.get_request_uri_path(operation_id)
+
+        cls.old_account_params = load_from_json_file(TEST_PARAMETERS_PATH)
+
+    def setUp(self):
         self.created_account_id = EntityAccount.add_from_json(
             self.old_account_params
         )
