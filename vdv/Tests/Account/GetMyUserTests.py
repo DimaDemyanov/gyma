@@ -10,10 +10,13 @@ class GetMyUserTests(BaseTestCase):
 
     # setUp & tearDown
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        super(GetMyUserTests, cls).setUpClass()
+
         operation_id = 'getMyUser'
-        self.check_operation_id_has_operation_handler(operation_id)
-        self.request_uri_path = self.get_request_uri_path(operation_id)
+        cls.check_operation_id_has_operation_handler(operation_id)
+        cls.request_uri_path = cls.get_request_uri_path(operation_id)
 
     # Tests
 

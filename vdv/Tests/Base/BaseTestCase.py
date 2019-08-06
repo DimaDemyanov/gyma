@@ -35,25 +35,39 @@ class BaseTestCase(testing.TestCase):
     def tearDownClass(cls):
         cls._remove_swagger_temp()
 
-    # MARK: - Public methods
+    # MARK: - Public class methods
 
-    def check_operation_id_has_operation_handler(self, operation_id):
+    @classmethod
+    def check_operation_id_has_operation_handler(cls, operation_id):
         if operation_id not in operation_handlers:
-            self.fail("operationId '%s' doesn't match operation handler" % operation_id)
+            cls.fail(
+                "operationId '%s' doesn't match operation handler" %
+                operation_id
+            )
 
-    def get_request_uri_path(self, operation_id):
-        request_uri_path = test_helpers.get_uri_path_by_opearation_id(operation_id)
+    @classmethod
+    def get_request_uri_path(cls, operation_id):
+        request_uri_path = test_helpers.get_uri_path_by_opearation_id(
+            operation_id
+        )
         if not request_uri_path:
-            self.fail("Can't get uri path for given operationId: %s" % operation_id)
+            cls.fail(
+                "Can't get uri path for given operationId: %s" % operation_id
+            )
         return request_uri_path
 
-    def check_dict1_in_dict2(self, dict1, dict2):
-        for dict1_param, dict1_value in dict1.items():
-            dict2_value = dict2[dict1_param]
-            self.assertEqual(dict2_value, dict1_value)
+    # MARK: - Public methods
 
-    def create_request_uri_path_with_param(self, base_path, param):
-        return "{base_path}{param}".format(base_path=base_path, param=param)
+    def check_dict1_in_dict2(self, dict1, dict2):
+        test_helpers.convert_dict_bool_str_values_to_bool(dict1)
+        test_helpers.convert_dict_bool_str_values_to_bool(dict2)
+
+        for dict1_key, dict1_value in dict1.items():
+            dict2_value = dict2[dict1_key]
+            if type(dict1_value) is dict:
+                self.check_dict1_in_dict2(dict2_value, dict1_value)
+            else:
+                self.assertEqual(dict2_value, dict1_value)
 
     # MARK: - Private methods
 
