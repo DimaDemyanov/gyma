@@ -145,7 +145,7 @@ def httpDefault(**request_handler_args):
 
     path = req.path
     src_path = path
-    path = path.replace(baseURL, '.')
+    path = path.replace(baseURL, './')
 
     if os.path.isdir(path):
         for index in "index.html", "index.htm", "test-search.html":
@@ -157,8 +157,8 @@ def httpDefault(**request_handler_args):
         else:
             return None
 
-    if path.endswith('swagger.json'):
-        path = path.replace('swagger.json', 'swagger_temp.json')
+    # if path.endswith('swagger.json'):
+    #     path = path.replace('swagger.json', 'swagger_temp.json')
 
     ctype = guess_response_type(path)
 
@@ -311,6 +311,7 @@ def getAllCourtRequestsByDate(**request_handler_args):
     resp.body = obj_to_json([o.to_dict() for o in res])
     resp.status = falcon.HTTP_200
 
+
 def getAllCourtRequest(**request_handler_args):
     PROPNAME_MAPPING = EntityProp.map_name_id()
 
@@ -323,8 +324,8 @@ def getAllCourtRequest(**request_handler_args):
     # extensions = EntityExtension.get().filter(EntityExtension.isconfirmed == False or (cast(EntityExtension.confirmed_time, DateTime) > get_curr_date() - timedelta(hours=24))).all()
 
     with DBConnection() as session:
-        res = session.db.query(EntityRequest)\
-            .join(EntityCourt, EntityRequest.courtid == EntityCourt.vdvid)\
+        res = session.db.query(EntityRequest) \
+            .join(EntityCourt, EntityRequest.courtid == EntityCourt.vdvid) \
             .filter(cast(EntityTime.time, DateTime) > get_curr_date() - timedelta(hours=24))
     resp.body = obj_to_json([o[0].to_dict() for o in res])
     resp.status = falcon.HTTP_200
@@ -346,9 +347,11 @@ def getAllLandlordRequests(**request_handler_args):
     res = []
     if date:
         with DBConnection() as session:
-            res = [s[0] for s in session.db.query(EntityRequest, PropRequestTime, EntityTime).filter(cast(EntityTime.time, Date) == date).filter(
+            res = [s[0] for s in session.db.query(EntityRequest, PropRequestTime, EntityTime).filter(
+                cast(EntityTime.time, Date) == date).filter(
                 EntityRequest.courtid.in_(courts)).filter(
-                PropRequestTime.value == EntityTime.vdvid).filter(EntityRequest.vdvid == PropRequestTime.vdvid).distinct(EntityRequest.vdvid)]
+                PropRequestTime.value == EntityTime.vdvid).filter(
+                EntityRequest.vdvid == PropRequestTime.vdvid).distinct(EntityRequest.vdvid)]
     else:
         with DBConnection() as session:
             res = [s[0] for s in session.db.query(EntityRequest, PropRequestTime, EntityTime).filter(
@@ -626,8 +629,8 @@ def getAllCourts(**request_handler_args):
 
     with DBConnection() as session:
         if sort_order == 'popularity':
-            objects = session.db.query(EntityCourt, func.count(EntityRequest.vdvid).label('total'))\
-                .outerjoin(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
+            objects = session.db.query(EntityCourt, func.count(EntityRequest.vdvid).label('total')) \
+                .outerjoin(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid) \
                 .group_by(EntityCourt.vdvid, EntityRequest.vdvid)
         else:
             objects = session.db.query(EntityCourt)
@@ -907,7 +910,7 @@ def confirmCourtById(**request_handler_args):
         if id:
             objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-            #resp.body = obj_to_json(objects[0].to_dict())
+            # resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -931,7 +934,7 @@ def declineCourtById(**request_handler_args):
         if id:
             objects = EntityCourt.get().filter_by(vdvid=id).all()
 
-            #resp.body = obj_to_json(objects[0].to_dict())
+            # resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
     except ValueError:
@@ -966,7 +969,8 @@ def getTimesForDate(**request_handler_args):
 
     with DBConnection() as session:
         # get requests for current user to this court
-        requestsid = [x.vdvid for x in EntityRequest.get().filter_by(accountid=int(req.context['accountid']), iscanceled=False).filter_by(
+        requestsid = [x.vdvid for x in EntityRequest.get().filter_by(accountid=int(req.context['accountid']),
+                                                                     iscanceled=False).filter_by(
             courtid=courtid).all()]
         # get court times
         court_times_id = [x.vdvid for x in court_times.all()]
@@ -1007,6 +1011,7 @@ def createCourtTimesOnDate(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
 
+    # params = req.params['times']
     params = json.loads(req.stream.read().decode('utf-8'))
 
     try:
@@ -1323,13 +1328,13 @@ def getMyUser(**request_handler_args):
     phone = req.context['phone']
     id = EntityAccount.get_id_from_phone(phone)
 
-
     objects = EntityAccount.get().filter_by(vdvid=id).all()
 
     res = app_helpers.get_user_wide_info(objects)
 
     resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
+
 
 def getUserByLandlord(**request_handler_args):
     req = request_handler_args['req']
@@ -1338,7 +1343,7 @@ def getUserByLandlord(**request_handler_args):
     phone = req.context['phone']
     landlordid = getIntPathParam("landlordId", **request_handler_args)
 
-    objects = EntityLandlord.get().filter_by(vdvid = landlordid).all()
+    objects = EntityLandlord.get().filter_by(vdvid=landlordid).all()
 
     if len(objects) == 0:
         resp.status = falcon.HTTP_404
@@ -1360,6 +1365,7 @@ def getUserByLandlord(**request_handler_args):
 
     resp.body = obj_to_json(res[0])
     resp.status = falcon.HTTP_200
+
 
 def deleteUser(**request_handler_args):
     resp = request_handler_args['resp']
@@ -1700,60 +1706,55 @@ def getLocationsWithFilter(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
+    params = json.loads(req.stream.read().decode('utf-8'))
     PROPNAME_MAPPING = EntityProp.map_name_id()
-    if 'sportid' in req.params:
-        sportid = req.params['sportid']
-    else:
-        sportid = None
-    if 'timeBegin' in req.params and 'timeEnd' in req.params:
-        timeBegin = req.params['timeBegin']
-        timeEnd = req.params['timeEnd']
-    else:
-        timeBegin = None
-        timeEnd = None
-    if 'date' in req.params:
-        date = req.params['date']
-    else:
-        date = None
-    if 'minPrice' in req.params:
-        minPrice = req.params['minPrice']
-    else:
+
+    date = params.get('date')
+    startTime = params.get('startTime')
+    endTime = params.get('endTime')
+    sportIds = params.get('sports')
+    equipmentIds = params.get('equipments')
+
+    minPrice = params.get('minPrice')
+    if not minPrice:
         minPrice = -2
-    if 'maxPrice' in req.params:
-        maxPrice = req.params['maxPrice']
-    else:
+
+    maxPrice = params.get('maxPrice')
+    if not maxPrice:
         maxPrice = 6000
-    if 'equipmentid' in req.params:
-        equipmentid = req.params['equipmentid']
-    else:
-        equipmentid = None
 
     courts = EntityCourt.get().filter_by(ispublished=True)
+    courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
-    if sportid:
-        courts = courts.filter(EntityCourt.vdvid.in_(PropSport.get_objects(sportid, PROPNAME_MAPPING['sport'])))
-    if equipmentid:
-        courts = courts.filter(
-            EntityCourt.vdvid.in_(PropEquipment.get_objects(equipmentid, PROPNAME_MAPPING['equipment'])))
+    if sportIds:
+       courts = courts.filter(EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+    if equipmentIds:
+        courts = courts.filter(EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
     if date:
-        free = [x.vdvid for x in EntityTime.get().filter(cast(EntityTime.time, Date) == date).distinct()]
+        free = [x.vdvid for x in EntityTime.get().filter(
+            cast(EntityTime.time, Date) == date).distinct()]
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
         courts = courts.filter(EntityCourt.vdvid.in_(courts_times))
-    if timeBegin and timeEnd and date:
+    if startTime and endTime and date:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
-        timeBegin = datetime.datetime.strptime(date + ' ' + timeBegin + ':00', time_format)
-        timeEnd = datetime.datetime.strptime(date + ' ' + timeEnd + ':00', time_format)
-        t = timeBegin
-        while t < timeEnd:
+        startTime = datetime.datetime.strptime(
+            '{date} {startTime}'.format(date=date, startTime=startTime),
+            time_format
+        )
+        endTime = datetime.datetime.strptime(
+            '{date} {endTime}'.format(date=date, endTime=endTime),
+            time_format
+        )
+        t = startTime
+        while t < endTime:
             times.append(t.strftime(time_format))
             t = t + datetime.timedelta(minutes=30)
         timesid = [_.vdvid for _ in EntityTime.get().filter(EntityTime.time.in_(times)).all()]
         courts = courts.filter(all(
             elem in PropCourtTime.get_object_property(EntityCourt.vdvid, PROPNAME_MAPPING['courtTime']) for elem in
             timesid))
-    courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
     locationsid = []
 
@@ -1771,15 +1772,19 @@ def getLocationsWithFilter(**request_handler_args):
 def getCourtsInArea(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
+
+    params = json.loads(req.stream.read().decode('utf-8'))
     PROPNAME_MAPPING = EntityProp.map_name_id()
+
     ## Getting locations in area
 
-    x = req.params['x']
-    y = req.params['y']
-    radius = req.params['radius']
+    x = params['x']
+    y = params['y']
+    radius = params['radius']
 
     objects = EntityLocation.get().filter(distanceMath(EntityLocation.latitude, EntityLocation.longitude,
-    float(x), float(y), func) < (float(radius))).all()  # PropLike.get_object_property(0, 0)#
+                                                       float(x), float(y), func) < (
+                                              float(radius))).all()  # PropLike.get_object_property(0, 0)#
     locations_id = []
     for o in objects:
         locations_id = locations_id + (PropLocation.get_objects(o.vdvid, PROPNAME_MAPPING['location']))
@@ -1787,61 +1792,54 @@ def getCourtsInArea(**request_handler_args):
 
     ## Getting courts with filters
 
+    date = params.get('date')
+    startTime = params.get('startTime')
+    endTime = params.get('endTime')
+    sportIds = params.get('sports')
+    equipmentIds = params.get('equipments')
 
-    if 'sportid' in req.params:
-        sportid = req.params['sportid']
-        sportid = sportid.split(',')
-    else:
-        sportid = None
-    if 'timeBegin' in req.params and 'timeEnd' in req.params:
-        timeBegin = req.params['timeBegin']
-        timeEnd = req.params['timeEnd']
-    else:
-        timeBegin = None
-        timeEnd = None
-    if 'date' in req.params:
-        date = req.params['date']
-    else:
-        date = None
-    if 'minPrice' in req.params:
-        minPrice = req.params['minPrice']
-    else:
+    minPrice = params.get('minPrice')
+    if not minPrice:
         minPrice = -2
-    if 'maxPrice' in req.params:
-        maxPrice = req.params['maxPrice']
-    else:
+
+    maxPrice = params.get('maxPrice')
+    if not maxPrice:
         maxPrice = 6000
-    if 'equipmentid' in req.params:
-        equipmentid = req.params['equipmentid']
-    else:
-        equipmentid = None
 
     # GET ONLY PUBLISHED
 
-    courts = EntityCourt.get()#.filter_by(ispublished=True)
+    courts = EntityCourt.get() # .filter_by(ispublished=True)
+    courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
-    if sportid:
-        courts = courts.filter(EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportid, PROPNAME_MAPPING['sport'])))
-    if equipmentid:
+    if sportIds:
         courts = courts.filter(
-            EntityCourt.vdvid.in_(PropEquipment.get_objects(equipmentid, PROPNAME_MAPPING['equipment'])))
+            EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+    if equipmentIds:
+        courts = courts.filter(
+            EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
     if date:
         free = [x.vdvid for x in EntityTime.get().filter(cast(EntityTime.time, Date) == date).distinct()]
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
         courts = courts.filter(EntityCourt.vdvid.in_(courts_times))
-    if timeBegin and timeEnd and date:
+    if startTime and endTime and date:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
-        timeBegin = datetime.datetime.strptime(date + ' ' + timeBegin + ':00', time_format)
-        timeEnd = datetime.datetime.strptime(date + ' ' + timeEnd + ':00', time_format)
-        t = timeBegin
-        while t < timeEnd:
+        startTime = datetime.datetime.strptime(
+            '{date} {startTime}'.format(date=date, startTime=startTime),
+            time_format
+        )
+        endTime = datetime.datetime.strptime(
+            '{date} {endTime}'.format(date=date, endTime=endTime),
+            time_format
+        )
+        t = startTime
+        while t < endTime:
             times.append(t.strftime(time_format))
             t = t + datetime.timedelta(minutes=30)
         timesid = [_.vdvid for _ in EntityTime.get().filter(EntityTime.time.in_(times)).all()]
-        courts = courts.filter(EntityCourt.vdvid.in_(PropCourtTime.get_objects_multiple_value(timesid, PROPNAME_MAPPING['courtTime'])))
-    courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
+        courts = courts.filter(
+            EntityCourt.vdvid.in_(PropCourtTime.get_objects_multiple_value(timesid, PROPNAME_MAPPING['courtTime'])))
 
     courts = courts.filter(EntityCourt.vdvid.in_(locations_id))
 
@@ -1855,14 +1853,14 @@ def getCourtsInArea(**request_handler_args):
         resp.status = falcon.HTTP_407
         return
 
-    filter = req.params['filter1']  # post_data['filter']
+    filter = params['filter1']  # post_data['filter']
 
-    sort_order = req.params['sortedby']
+    sort_order = params['sortedby']
 
     with DBConnection() as session:
         if sort_order == 'popularity':
-            objects = session.db.query(EntityCourt, func.count(EntityRequest.vdvid).label('total'))\
-                .outerjoin(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid)\
+            objects = session.db.query(EntityCourt, func.count(EntityRequest.vdvid).label('total')) \
+                .outerjoin(EntityRequest, EntityRequest.courtid == EntityCourt.vdvid) \
                 .group_by(EntityCourt.vdvid, EntityRequest.vdvid)
         else:
             objects = courts
@@ -1876,7 +1874,7 @@ def getCourtsInArea(**request_handler_args):
     if filter == 'notmy':
         objects = objects.filter(EntityCourt.ownerid != my_landlordid)
 
-    filter = req.params['filter2']  # post_data['filter']
+    filter = params['filter2']  # post_data['filter']
 
     if filter == 'drafts':
         objects = objects.filter(EntityCourt.isdraft == True)
@@ -1903,8 +1901,6 @@ def getCourtsInArea(**request_handler_args):
         b = [EntityCourt.get_wide_object(d.vdvid) for d in a]
 
     resp.body = obj_to_json(b)
-
-
 
 
 def createTariff(**request_handler_args):  # TODO: implement it
@@ -1949,6 +1945,7 @@ def deleteTariff(**request_handler_args):  # TODO: implement it
 
     resp.status = falcon.HTTP_400
 
+
 def getAllTariffs(**request_handler_args):
     resp = request_handler_args['resp']
 
@@ -1957,6 +1954,7 @@ def getAllTariffs(**request_handler_args):
     resp.body = obj_to_json([o.to_dict() for o in objects])
 
     resp.status = falcon.HTTP_200
+
 
 def sendkey(**request_handler_args):
     req = request_handler_args['req']
@@ -1989,8 +1987,8 @@ def sendkey(**request_handler_args):
                         'vdvid': validation.vdvid,
                         'code': key,
                         'timesADay': 1 if validation.timesend.year != curr_time.year \
-                                            or validation.timesend.month != curr_time.month \
-                                            or validation.timesend.day != curr_time.day else 2,
+                                          or validation.timesend.month != curr_time.month \
+                                          or validation.timesend.day != curr_time.day else 2,
                         'timeSend': curr_time.strftime('%Y-%m-%d %H:%M')
                     }
 
@@ -2092,13 +2090,15 @@ def createHelp(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
+
 def setDoneHelp(**request_handler_args):
     resp = request_handler_args['resp']
     id = getIntPathParam('helpId', **request_handler_args)
     EntityHelp.set_done(id)
     resp.status = falcon.HTTP_200
 
-def createExtension(**request_handler_args):  # TODO: implement it
+
+def createExtention(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
@@ -2120,7 +2120,8 @@ def createExtension(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
-def updateExtension(**request_handler_args):  # TODO: implement it
+
+def updateExtention(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
@@ -2143,11 +2144,12 @@ def updateExtension(**request_handler_args):  # TODO: implement it
         return
     resp.status = falcon.HTTP_404
 
-def confirmExtension(**request_handler_args):  # TODO: implement it
+
+def confirmExtention(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
-    id = getIntPathParam('extensionid', **request_handler_args)
-    if('adminid' in req.params):
+    id = getIntPathParam('extentionid', **request_handler_args)
+    if ('adminid' in req.params):
         adminid = req.params['adminid']
     else:
         resp.status = falcon.HTTP_407
@@ -2164,10 +2166,10 @@ def getAllExtensions(**request_handler_args):
     is_one_day_passed_after_confirmation = cast(
         EntityExtension.confirmedtime, DateTime) > one_day_earlier_datetime
 
-    extensions = EntityExtension.get().filter(or_(
-            EntityExtension.isconfirmed == False,
-            is_one_day_passed_after_confirmation == True,))\
-        .order_by(EntityExtension.created).all()
+    extentions = EntityExtention.get().filter(or_(
+        EntityExtention.isconfirmed == False,
+        is_one_day_passed_after_confirmation == True, )) \
+        .order_by(EntityExtention.created).all()
 
     resp.body = obj_to_json([o.to_dict() for o in extensions])
     resp.status = falcon.HTTP_200
@@ -2189,8 +2191,8 @@ def getExtensionsByLandlordId(**request_handler_args):
         return
 
     with DBConnection() as session:
-        extensions = session.db.query(EntityExtension)\
-            .join(EntityCourt, EntityExtension.courtid == EntityCourt.vdvid)\
+        extentions = session.db.query(EntityExtention) \
+            .join(EntityCourt, EntityExtention.courtid == EntityCourt.vdvid) \
             .filter(EntityCourt.ownerid == id)
     isconfirmed = req.params['isconfirmed']
 
@@ -2324,7 +2326,6 @@ operation_handlers = {
     'getAllLocations': [getAllLocations],
     'getLocationsWithFilter': [getLocationsWithFilter],
 
-
     # Help methods
     'createHelp': [createHelp],
     'setDoneHelp': [setDoneHelp],
@@ -2343,10 +2344,8 @@ operation_handlers = {
 }
 
 
-
-
 class CORS(object):
-    def process_response(self, req, resp, resource):
+    def process_response(self, req, resp, resource, req_succeeded):
         origin = req.get_header('Origin')
         if origin:
             resp.set_header('Access-Control-Allow-Origin', origin)
@@ -2428,11 +2427,11 @@ def getConfigFromLaunchArguments():
 
 
 from . import __path__ as ROOT_PATH
+
 SWAGGER_SPEC_PATH = (ROOT_PATH[0] + "/../swagger.json")
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-
 
 cfg = getConfigFromLaunchArguments()
 
