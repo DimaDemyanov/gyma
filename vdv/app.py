@@ -12,6 +12,7 @@ import jwt
 import requests
 from sqlalchemy import and_, cast, DateTime, func, desc
 from sqlalchemy import or_
+import pytz
 import time
 from collections import OrderedDict
 from datetime import timedelta
@@ -1691,6 +1692,7 @@ def getLocationsWithFilter(**request_handler_args):
     date = params.get('date')
     startTime = params.get('startTime')
     endTime = params.get('endTime')
+    timeZoneName = params.get('timeZoneName')
     sportIds = params.get('sports')
     equipmentIds = params.get('equipments')
 
@@ -1715,15 +1717,19 @@ def getLocationsWithFilter(**request_handler_args):
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
         courts = courts.filter(EntityCourt.vdvid.in_(courts_times))
-    if startTime and endTime and date:
+    if startTime and endTime and date and timeZoneName:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
+        utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
+
         startTime = datetime.datetime.strptime(
-            '{date} {startTime}'.format(date=date, startTime=startTime),
+            '{date} {startTime}{utcOffset}'.format(
+                date=date, startTime=startTime, utcOffset=utcOffset),
             time_format
         )
         endTime = datetime.datetime.strptime(
-            '{date} {endTime}'.format(date=date, endTime=endTime),
+            '{date} {endTime}{utcOffset}'.format(
+                date=date, startTime=startTime, utcOffset=utcOffset),
             time_format
         )
         t = startTime
@@ -1774,6 +1780,7 @@ def getCourtsInArea(**request_handler_args):
     date = params.get('date')
     startTime = params.get('startTime')
     endTime = params.get('endTime')
+    timeZoneName = params.get('timeZoneName')
     sportIds = params.get('sports')
     equipmentIds = params.get('equipments')
 
@@ -1801,15 +1808,19 @@ def getCourtsInArea(**request_handler_args):
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
         courts = courts.filter(EntityCourt.vdvid.in_(courts_times))
-    if startTime and endTime and date:
+    if startTime and endTime and date and timeZoneName:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
+        utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
+
         startTime = datetime.datetime.strptime(
-            '{date} {startTime}'.format(date=date, startTime=startTime),
+            '{date} {startTime}{utcOffset}'.format(
+                date=date, startTime=startTime, utcOffset=utcOffset),
             time_format
         )
         endTime = datetime.datetime.strptime(
-            '{date} {endTime}'.format(date=date, endTime=endTime),
+            '{date} {endTime}{utcOffset}'.format(
+                date=date, endTime=endTime, utcOffset=utcOffset),
             time_format
         )
         t = startTime
