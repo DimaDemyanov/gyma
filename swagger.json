@@ -3511,11 +3511,15 @@
         },
         "startTime": {
           "type": "string",
-          "example": "20:24:00+0000"
+          "example": "20:24:00"
         },
         "endTime": {
           "type": "string",
-          "example": "22:24:00+0000"
+          "example": "22:24:00"
+        },
+        "timeZoneName": {
+          "type": "string",
+          "example": "Europe/Moscow"
         },
         "minPrice": {
           "type": "number",
@@ -3699,11 +3703,15 @@
         },
         "startTime": {
           "type": "string",
-          "example": "20:24:00+0000"
+          "example": "20:24:00"
         },
         "endTime": {
           "type": "string",
-          "example": "22:24:00+0000"
+          "example": "22:24:00"
+        },
+        "timeZoneName": {
+          "type": "string",
+          "example": "Europe/Moscow"
         },
         "minPrice": {
           "type": "number",
