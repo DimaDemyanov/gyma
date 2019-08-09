@@ -2109,7 +2109,7 @@ def setDoneHelp(**request_handler_args):
     resp.status = falcon.HTTP_200
 
 
-def createExtention(**request_handler_args):  # TODO: implement it
+def createExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
@@ -2132,7 +2132,7 @@ def createExtention(**request_handler_args):  # TODO: implement it
     resp.status = falcon.HTTP_200
 
 
-def updateExtention(**request_handler_args):  # TODO: implement it
+def updateExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
@@ -2156,10 +2156,10 @@ def updateExtention(**request_handler_args):  # TODO: implement it
     resp.status = falcon.HTTP_404
 
 
-def confirmExtention(**request_handler_args):  # TODO: implement it
+def confirmExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
-    id = getIntPathParam('extentionid', **request_handler_args)
+    id = getIntPathParam('extensionid', **request_handler_args)
     if ('adminid' in req.params):
         adminid = req.params['adminid']
     else:
@@ -2177,10 +2177,10 @@ def getAllExtensions(**request_handler_args):
     is_one_day_passed_after_confirmation = cast(
         EntityExtension.confirmedtime, DateTime) > one_day_earlier_datetime
 
-    extentions = EntityExtention.get().filter(or_(
-        EntityExtention.isconfirmed == False,
+    extensions = EntityExtension.get().filter(or_(
+        EntityExtension.isconfirmed == False,
         is_one_day_passed_after_confirmation == True, )) \
-        .order_by(EntityExtention.created).all()
+        .order_by(EntityExtension.created).all()
 
     resp.body = obj_to_json([o.to_dict() for o in extensions])
     resp.status = falcon.HTTP_200
@@ -2202,8 +2202,8 @@ def getExtensionsByLandlordId(**request_handler_args):
         return
 
     with DBConnection() as session:
-        extentions = session.db.query(EntityExtention) \
-            .join(EntityCourt, EntityExtention.courtid == EntityCourt.vdvid) \
+        extensions = session.db.query(EntityExtension) \
+            .join(EntityCourt, EntityExtension.courtid == EntityCourt.vdvid) \
             .filter(EntityCourt.ownerid == id)
     isconfirmed = req.params['isconfirmed']
 
