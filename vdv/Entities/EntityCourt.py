@@ -289,7 +289,7 @@ class EntityCourt(EntityBase, Base):
             'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id)[0] if len(PropLocation.get_object_property(_vdvid, _id)) else -1,
             'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
             'equipment': lambda _vdvid, _id: PropEquipment.get_object_property(_vdvid, _id),
-            'sport': lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id),
+            'sport':     lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id),
         }
 
         prop = {}
