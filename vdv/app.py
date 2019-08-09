@@ -1886,9 +1886,9 @@ def getCourtsInArea(**request_handler_args):
 
     a = objects.all()
     if sort_order == 'popularity':
-        b = [EntityCourt.get_wide_object(d[0].vdvid) for d in a]
+        b = [EntityCourt.get_wide_object_wide_location_prop(d[0].vdvid) for d in a]
     else:
-        b = [EntityCourt.get_wide_object(d.vdvid) for d in a]
+        b = [EntityCourt.get_wide_object_wide_location_prop(d.vdvid) for d in a]
 
     resp.body = obj_to_json(b)
 
