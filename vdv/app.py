@@ -3,6 +3,7 @@ import json
 import logging
 import mimetypes
 import os
+import sys
 import posixpath
 import random
 import re
@@ -158,8 +159,8 @@ def httpDefault(**request_handler_args):
         else:
             return None
 
-    # if path.endswith('swagger.json'):
-    #     path = path.replace('swagger.json', 'swagger_temp.json')
+    if path.endswith('swagger.json'):
+        path = path.replace('swagger.json', 'swagger_temp.json')
 
     ctype = guess_response_type(path)
 
@@ -2394,6 +2395,7 @@ def getConfigFromLaunchArguments():
 from . import __path__ as ROOT_PATH
 
 SWAGGER_SPEC_PATH = (ROOT_PATH[0] + "/../swagger.json")
+SWAGGER_TEMP_PATH = '{dir_path}/swagger_temp.json'.format(dir_path=sys.path[0])
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -2447,18 +2449,16 @@ def configureOIDC(cfg=cfg):
         auth.Configure(**cfg_oidc)
 
 
-def configureSwagger(server, swagger_json=swagger_json):
-    swagger_temp_path = './swagger_temp.json'
-    createSwaggerTemplate(swagger_temp_path)
+def configureSwagger(server, swagger_temp_path=SWAGGER_TEMP_PATH, swagger_json=swagger_json):
+
+    def createSwaggerTemplate(swagger_temp_path, swagger_json):
+        json_string = json.dumps(swagger_json)
+        with open(swagger_temp_path, 'wt') as f:
+            f.write(json_string)
+
+    def loadSpecSwagger(server, swagger_temp_path):
+        with open(swagger_temp_path) as f:
+            server.load_spec_swagger(f.read())
+
+    createSwaggerTemplate(swagger_temp_path, swagger_json)
     loadSpecSwagger(server, swagger_temp_path)
-
-
-def createSwaggerTemplate(swagger_temp_path, swagger_json=swagger_json):
-    json_string = json.dumps(swagger_json)
-    with open(swagger_temp_path, 'wt') as f:
-        f.write(json_string)
-
-
-def loadSpecSwagger(server, swagger_temp_path):
-    with open(swagger_temp_path) as f:
-        server.load_spec_swagger(f.read())
