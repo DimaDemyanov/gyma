@@ -27,7 +27,7 @@ class BaseTestCase(testing.TestCase):
         configureDBConnection()
         cls.api = API(middleware=[AuthenticationForTest()])
         server = SpecServer(operation_handlers=operation_handlers)
-        configureSwagger(server)
+        configureSwagger(server, SWAGGER_TEMP_PATH)
         cls.api.add_sink(server, r'/')
         cls.client = testing.TestClient(cls.api)
 
