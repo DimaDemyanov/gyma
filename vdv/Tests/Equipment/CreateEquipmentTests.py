@@ -37,9 +37,7 @@ class CreateEquipmentTests(BaseEquipmentTestCase):
         cls.invalid_request_params = {"json":  {}}
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntityEquipment).delete()
-            session.db.commit()
+        self._delete_created_equipments()
 
     # MARK: - Tests
 

@@ -51,7 +51,7 @@ class DeleteTariffTests(BaseTariffTestCase):
         }
 
     def tearDown(self):
-        self._delete_all_tariffs()
+        self._delete_created_tariffs()
 
     # MARK: - Tests
 

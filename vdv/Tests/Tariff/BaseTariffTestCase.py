@@ -28,7 +28,7 @@ class BaseTariffTestCase(BaseTestCase):
         )
         return True
 
-    def _delete_all_tariffs(self):
+    def _delete_created_tariffs(self):
        with DBConnection() as session:
             session.db.query(EntityTariff).delete()
             session.db.commit()

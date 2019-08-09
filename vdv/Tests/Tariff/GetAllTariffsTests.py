@@ -34,7 +34,7 @@ class GetTariffsTests(BaseTariffTestCase):
         cls.valid_tariff_params['vdvid'] = str(cls.created_tariff_id)
 
     def tearDown(self):
-        self._delete_all_tariffs()
+        self._delete_created_tariffs()
 
     # MARK: - Tests
 

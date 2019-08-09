@@ -36,7 +36,7 @@ class CreateTariffTests(BaseTariffTestCase):
         cls.invalid_request_params = {"json": cls.invalid_tariff_params}
 
     def tearDown(self):
-        self._delete_all_tariffs()
+        self._delete_created_tariffs()
 
     # MARK: - Tests
 

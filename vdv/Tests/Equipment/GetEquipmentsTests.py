@@ -34,9 +34,7 @@ class GetEquipmentsTests(BaseEquipmentTestCase):
         cls.valid_equipment_params['vdvid'] = str(cls.created_equipment_id)
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntityEquipment).delete()
-            session.db.commit()
+        self._delete_created_equipments()
 
     # MARK: - Tests
 
