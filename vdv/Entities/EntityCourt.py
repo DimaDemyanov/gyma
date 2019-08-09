@@ -9,7 +9,6 @@ from sqlalchemy.orm import relationship
 from gyma.vdv.Entities.EntityBase import EntityBase
 from gyma.vdv.Entities.EntityProp import EntityProp
 from gyma.vdv.Entities.EntityTime import EntityTime
-from gyma.vdv.Entities.EntityLocation import EntityLocation
 from gyma.vdv.Prop.PropCourtTime import PropCourtTime
 
 from gyma.vdv.Prop.PropEquipment import PropEquipment
@@ -249,51 +248,21 @@ class EntityCourt(EntityBase, Base):
 
     @classmethod
     def get_wide_object(cls, vdvid, items=[]):
-        PROPNAME_MAPPING = EntityProp.map_name_id()
-
-        PROP_MAPPING = {
-            'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id)[0] if len(PropLocation.get_object_property(_vdvid, _id)) else -1,
-            'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
-            'equipment': lambda _vdvid, _id: PropEquipment.get_object_property(_vdvid, _id),
-            'sport': lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id),
-        }
-
+        prop = cls._get_prop(vdvid, items)
         result = EntityCourt.get().filter_by(vdvid=vdvid).all()[0].to_dict()
-
-        prop = {}
-        for key, propid in PROPNAME_MAPPING.items():
-            if key in PROP_MAPPING and (not len(items) or key in items):
-                prop.update({key: PROP_MAPPING[key](vdvid, propid)})
-
         result.update({'prop': prop})
-
         return result
 
     @classmethod
     def get_wide_object_wide_location_prop(cls, vdvid, items=[]):
-
-        PROPNAME_MAPPING = EntityProp.map_name_id()
-
-        PROP_MAPPING = {
-            'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id)[0] if len(PropLocation.get_object_property(_vdvid, _id)) else -1,
-            'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
-            'equipment': lambda _vdvid, _id: PropEquipment.get_object_property(_vdvid, _id),
-            'sport':     lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id),
-        }
-
         result = EntityCourt.get().filter_by(vdvid=vdvid).all()[0].to_dict()
-
-        prop = {}
-        for key, propid in PROPNAME_MAPPING.items():
-            if key in PROP_MAPPING and (not len(items) or key in items):
-                prop.update({key: PROP_MAPPING[key](vdvid, propid)})
+        prop = cls._get_prop(vdvid, items)
 
         # Get location wide object
         if prop['location'] != -1:
-            prop['location'] = EntityLocation.get().filter_by(vdvid=prop['location']).all()[0].to_dict()
+            prop['location'] = PropLocation.get_wide_object()
 
         result.update({'prop': prop})
-
         return result
 
     @classmethod
@@ -311,3 +280,21 @@ class EntityCourt(EntityBase, Base):
         for key, propid in PROPNAME_MAPPING.items():
             if key in PROP_MAPPING:
                 PROP_MAPPING[key](vdvid, propid)
+
+    @classmethod
+    def _get_prop(cls, vdvid, items=[]):
+        PROPNAME_MAPPING = EntityProp.map_name_id()
+
+        PROP_MAPPING = {
+            'location':  lambda _vdvid, _id: PropLocation.get_object_property(_vdvid, _id)[0] if len(PropLocation.get_object_property(_vdvid, _id)) else -1,
+            'media':     lambda _vdvid, _id: PropMedia.get_object_property(_vdvid, _id),
+            'equipment': lambda _vdvid, _id: PropEquipment.get_object_property(_vdvid, _id),
+            'sport': lambda _vdvid, _id: PropSport.get_object_property(_vdvid, _id),
+        }
+
+        prop = {}
+        for key, propid in PROPNAME_MAPPING.items():
+            if key in PROP_MAPPING and (not len(items) or key in items):
+                prop.update({key: PROP_MAPPING[key](vdvid, propid)})
+
+        return prop
