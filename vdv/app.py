@@ -1729,7 +1729,7 @@ def getLocationsWithFilter(**request_handler_args):
         )
         endTime = datetime.datetime.strptime(
             '{date} {endTime}{utcOffset}'.format(
-                date=date, startTime=startTime, utcOffset=utcOffset),
+                date=date, endTime=endTime, utcOffset=utcOffset),
             time_format
         )
         t = startTime
