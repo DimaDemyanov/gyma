@@ -1716,6 +1716,12 @@ def getLocationsWithFilter(**request_handler_args):
 
     if sportIds:
         try:
+            for sportId in sportIds:
+                sport = EntitySport.get().filter_by(vdvid=sportId).all()
+                if not len(sport):
+                    resp.body = "sport with id '{}' doesn't exist".format(sportId)
+                    resp.status = falcon.HTTP_400
+                    return
             courts = courts.filter(
                 EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
         except DataError:
@@ -1723,6 +1729,12 @@ def getLocationsWithFilter(**request_handler_args):
             return
     if equipmentIds:
         try:
+            for equipmentId in equipmentIds:
+                equipment = EntityEquipment.get().filter_by(vdvid=equipmentId).all()
+                if not len(equipment):
+                    resp.body = "equipment with id '{}' doesn't exist".format(equipmentId)
+                    resp.status = falcon.HTTP_400
+                    return
             courts = courts.filter(
                 EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
         except DataError:
@@ -1840,6 +1852,12 @@ def getCourtsInArea(**request_handler_args):
 
     if sportIds:
         try:
+            for sportId in sportIds:
+                sport = EntitySport.get().filter_by(vdvid=sportId).all()
+                if not len(sport):
+                    resp.body = "sport with id '{}' doesn't exist".format(sportId)
+                    resp.status = falcon.HTTP_400
+                    return
             courts = courts.filter(
                 EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
         except DataError:
@@ -1847,6 +1865,12 @@ def getCourtsInArea(**request_handler_args):
             return
     if equipmentIds:
         try:
+            for equipmentId in equipmentIds:
+                equipment = EntityEquipment.get().filter_by(vdvid=equipmentId).all()
+                if not len(equipment):
+                    resp.body = "equipment with id '{}' doesn't exist".format(equipmentId)
+                    resp.status = falcon.HTTP_400
+                    return
             courts = courts.filter(
                 EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
         except DataError:
