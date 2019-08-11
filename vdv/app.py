@@ -12,6 +12,7 @@ import jwt
 import requests
 from sqlalchemy import and_, cast, DateTime, func, desc
 from sqlalchemy import or_
+from sqlalchemy.exc import DataError
 import pytz
 import time
 from collections import OrderedDict
@@ -1714,11 +1715,19 @@ def getLocationsWithFilter(**request_handler_args):
     courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
     if sportIds:
-        courts = courts.filter(
-            EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+        try:
+            courts = courts.filter(
+                EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+        except DataError:
+            resp.status = falcon.HTTP_400
+            return
     if equipmentIds:
-        courts = courts.filter(
-            EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
+        try:
+            courts = courts.filter(
+                EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
+        except DataError:
+            resp.status = falcon.HTTP_400
+            return
     if date:
         try:
             date_format = '%Y-%m-%d'
@@ -1830,11 +1839,19 @@ def getCourtsInArea(**request_handler_args):
     courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
     if sportIds:
-        courts = courts.filter(
-            EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+        try:
+            courts = courts.filter(
+                EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+        except DataError:
+            resp.status = falcon.HTTP_400
+            return
     if equipmentIds:
-        courts = courts.filter(
-            EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
+        try:
+            courts = courts.filter(
+                EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
+        except DataError:
+            resp.status = falcon.HTTP_400
+            return
     if date:
         try:
             date_format = '%Y-%m-%d'
