@@ -265,7 +265,7 @@ DROP TABLE IF EXISTS "vdv_sport" CASCADE;
 CREATE TABLE "vdv_sport" (
 	"vdvid" int8 NOT NULL,
 	"name" varchar(40),
-        "iconid" int4 NOT NULL,
+        "iconid" int4,
 	PRIMARY KEY("vdvid")
 );
 
