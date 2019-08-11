@@ -32,7 +32,3 @@ class PropLocation(PropBase, Base):
                     .filter(EntityLocation.latitude.between(p[0] - r, p[0] + r))
                     .filter(cls.value == EntityLocation.vdvid)
                     .all()]
-
-    @classmethod
-    def get_wide_object(cls):
-        return EntityLocation.get_wide_info(cls.value)
