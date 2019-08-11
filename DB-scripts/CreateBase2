@@ -265,19 +265,10 @@ DROP TABLE IF EXISTS "vdv_sport" CASCADE;
 CREATE TABLE "vdv_sport" (
 	"vdvid" int8 NOT NULL,
 	"name" varchar(40),
+        "iconid" int4 NOT NULL,
 	PRIMARY KEY("vdvid")
 );
 
-DROP TABLE IF EXISTS "vdv_sport_icon" CASCADE;
-
-CREATE TABLE "vdv_sport_icon" (
-	"vdvid" int8 NOT NULL,
-	"sportid" int8 NOT NULL UNIQUE,
-	"url" varchar(4000) NOT NULL,
-	PRIMARY KEY("vdvid"),
-	CONSTRAINT "Ref_vdv_sport_icon_to_vdv_sport" FOREIGN KEY ("sportid")
-		REFERENCES "vdv_sport"("vdvid")
-);
 
 DROP TABLE IF EXISTS "vdv_prop_sport" CASCADE;
 
