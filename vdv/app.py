@@ -1686,7 +1686,13 @@ def getLocationsWithFilter(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    params = json.loads(req.stream.read().decode('utf-8'))
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+    except json.decoder.JSONDecodeError as e:
+        resp.body = "Invalid JSON: %s" % e
+        resp.status = falcon.HTTP_400
+        return
+
     PROPNAME_MAPPING = EntityProp.map_name_id()
 
     date = params.get('date')
@@ -1708,31 +1714,43 @@ def getLocationsWithFilter(**request_handler_args):
     courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
     if sportIds:
-       courts = courts.filter(EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+        courts = courts.filter(
+            EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
     if equipmentIds:
-        courts = courts.filter(EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
+        courts = courts.filter(
+            EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
     if date:
-        free = [x.vdvid for x in EntityTime.get().filter(
-            cast(EntityTime.time, Date) == date).distinct()]
+        try:
+            date_format = '%Y-%m-%d'
+            datetime.datetime.strptime(date, date_format)
+        except Exception as e:
+            resp.body = str(e)
+            resp.status = falcon.HTTP_400
+            return
+
+        free = [x.vdvid for x in EntityTime.get().filter(cast(EntityTime.time, Date) == date).distinct()]
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
         courts = courts.filter(EntityCourt.vdvid.in_(courts_times))
     if startTime and endTime and date and timeZoneName:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
-        utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
-
-        startTime = datetime.datetime.strptime(
-            '{date} {startTime}{utcOffset}'.format(
-                date=date, startTime=startTime, utcOffset=utcOffset),
-            time_format
-        )
-        endTime = datetime.datetime.strptime(
-            '{date} {endTime}{utcOffset}'.format(
-                date=date, endTime=endTime, utcOffset=utcOffset),
-            time_format
-        )
-        t = startTime
+        try:
+            utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
+            startTime = datetime.datetime.strptime(
+                '{date} {startTime}{utcOffset}'.format(
+                    date=date, startTime=startTime, utcOffset=utcOffset),
+                time_format
+            )
+            endTime = datetime.datetime.strptime(
+                '{date} {endTime}{utcOffset}'.format(
+                    date=date, endTime=endTime, utcOffset=utcOffset),
+                time_format
+            )
+        except Exception as e:
+            resp.body = str(e)
+            resp.status = falcon.HTTP_400
+            return
         while t < endTime:
             times.append(t.strftime(time_format))
             t = t + datetime.timedelta(minutes=30)
@@ -1758,18 +1776,32 @@ def getCourtsInArea(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    params = json.loads(req.stream.read().decode('utf-8'))
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+    except json.decoder.JSONDecodeError as e:
+        resp.body = "Invalid JSON: %s" % e
+        resp.status = falcon.HTTP_400
+        return
+
     PROPNAME_MAPPING = EntityProp.map_name_id()
 
     ## Getting locations in area
 
-    x = params['x']
-    y = params['y']
-    radius = params['radius']
+    x = params.get('x')
+    y = params.get('y')
+    radius = params.get('radius')
 
-    objects = EntityLocation.get().filter(distanceMath(EntityLocation.latitude, EntityLocation.longitude,
-                                                       float(x), float(y), func) < (
-                                              float(radius))).all()  # PropLike.get_object_property(0, 0)#
+    try:
+        objects = EntityLocation.get().filter(
+            distanceMath(EntityLocation.latitude,
+                         EntityLocation.longitude,
+                         float(x), float(y), func) < (float(radius))
+        ).all()  # PropLike.get_object_property(0, 0)#
+    except Exception as e:
+        resp.body = str(e)
+        resp.status = falcon.HTTP_400
+        return
+
     locations_id = []
     for o in objects:
         locations_id = locations_id + (PropLocation.get_objects(o.vdvid, PROPNAME_MAPPING['location']))
@@ -1804,6 +1836,14 @@ def getCourtsInArea(**request_handler_args):
         courts = courts.filter(
             EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
     if date:
+        try:
+            date_format = '%Y-%m-%d'
+            datetime.datetime.strptime(date, date_format)
+        except Exception as e:
+            resp.body = str(e)
+            resp.status = falcon.HTTP_400
+            return
+
         free = [x.vdvid for x in EntityTime.get().filter(cast(EntityTime.time, Date) == date).distinct()]
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
@@ -1811,18 +1851,22 @@ def getCourtsInArea(**request_handler_args):
     if startTime and endTime and date and timeZoneName:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
-        utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
-
-        startTime = datetime.datetime.strptime(
-            '{date} {startTime}{utcOffset}'.format(
-                date=date, startTime=startTime, utcOffset=utcOffset),
-            time_format
-        )
-        endTime = datetime.datetime.strptime(
-            '{date} {endTime}{utcOffset}'.format(
-                date=date, endTime=endTime, utcOffset=utcOffset),
-            time_format
-        )
+        try:
+            utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
+            startTime = datetime.datetime.strptime(
+                '{date} {startTime}{utcOffset}'.format(
+                    date=date, startTime=startTime, utcOffset=utcOffset),
+                time_format
+            )
+            endTime = datetime.datetime.strptime(
+                '{date} {endTime}{utcOffset}'.format(
+                    date=date, endTime=endTime, utcOffset=utcOffset),
+                time_format
+            )
+        except Exception as e:
+            resp.body = str(e)
+            resp.status = falcon.HTTP_400
+            return
         t = startTime
         while t < endTime:
             times.append(t.strftime(time_format))
@@ -1856,7 +1900,7 @@ def getCourtsInArea(**request_handler_args):
             objects = courts
 
     if filter == 'all':
-        objects = objects
+        pass
 
     if filter == 'my':
         objects = objects.filter(EntityCourt.ownerid == my_landlordid)
