@@ -12,6 +12,7 @@ import jwt
 import requests
 from sqlalchemy import and_, cast, DateTime, func, desc
 from sqlalchemy import or_
+from sqlalchemy.exc import DataError
 import pytz
 import time
 from collections import OrderedDict
@@ -24,7 +25,7 @@ from falcon_multipart.middleware import MultipartMiddleware
 from gyma.vdv.Entities.EntityCourt import EntityCourt, create_times, update_times
 from gyma.vdv import utils
 from gyma.vdv.Entities.EntityEquipment import EntityEquipment
-from gyma.vdv.Entities.EntityExtension import EntityExtention
+from gyma.vdv.Entities.EntityExtension import EntityExtension
 from gyma.vdv.Entities.EntityHelp import EntityHelp
 from gyma.vdv.Entities.EntityLandlord import EntityLandlord
 from gyma.vdv.Entities.EntityRequest import EntityRequest
@@ -322,7 +323,7 @@ def getAllCourtRequest(**request_handler_args):
     res = []
 
     id = getIntPathParam('courtId', **request_handler_args)
-    # extentions = EntityExtention.get().filter(EntityExtention.isconfirmed == False or (cast(EntityExtention.confirmed_time, DateTime) > get_curr_date() - timedelta(hours=24))).all()
+    # extensions = EntityExtension.get().filter(EntityExtension.isconfirmed == False or (cast(EntityExtension.confirmed_time, DateTime) > get_curr_date() - timedelta(hours=24))).all()
 
     with DBConnection() as session:
         res = session.db.query(EntityRequest) \
@@ -471,11 +472,16 @@ def createSport(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_400
 
     params = json.loads(req.stream.read().decode('utf-8'))
+    name = params.get('name')
+    sports_with_same_name = EntitySport.get().filter_by(name=name).all()
+    if len(sports_with_same_name) != 0:
+        resp.status = falcon.HTTP_412
+        return
     try:
         id = EntitySport.add_from_json(params)
     except Exception as e:
         logger.info(e)
-        resp.status = falcon.HTTP_412
+        resp.status = falcon.HTTP_501
         return
     if id:
         objects = EntitySport.get().filter_by(vdvid=id).all()
@@ -539,11 +545,16 @@ def createEquipment(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_400
 
     params = json.loads(req.stream.read().decode('utf-8'))
+    name = params.get('name')
+    equipment_with_same_name = EntityEquipment.get().filter_by(name=name).all()
+    if len(equipment_with_same_name) != 0:
+        resp.status = falcon.HTTP_412
+        return
     try:
         id = EntityEquipment.add_from_json(params)
     except Exception as e:
         logger.info(e)
-        resp.status = falcon.HTTP_412
+        resp.status = falcon.HTTP_501
         return
     if id:
         objects = EntityEquipment.get().filter_by(vdvid=id).all()
@@ -589,6 +600,9 @@ def getEquipmentById(**request_handler_args):
 
     id = getIntPathParam('equipmentId', **request_handler_args)
     objects = EntityEquipment.get().filter_by(vdvid=id).all()
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
 
     resp.body = obj_to_json(objects[0].to_dict())
     resp.status = falcon.HTTP_200
@@ -676,6 +690,7 @@ def getCourtById(**request_handler_args):
     id = getIntPathParam('courtId', **request_handler_args)
     objects = EntityCourt.get().filter_by(vdvid=id).all()
     if len(objects) == 0:
+        resp.status = falcon.HTTP_404
         return
 
     wide_info = EntityCourt.get_wide_object(id)
@@ -697,8 +712,12 @@ def getCourtByLandlordId(**request_handler_args):
 
     id = getIntPathParam('landlordId', **request_handler_args)
     objects = EntityCourt.get().filter_by(ownerid=id).all()
+
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
+        return
+
     ispublished = req.params['ispublished']
-    phone = req.context['phone']
 
     # wide_info = EntityCourt.get_wide_object(id)
 
@@ -731,8 +750,6 @@ def getCourtByLocationId(**request_handler_args):
         resp.status = falcon.HTTP_404
         return
     objects = EntityCourt.get().filter(EntityCourt.vdvid.in_(locations)).all()
-
-    phone = req.context['phone']
 
     res = []
     for _ in objects:
@@ -813,6 +830,11 @@ def createCourt(**request_handler_args):
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
         params['ispublished'] = False
+        name = params.get('name')
+        courts_with_same_name = EntityCourt.get().filter_by(name=name).all()
+        if len(courts_with_same_name) != 0:
+            resp.status = falcon.HTTP_412
+            return
         id = EntityCourt.add_from_json(params)
     except Exception as e:
         logger.info(e)
@@ -858,15 +880,14 @@ def deleteCourt(**request_handler_args):
     if id is not None:
         try:
             EntityCourt.delete_wide_object(id)
-            EntityCourt.delete(id)
         except FileNotFoundError:
-            resp.status = falcon.HTTP_404
+            resp.status = falcon.HTTP_405
             return
 
         try:
-            EntityCourt.delete_wide_object(id)
+            EntityCourt.delete(id)
         except FileNotFoundError:
-            resp.status = falcon.HTTP_405
+            resp.status = falcon.HTTP_404
             return
 
         object = EntityCourt.get().filter_by(vdvid=id).all()
@@ -986,11 +1007,22 @@ def createCourtTimesOnDate(**request_handler_args):
     resp = request_handler_args['resp']
 
     courtid = req.params['courtid']
+
+    courts = EntityCourt.get().filter_by(vdvid=courtid).all()
+    if len(courts) == 0:
+        resp.status = falcon.HTTP_404
+        return
+
     # params = req.params['times']
     params = json.loads(req.stream.read().decode('utf-8'))
 
-    with DBConnection() as session:
-        create_times(session, courtid, PROPNAME_MAPPING['courtTime'], params['times'], 0)
+    try:
+        with DBConnection() as session:
+            create_times(session, courtid, PROPNAME_MAPPING['courtTime'], params['times'], 0)
+    except Exception as e:
+        logger.error(e)
+        resp.status = falcon.HTTP_400
+        return
 
     resp.status = falcon.HTTP_200
 
@@ -1054,7 +1086,7 @@ def createLandlord(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
         resp.status = falcon.HTTP_405
         return
 
@@ -1131,7 +1163,7 @@ def createSimpleuser(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
         resp.status = falcon.HTTP_405
         return
 
@@ -1235,7 +1267,7 @@ def updateUser(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
         resp.status = falcon.HTTP_405
         return
 
@@ -1592,23 +1624,19 @@ def createLocation(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
+    params = json.loads(req.stream.read().decode('utf-8'))
+    name = params.get('name')
+    if name:
+        locations_with_same_name = EntityLocation.get().filter_by(name=name).all()
+        if locations_with_same_name:
+            resp.status = falcon.HTTP_412
+            return
     try:
-        params = json.loads(req.stream.read().decode('utf-8'))
-        if 'name' in params:
-            name = params.get('name')
-        else:
-            name = "location default"
-        latitude = params.get('latitude')
-        longitude = params.get('longitude')
-    except ValueError:
+        id = EntityLocation.add_from_json(params)
+    except Exception as e:
+        logger.info(e)
         resp.status = falcon.HTTP_405
         return
-
-    if not name:
-        resp.status = falcon.HTTP_405
-        return
-
-    id = EntityLocation(name, latitude, longitude).add()
 
     if id:
         objects = EntityLocation.get().filter_by(vdvid=id).all()
@@ -1626,14 +1654,13 @@ def getLocationById(**request_handler_args):
 
     id = getIntPathParam('locId', **request_handler_args)
 
-    if id is not None:
-        objects = EntityLocation.get().filter_by(vdvid=id).all()
-
-        resp.body = obj_to_json(objects[0].to_dict())
-        resp.status = falcon.HTTP_200
+    objects = EntityLocation.get().filter_by(vdvid=id).all()
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
         return
 
-    resp.status = falcon.HTTP_500
+    resp.body = obj_to_json(objects[0].to_dict())
+    resp.status = falcon.HTTP_200
 
 
 def deleteLocation(**request_handler_args):
@@ -1671,7 +1698,13 @@ def getLocationsWithFilter(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    params = json.loads(req.stream.read().decode('utf-8'))
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+    except json.decoder.JSONDecodeError as e:
+        resp.body = "Invalid JSON: %s" % e
+        resp.status = falcon.HTTP_400
+        return
+
     PROPNAME_MAPPING = EntityProp.map_name_id()
 
     date = params.get('date')
@@ -1693,31 +1726,63 @@ def getLocationsWithFilter(**request_handler_args):
     courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
     if sportIds:
-       courts = courts.filter(EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+        try:
+            for sportId in sportIds:
+                sport = EntitySport.get().filter_by(vdvid=sportId).all()
+                if not len(sport):
+                    resp.body = "sport with id '{}' doesn't exist".format(sportId)
+                    resp.status = falcon.HTTP_400
+                    return
+            courts = courts.filter(
+                EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+        except DataError:
+            resp.status = falcon.HTTP_400
+            return
     if equipmentIds:
-        courts = courts.filter(EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
+        try:
+            for equipmentId in equipmentIds:
+                equipment = EntityEquipment.get().filter_by(vdvid=equipmentId).all()
+                if not len(equipment):
+                    resp.body = "equipment with id '{}' doesn't exist".format(equipmentId)
+                    resp.status = falcon.HTTP_400
+                    return
+            courts = courts.filter(
+                EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
+        except DataError:
+            resp.status = falcon.HTTP_400
+            return
     if date:
-        free = [x.vdvid for x in EntityTime.get().filter(
-            cast(EntityTime.time, Date) == date).distinct()]
+        try:
+            date_format = '%Y-%m-%d'
+            datetime.datetime.strptime(date, date_format)
+        except Exception as e:
+            resp.body = str(e)
+            resp.status = falcon.HTTP_400
+            return
+
+        free = [x.vdvid for x in EntityTime.get().filter(cast(EntityTime.time, Date) == date).distinct()]
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
         courts = courts.filter(EntityCourt.vdvid.in_(courts_times))
     if startTime and endTime and date and timeZoneName:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
-        utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
-
-        startTime = datetime.datetime.strptime(
-            '{date} {startTime}{utcOffset}'.format(
-                date=date, startTime=startTime, utcOffset=utcOffset),
-            time_format
-        )
-        endTime = datetime.datetime.strptime(
-            '{date} {endTime}{utcOffset}'.format(
-                date=date, endTime=endTime, utcOffset=utcOffset),
-            time_format
-        )
-        t = startTime
+        try:
+            utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
+            startTime = datetime.datetime.strptime(
+                '{date} {startTime}{utcOffset}'.format(
+                    date=date, startTime=startTime, utcOffset=utcOffset),
+                time_format
+            )
+            endTime = datetime.datetime.strptime(
+                '{date} {endTime}{utcOffset}'.format(
+                    date=date, endTime=endTime, utcOffset=utcOffset),
+                time_format
+            )
+        except Exception as e:
+            resp.body = str(e)
+            resp.status = falcon.HTTP_400
+            return
         while t < endTime:
             times.append(t.strftime(time_format))
             t = t + datetime.timedelta(minutes=30)
@@ -1743,18 +1808,32 @@ def getCourtsInArea(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
-    params = json.loads(req.stream.read().decode('utf-8'))
+    try:
+        params = json.loads(req.stream.read().decode('utf-8'))
+    except json.decoder.JSONDecodeError as e:
+        resp.body = "Invalid JSON: %s" % e
+        resp.status = falcon.HTTP_400
+        return
+
     PROPNAME_MAPPING = EntityProp.map_name_id()
 
     ## Getting locations in area
 
-    x = params['x']
-    y = params['y']
-    radius = params['radius']
+    x = params.get('x')
+    y = params.get('y')
+    radius = params.get('radius')
 
-    objects = EntityLocation.get().filter(distanceMath(EntityLocation.latitude, EntityLocation.longitude,
-                                                       float(x), float(y), func) < (
-                                              float(radius))).all()  # PropLike.get_object_property(0, 0)#
+    try:
+        objects = EntityLocation.get().filter(
+            distanceMath(EntityLocation.latitude,
+                         EntityLocation.longitude,
+                         float(x), float(y), func) < (float(radius))
+        ).all()  # PropLike.get_object_property(0, 0)#
+    except Exception as e:
+        resp.body = str(e)
+        resp.status = falcon.HTTP_400
+        return
+
     locations_id = []
     for o in objects:
         locations_id = locations_id + (PropLocation.get_objects(o.vdvid, PROPNAME_MAPPING['location']))
@@ -1783,12 +1862,40 @@ def getCourtsInArea(**request_handler_args):
     courts = courts.filter(EntityCourt.price.between(minPrice, maxPrice))
 
     if sportIds:
-        courts = courts.filter(
-            EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+        try:
+            for sportId in sportIds:
+                sport = EntitySport.get().filter_by(vdvid=sportId).all()
+                if not len(sport):
+                    resp.body = "sport with id '{}' doesn't exist".format(sportId)
+                    resp.status = falcon.HTTP_400
+                    return
+            courts = courts.filter(
+                EntityCourt.vdvid.in_(PropSport.get_objects_multiple_value(sportIds, PROPNAME_MAPPING['sport'])))
+        except DataError:
+            resp.status = falcon.HTTP_400
+            return
     if equipmentIds:
-        courts = courts.filter(
-            EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
+        try:
+            for equipmentId in equipmentIds:
+                equipment = EntityEquipment.get().filter_by(vdvid=equipmentId).all()
+                if not len(equipment):
+                    resp.body = "equipment with id '{}' doesn't exist".format(equipmentId)
+                    resp.status = falcon.HTTP_400
+                    return
+            courts = courts.filter(
+                EntityCourt.vdvid.in_(PropEquipment.get_objects_multiple_value(equipmentIds, PROPNAME_MAPPING['equipment'])))
+        except DataError:
+            resp.status = falcon.HTTP_400
+            return
     if date:
+        try:
+            date_format = '%Y-%m-%d'
+            datetime.datetime.strptime(date, date_format)
+        except Exception as e:
+            resp.body = str(e)
+            resp.status = falcon.HTTP_400
+            return
+
         free = [x.vdvid for x in EntityTime.get().filter(cast(EntityTime.time, Date) == date).distinct()]
         courts_times = [x.vdvid for x in
                         PropCourtTime.get().filter(PropCourtTime.value.in_(free)).distinct(PropCourtTime.vdvid)]
@@ -1796,18 +1903,22 @@ def getCourtsInArea(**request_handler_args):
     if startTime and endTime and date and timeZoneName:
         time_format = '%Y-%m-%d %H:%M:%S%z'
         times = []
-        utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
-
-        startTime = datetime.datetime.strptime(
-            '{date} {startTime}{utcOffset}'.format(
-                date=date, startTime=startTime, utcOffset=utcOffset),
-            time_format
-        )
-        endTime = datetime.datetime.strptime(
-            '{date} {endTime}{utcOffset}'.format(
-                date=date, endTime=endTime, utcOffset=utcOffset),
-            time_format
-        )
+        try:
+            utcOffset = datetime.datetime.now(pytz.timezone(timeZoneName)).strftime('%z')
+            startTime = datetime.datetime.strptime(
+                '{date} {startTime}{utcOffset}'.format(
+                    date=date, startTime=startTime, utcOffset=utcOffset),
+                time_format
+            )
+            endTime = datetime.datetime.strptime(
+                '{date} {endTime}{utcOffset}'.format(
+                    date=date, endTime=endTime, utcOffset=utcOffset),
+                time_format
+            )
+        except Exception as e:
+            resp.body = str(e)
+            resp.status = falcon.HTTP_400
+            return
         t = startTime
         while t < endTime:
             times.append(t.strftime(time_format))
@@ -1841,7 +1952,7 @@ def getCourtsInArea(**request_handler_args):
             objects = courts
 
     if filter == 'all':
-        objects = objects
+        pass
 
     if filter == 'my':
         objects = objects.filter(EntityCourt.ownerid == my_landlordid)
@@ -1871,9 +1982,9 @@ def getCourtsInArea(**request_handler_args):
 
     a = objects.all()
     if sort_order == 'popularity':
-        b = [EntityCourt.get_wide_object(d[0].vdvid) for d in a]
+        b = [EntityCourt.get_wide_object_wide_location_prop(d[0].vdvid) for d in a]
     else:
-        b = [EntityCourt.get_wide_object(d.vdvid) for d in a]
+        b = [EntityCourt.get_wide_object_wide_location_prop(d.vdvid) for d in a]
 
     resp.body = obj_to_json(b)
 
@@ -2073,7 +2184,7 @@ def setDoneHelp(**request_handler_args):
     resp.status = falcon.HTTP_200
 
 
-def createExtention(**request_handler_args):  # TODO: implement it
+def createExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
@@ -2083,20 +2194,20 @@ def createExtention(**request_handler_args):  # TODO: implement it
         resp.status = falcon.HTTP_400
     try:
         params = json.loads(req.stream.read().decode('utf-8'))
-        id = EntityExtention.add_from_json(params)
+        id = EntityExtension.add_from_json(params)
     except Exception as e:
         logger.info(e)
         resp.status = falcon.HTTP_412
         return
     if id:
-        objects = EntityExtention.get().filter_by(vdvid=id).all()
+        objects = EntityExtension.get().filter_by(vdvid=id).all()
 
         resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
     resp.status = falcon.HTTP_200
 
 
-def updateExtention(**request_handler_args):  # TODO: implement it
+def updateExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
 
@@ -2107,67 +2218,82 @@ def updateExtention(**request_handler_args):  # TODO: implement it
 
     params = json.loads(req.stream.read().decode('utf-8'))
     try:
-        id = EntityExtention.update_from_json(params)
+        id = EntityExtension.update_from_json(params)
     except Exception as e:
         logger.info(e)
         resp.status = falcon.HTTP_412
         return
     if id:
-        objects = EntityExtention.get().filter_by(vdvid=id).all()
+        objects = EntityExtension.get().filter_by(vdvid=id).all()
         resp.body = obj_to_json(objects[0].to_dict())
         resp.status = falcon.HTTP_200
-    resp.status = falcon.HTTP_200
+        return
+    resp.status = falcon.HTTP_404
 
 
-def confirmExtention(**request_handler_args):  # TODO: implement it
+def confirmExtension(**request_handler_args):  # TODO: implement it
     resp = request_handler_args['resp']
     req = request_handler_args['req']
-    id = getIntPathParam('extentionid', **request_handler_args)
+    id = getIntPathParam('extensionid', **request_handler_args)
     if ('adminid' in req.params):
         adminid = req.params['adminid']
     else:
         resp.status = falcon.HTTP_407
         return
-    EntityExtention.confirm(id, adminid)
+    EntityExtension.confirm(id, adminid)
     resp.status = falcon.HTTP_200
 
 
-def getAllExtentions(**request_handler_args):
+def getAllExtensions(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     one_day_earlier_datetime = get_curr_date() - timedelta(hours=24)
     is_one_day_passed_after_confirmation = cast(
-        EntityExtention.confirmedtime, DateTime) > one_day_earlier_datetime
+        EntityExtension.confirmedtime, DateTime) > one_day_earlier_datetime
 
-    extentions = EntityExtention.get().filter(or_(
-        EntityExtention.isconfirmed == False,
+    extensions = EntityExtension.get().filter(or_(
+        EntityExtension.isconfirmed == False,
         is_one_day_passed_after_confirmation == True, )) \
-        .order_by(EntityExtention.created).all()
+        .order_by(EntityExtension.created).all()
 
-    resp.body = obj_to_json([o.to_dict() for o in extentions])
+    resp.body = obj_to_json([o.to_dict() for o in extensions])
     resp.status = falcon.HTTP_200
 
 
-def getExtentionsByLandlordId(**request_handler_args):
+def getExtensionsByLandlordId(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
     id = getIntPathParam('landlordId', **request_handler_args)
+
+    if id is None:
+        resp.status = falcon.HTTP_400
+        return
+
+    landlords = EntityLandlord.get().filter_by(vdvid=id).all()
+    if len(landlords) == 0:
+        resp.status = falcon.HTTP_404
+        return
+
     with DBConnection() as session:
-        extentions = session.db.query(EntityExtention) \
-            .join(EntityCourt, EntityExtention.courtid == EntityCourt.vdvid) \
+        extensions = session.db.query(EntityExtension) \
+            .join(EntityCourt, EntityExtension.courtid == EntityCourt.vdvid) \
             .filter(EntityCourt.ownerid == id)
     isconfirmed = req.params['isconfirmed']
 
     # wide_info = EntityCourt.get_wide_object(id)
 
     if isconfirmed == 'confirmed':
-        extentions = extentions.filter(isconfirmed == "true").all()
+        extensions = extensions.filter(
+            EntityExtension.isconfirmed == "true"
+        ).all()
     if isconfirmed == 'notconfirmed':
-        extentions = extentions.filter(isconfirmed == "false").all()
+        extensions = extensions.filter(
+            EntityExtension.isconfirmed == "False"
+        ).all()
 
-    resp.body = obj_to_json([o.to_dict() for o in extentions])
+    resp.body = obj_to_json([o.to_dict() for o in extensions])
     resp.status = falcon.HTTP_200
 
 
@@ -2295,12 +2421,12 @@ operation_handlers = {
     'getAllTariffs': [getAllTariffs],
     'deleteTariff': [deleteTariff],
 
-    # Extention methods
-    'createExtention': [createExtention],
-    'updateExtention': [updateExtention],
-    'confirmExtention': [confirmExtention],
-    'getAllExtentions': [getAllExtentions],
-    'getExtentionsByLandlordId': [getExtentionsByLandlordId]
+    # Extension methods
+    'createExtension': [createExtension],
+    'updateExtension': [updateExtension],
+    'confirmExtension': [confirmExtension],
+    'getAllExtensions': [getAllExtensions],
+    'getExtensionsByLandlordId': [getExtensionsByLandlordId]
 }
 
 

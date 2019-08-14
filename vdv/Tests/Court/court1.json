@@ -1,0 +1,7 @@
+{
+  "ownerid": "Should be equal to created court id",
+  "name": "Workout1",
+  "desc": "Very cool workout place1",
+  "price": "1",
+  "isdraft": false
+}

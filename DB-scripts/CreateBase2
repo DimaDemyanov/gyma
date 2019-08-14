@@ -417,9 +417,9 @@ CREATE TABLE "vdv_help" (
 	NOT DEFERRABLE
 );
 
-DROP TABLE IF EXISTS "vdv_extention" CASCADE;
+DROP TABLE IF EXISTS "vdv_extension" CASCADE;
 
-CREATE TABLE "vdv_extention" (
+CREATE TABLE "vdv_extension" (
 	"vdvid" int8 NOT NULL,
 	"courtid" int8 NOT NULL,
 	"tariffid" int8,

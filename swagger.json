@@ -2825,13 +2825,13 @@
         ]
       }
     },
-    "/extention": {
+    "/extension": {
       "post": {
         "tags": [
-          "extention"
+          "extension"
         ],
-        "summary": "Add new extention(ready)",
-        "operationId": "createExtention",
+        "summary": "Add new extension(ready)",
+        "operationId": "createExtension",
         "consumes": [
           "application/json"
         ],
@@ -2840,12 +2840,12 @@
         ],
         "parameters": [
           {
-            "name": "newExtention",
+            "name": "newExtension",
             "in": "body",
-            "description": "Extention encoded in JSON string",
+            "description": "Extension encoded in JSON string",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Extention"
+              "$ref": "#/definitions/Extension"
             }
           }
         ],
@@ -2865,10 +2865,10 @@
       },
       "put": {
         "tags": [
-          "extention"
+          "extension"
         ],
-        "summary": "Update extention(ready)",
-        "operationId": "updateExtention",
+        "summary": "Update extension(ready)",
+        "operationId": "updateExtension",
         "consumes": [
           "application/json"
         ],
@@ -2877,12 +2877,12 @@
         ],
         "parameters": [
           {
-            "name": "newExtention",
+            "name": "newExtension",
             "in": "body",
-            "description": "Extention encoded in JSON string",
+            "description": "Extension encoded in JSON string",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Extention"
+              "$ref": "#/definitions/Extension"
             }
           }
         ],
@@ -2902,11 +2902,11 @@
       },
       "get": {
         "tags": [
-          "extention"
+          "extension"
         ],
-        "summary": "Find all extentions that are not confirmed or were confirmed in last 24 hours(ready)",
-        "description": "Returns extentions description",
-        "operationId": "getAllExtentions",
+        "summary": "Find all extensions that are not confirmed or were confirmed in last 24 hours(ready)",
+        "description": "Returns extensions description",
+        "operationId": "getAllExtensions",
         "produces": [
           "application/json"
         ],
@@ -2914,14 +2914,14 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/Extention"
+              "$ref": "#/definitions/Extension"
             }
           },
           "400": {
             "description": "Invalid ID supplied"
           },
           "404": {
-            "description": "Extention not found"
+            "description": "Extension not found"
           }
         },
         "security": [
@@ -2931,13 +2931,13 @@
         ]
       }
     },
-    "/confirm/extention/{extentionid}": {
+    "/confirm/extension/{extensionid}": {
       "post": {
         "tags": [
-          "extention"
+          "extension"
         ],
-        "summary": "Confirm extention(ready)",
-        "operationId": "confirmExtention",
+        "summary": "Confirm extension(ready)",
+        "operationId": "confirmExtension",
         "consumes": [
           "application/json"
         ],
@@ -2946,9 +2946,9 @@
         ],
         "parameters": [
           {
-            "name": "extentionid",
+            "name": "extensionid",
             "in": "path",
-            "description": "ID of extention to confirm",
+            "description": "ID of extension to confirm",
             "required": true,
             "type": "integer",
             "format": "int64"
@@ -2970,7 +2970,7 @@
             "description": "Invalid ID supplied"
           },
           "404": {
-            "description": "Extention not found"
+            "description": "Extension not found"
           }
         },
         "security": [
@@ -2980,14 +2980,14 @@
         ]
       }
     },
-    "/extention/landlord/{landlordId}": {
+    "/extension/landlord/{landlordId}": {
       "get": {
         "tags": [
-          "extention"
+          "extension"
         ],
-        "summary": "Find extentions by landlord ID(ready)",
-        "description": "Returns extentions description",
-        "operationId": "getExtentionsByLandlordId",
+        "summary": "Find extensions by landlord ID(ready)",
+        "description": "Returns extensions description",
+        "operationId": "getExtensionsByLandlordId",
         "produces": [
           "application/json"
         ],
@@ -3017,7 +3017,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/Extention"
+              "$ref": "#/definitions/Extension"
             }
           },
           "400": {
@@ -3298,7 +3298,7 @@
         }
       }
     },
-    "Extention": {
+    "Extension": {
       "type": "object",
       "required": [
         "courtid",

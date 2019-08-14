@@ -7,6 +7,8 @@ from gyma.vdv.Entities.EntityBase import EntityBase
 # from gyma.vdv.Entities.EntityCourt import EntityCourt
 from gyma.vdv.Entities.EntityProp import EntityProp
 
+from gyma.vdv.db import DBConnection
+
 
 Base = declarative_base()
 
@@ -49,3 +51,25 @@ class EntityLocation(EntityBase, Base):
             max_cost = max(prices)
             obj_dict.update({'minCost': min_cost, 'maxCost': max_cost})
         return obj_dict
+
+    @classmethod
+    def add_from_json(cls, data):
+        vdvid = None
+
+        if 'name' in data and 'latitude' in data and 'longitude' in data:
+            name = data['name']
+            latitude = data['latitude']
+            longitude = data['longitude']
+
+            new_entity = EntityLocation(name, latitude, longitude)
+            vdvid = new_entity.add()
+
+            try:
+                with DBConnection() as session:
+                    session.db.commit()
+            except Exception as e:
+                EntityLocation.delete(vdvid)
+                raise Exception('Internal error')
+        else:
+            raise Exception('Validation exception')
+        return vdvid
