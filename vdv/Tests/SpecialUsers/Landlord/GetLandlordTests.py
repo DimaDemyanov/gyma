@@ -14,7 +14,6 @@ from gyma.vdv.Tests.Base.test_helpers import (
 
 from gyma.vdv.Entities.EntityLandlord import EntityLandlord
 
-from gyma.vdv.db import DBConnection
 from gyma.vdv.app import stringToBool
 
 
@@ -54,9 +53,7 @@ class GetLandlordTests(BaseLandlordTestCase):
         }
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntityLandlord).delete()
-            session.db.commit()
+        self._delete_created_landlords()
 
     # Tests
 

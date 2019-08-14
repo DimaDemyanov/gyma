@@ -18,3 +18,8 @@ class BaseLandlordTestCase(BaseTestCase):
             return None
 
         return isAgreeRulesList[0][0]
+
+    def _delete_created_landlords(self):
+        with DBConnection() as session:
+            session.db.query(EntityLandlord).delete()
+            session.db.commit()

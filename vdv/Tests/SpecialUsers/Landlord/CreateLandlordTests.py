@@ -11,8 +11,6 @@ from gyma.vdv.Tests.SpecialUsers.Landlord.BaseLandlordTestCase import (
 
 from gyma.vdv.Entities.EntityLandlord import EntityLandlord
 
-from gyma.vdv.db import DBConnection
-
 
 TEST_PARAMETERS_PATH = '{dir_path}/landlord.json'.format(dir_path=sys.path[0])
 
@@ -41,9 +39,7 @@ class CreateAccountTests(BaseLandlordTestCase):
         cls.invalid_request_params = {"json":  cls.invalid_landlord_params}
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntityLandlord).delete()
-            session.db.commit()
+        self._delete_created_landlords()
 
     # MARK: - Tests
 
