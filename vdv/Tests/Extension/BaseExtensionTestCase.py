@@ -65,11 +65,10 @@ class BaseExtensionTestCase(BaseTestCase):
 
     @classmethod
     def _delete_created_extension(self, extension_id):
-        with DBConnection() as session:
-            session.db.query(EntityExtension).filter_by(
-                vdvid=extension_id
-            ).delete()
-            session.db.commit()
+        try:
+            EntityExtension.delete(extension_id)
+        except FileNotFoundError:
+            pass
 
     @classmethod
     def _create_tariff(cls, tariff_params_path=TARIFF_PARAMETERS_PATH):

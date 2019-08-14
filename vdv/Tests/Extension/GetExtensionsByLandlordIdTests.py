@@ -5,14 +5,11 @@ import falcon
 from gyma.vdv.Tests.Extension.BaseExtensionTestCase import (
     BaseExtensionTestCase, EXTENSION_PARAMETERS_PATH
 )
-
 from gyma.vdv.Tests.Base.test_helpers import (
     create_request_uri_path_with_param, load_from_json_file
 )
 
 from gyma.vdv.Entities.EntityExtension import EntityExtension
-
-from gyma.vdv.db import DBConnection
 
 
 class GetExtensionsByLandlordId(BaseExtensionTestCase):
