@@ -35,9 +35,7 @@ class CreateLocationTests(BaseLocationTestCase):
         cls.invalid_request_params = {"json":  cls.invalid_location_params}
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntityLocation).delete()
-            session.db.commit()
+        self._delete_created_locations()
 
     # MARK: - Tests
 

@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 import falcon
 
-from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
+from gyma.vdv.Tests.Location.BaseLocationTestCase import BaseLocationTestCase
 from gyma.vdv.Tests.Base.test_helpers import load_from_json_file
 
 from gyma.vdv.Entities.EntityLocation import EntityLocation
@@ -13,7 +13,7 @@ from gyma.vdv.Entities.EntityLocation import EntityLocation
 TEST_PARAMETERS_PATH = '{dir_path}/location.json'.format(dir_path=sys.path[0])
 
 
-class GetAllLocationsTests(BaseTestCase):
+class GetAllLocationsTests(BaseLocationTestCase):
 
     # MARK: - setUp & tearDown
 
@@ -33,8 +33,7 @@ class GetAllLocationsTests(BaseTestCase):
         ).add()
 
     def tearDown(self):
-        if self._is_location_in_db():
-            EntityLocation.delete(self.created_location_id)
+        self._delete_created_locations()
 
     # MARK: - Tests
 

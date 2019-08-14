@@ -3,6 +3,10 @@ from gyma.vdv.Tests.Base.test_helpers import (
     convert_dict_bool_str_values_to_bool
 )
 
+from gyma.vdv.Entities.EntityLocation import EntityLocation
+
+from gyma.vdv.db import DBConnection
+
 
 class BaseLocationTestCase(BaseTestCase):
 
@@ -22,3 +26,8 @@ class BaseLocationTestCase(BaseTestCase):
                 self.check_dict1_in_dict2(dict2_value, dict1_value)
             else:
                 self.assertEqual(dict2_value, dict1_value)
+
+    def _delete_created_locations(self):
+        with DBConnection() as session:
+            session.db.query(EntityLocation).delete()
+            session.db.commit()

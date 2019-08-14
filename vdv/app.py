@@ -1624,28 +1624,19 @@ def createLocation(**request_handler_args):
     req = request_handler_args['req']
     resp = request_handler_args['resp']
 
+    params = json.loads(req.stream.read().decode('utf-8'))
+    name = params.get('name')
+    if name:
+        locations_with_same_name = EntityLocation.get().filter_by(name=name).all()
+        if locations_with_same_name:
+            resp.status = falcon.HTTP_412
+            return
     try:
-        params = json.loads(req.stream.read().decode('utf-8'))
-        if 'name' in params:
-            name = params.get('name')
-        else:
-            name = "location default"
-        latitude = params.get('latitude')
-        longitude = params.get('longitude')
-    except ValueError:
+        id = EntityLocation.add_from_json(params)
+    except Exception as e:
+        logger.info(e)
         resp.status = falcon.HTTP_405
         return
-
-    locations_with_same_name = EntityLocation.get().filter_by(name=name).all()
-    if len(locations_with_same_name) != 0:
-        resp.status = falcon.HTTP_412
-        return
-
-    if not name or not latitude or not longitude:
-        resp.status = falcon.HTTP_405
-        return
-
-    id = EntityLocation(name, latitude, longitude).add()
 
     if id:
         objects = EntityLocation.get().filter_by(vdvid=id).all()
@@ -1663,14 +1654,13 @@ def getLocationById(**request_handler_args):
 
     id = getIntPathParam('locId', **request_handler_args)
 
-    if id is not None:
-        objects = EntityLocation.get().filter_by(vdvid=id).all()
-
-        resp.body = obj_to_json(objects[0].to_dict())
-        resp.status = falcon.HTTP_200
+    objects = EntityLocation.get().filter_by(vdvid=id).all()
+    if len(objects) == 0:
+        resp.status = falcon.HTTP_404
         return
 
-    resp.status = falcon.HTTP_500
+    resp.body = obj_to_json(objects[0].to_dict())
+    resp.status = falcon.HTTP_200
 
 
 def deleteLocation(**request_handler_args):
