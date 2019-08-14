@@ -55,9 +55,7 @@ class GetSimpleuserTests(BaseSimpleuserTestCase):
         }
 
     def tearDown(self):
-        with DBConnection() as session:
-            session.db.query(EntitySimpleuser).delete()
-            session.db.commit()
+        self._delete_created_simpleusers()
 
     # Tests
 

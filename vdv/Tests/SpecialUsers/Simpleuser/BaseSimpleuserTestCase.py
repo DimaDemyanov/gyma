@@ -18,3 +18,8 @@ class BaseSimpleuserTestCase(BaseTestCase):
             return None
 
         return isAgreeRulesList[0][0]
+
+    def _delete_created_simpleusers(self):
+        with DBConnection() as session:
+            session.db.query(EntitySimpleuser).delete()
+            session.db.commit()
