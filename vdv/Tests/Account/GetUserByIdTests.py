@@ -3,7 +3,9 @@ import unittest
 import falcon
 
 from gyma.vdv.Tests.Base.BaseTestCase import BaseTestCase
-from gyma.vdv.Tests.Base.test_helpers import TEST_ACCOUNT
+from gyma.vdv.Tests.Base.test_helpers import (
+    TEST_ACCOUNT, create_request_uri_path_with_param
+)
 
 
 class GetMyUserTests(BaseTestCase):
@@ -30,7 +32,7 @@ class GetMyUserTests(BaseTestCase):
 
     def test_get_user_given_valid_user_id_param(self):
         # Given
-        request_uri_path_with_param = self.create_request_uri_path_with_param(
+        request_uri_path_with_param = create_request_uri_path_with_param(
             self.base_request_uri_path,
             self.valid_request_params['params']['userId']
         )
@@ -46,7 +48,7 @@ class GetMyUserTests(BaseTestCase):
 
     def test_get_user_given_non_existing_user_id_param(self):
         # Given
-        request_uri_path_with_param = self.create_request_uri_path_with_param(
+        request_uri_path_with_param = create_request_uri_path_with_param(
             self.base_request_uri_path,
             self.non_existing_user_id_request_params['params']['userId']
         )

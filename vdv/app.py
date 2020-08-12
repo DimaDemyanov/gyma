@@ -1054,7 +1054,7 @@ def createLandlord(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
         resp.status = falcon.HTTP_405
         return
 
@@ -1235,7 +1235,7 @@ def updateUser(**request_handler_args):
             resp.body = obj_to_json(objects[0].to_dict())
             resp.status = falcon.HTTP_200
             return
-    except ValueError:
+    except (ValueError, TypeError):
         resp.status = falcon.HTTP_405
         return
 

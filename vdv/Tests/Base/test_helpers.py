@@ -45,6 +45,20 @@ def get_uri_path_by_opearation_id(operation_id, swagger_spec_path=SWAGGER_SPEC_P
                 return '{base_url}{path}'.format(base_url=baseURL, path=path)
 
 
+def create_request_uri_path_with_param(base_path, param):
+    return "{base_path}{param}".format(base_path=base_path, param=param)
+
+
+def convert_json_response_str_values_to_bool(response):
+    for key, value in response.items():
+        if value == 'True':
+            response[key] = True
+        if value == 'False':
+            response[key] = False
+
+    return response
+
+
 # MARK: - Not in use:
 
 # def get_uri_parameters_in_path(path, swagger_spec_path=SWAGGER_SPEC_PATH):
